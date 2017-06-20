@@ -3,16 +3,19 @@
 ### Open Sandbox Game
 <br>
 
+
 ## Download Executable (.Jar):
 
 https://drive.google.com/open?id=0B4XH4Bj8pv4sc0x3UUg3Q1phZEU
 <br>
+
 
 ## Dependencies
 
 - This project requires Oracle JDK 8.
 - easyogg, gson, timer, jorbis, jogg, are all included in the project (lib folder).
 <br>
+
 
 ## Software used for development:
 
@@ -23,6 +26,7 @@ https://drive.google.com/open?id=0B4XH4Bj8pv4sc0x3UUg3Q1phZEU
 - Aseprite: https://github.com/aseprite/aseprite
 - Gimp: https://www.gimp.org
 <br>
+
 
 ## Credits
 
@@ -37,10 +41,12 @@ https://drive.google.com/open?id=0B4XH4Bj8pv4sc0x3UUg3Q1phZEU
 - Stefano Peris <lordstephen77@gmail.com>
 <br>
 
+
 ### Special Thanks
 
 - Claudio De Sio Cesari: www.claudiodesio.com
 <br>
+
 
 ## License
 
