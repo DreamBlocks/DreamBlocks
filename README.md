@@ -10,10 +10,10 @@ https://drive.google.com/open?id=0B4XH4Bj8pv4sc0x3UUg3Q1phZEU
 <br>
 
 
-## Dependencies
+## Requirements:
 
 - This project requires Oracle JDK 8.
-- easyogg, gson, timer, jorbis, jogg, are all included in the project (lib folder).
+- Open the project with Eclipse, IntelliJ, NetBeans, using the Gradle import.
 <br>
 
 
