@@ -1,0 +1,14 @@
+[
+{type:"Pick",  power:"Wood",   item_id:89, name:"wPick",spriteRef:"sprites/tools/wPic.png",   recipe:[[112,112,112],[0,107,0],[0,107,0]],yield:1},
+{type:"Pick",  power:"Stone",  item_id:63, name:"sPick",spriteRef:"sprites/tools/sPic.png",   recipe:[[98,98,98],[0,107,0],[0,107,0]],   yield:1},
+{type:"Pick",  power:"Metal",  item_id:239,name:"mPick",spriteRef:"sprites/tools/mPic.png",   recipe:[[105,105,105],[0,107,0],[0,107,0]],yield:1},
+{type:"Pick",  power:"Diamond",item_id:175,name:"dPick",spriteRef:"sprites/tools/dPic.png",   recipe:[[109,109,109],[0,107,0],[0,107,0]],yield:1},
+{type:"Axe",   power:"Wood",   item_id:95, name:"wAxe", spriteRef:"sprites/tools/wAxe.png",   recipe:[[112,112,0],[112,107,0],[0,107,0]],yield:1},
+{type:"Axe",   power:"Stone",  item_id:91, name:"sAxe", spriteRef:"sprites/tools/sAxe.png",   recipe:[[98,98,0],[98,107,0],[0,107,0]],   yield:1},
+{type:"Axe",   power:"Metal",  item_id:87, name:"mAxe", spriteRef:"sprites/tools/mAxe.png",   recipe:[[105,105,0],[105,107,0],[0,107,0]],yield:1},
+{type:"Axe",   power:"Diamond",item_id:140,name:"dAxe", spriteRef:"sprites/tools/dAxe.png",   recipe:[[109,109,0],[109,107,0],[0,107,0]],yield:1},
+{type:"Shovel",power:"Wood",   item_id:90, name:"wShov",spriteRef:"sprites/tools/wShovel.png",recipe:[[0,112,0],[0,107,0],[0,107,0]],    yield:1},
+{type:"Shovel",power:"Stone",  item_id:190,name:"sShov",spriteRef:"sprites/tools/sShovel.png",recipe:[[0,98,0],[0,107,0],[0,107,0]],     yield:1},
+{type:"Shovel",power:"Metal",  item_id:86, name:"mShov",spriteRef:"sprites/tools/mShovel.png",recipe:[[0,105,0],[0,107,0],[0,107,0]],    yield:1},
+{type:"Shovel",power:"Diamond",item_id:88, name:"dShov",spriteRef:"sprites/tools/dShovel.png",recipe:[[0,109,0],[0,107,0],[0,107,0]],    yield:1}
+]
