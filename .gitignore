@@ -1,6 +1,15 @@
 # Compiled class file
 *.class
 
+#IntellijIDEA specific files
+workspace.xml
+tasks.xml
+*.iml
+.idea/libraries/*.xml
+
+#output directory
+build/*
+
 # Log file
 *.log
 
