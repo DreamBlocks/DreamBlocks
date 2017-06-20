@@ -17,14 +17,14 @@ Copyright (C) 2017 Stefano Peris
 
 nickname: LordStephen77
 eMail: lordstephen77@gmail.com
-Github: https://github.com/LordStephen77/SkyBlocks-Beyond-of-Time
+Github: https://github.com/DreamBlocks
 
-"DreamBlocks - Beyond of Time" is free software: you can redistribute it and/or modify it
+is free software: you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the
 Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-"DreamBlocks - Beyond of Time" is distributed in the hope that it will be useful, but
+is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU General Public License for more details.
