@@ -118,6 +118,7 @@ public class MainGame {
 			for (Entity entity : entities) {
 				if (entity instanceof Player) {
 					player = (Player) entity;
+                    hotbar.setInventory(player.inventory);
 					player.widthPX = 7 * (tileSize / 8);
 					player.heightPX = 14 * (tileSize / 8);
 				}
