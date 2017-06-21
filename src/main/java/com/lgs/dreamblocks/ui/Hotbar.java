@@ -9,8 +9,7 @@ import com.lgs.dreamblocks.InventoryItem;
  * Created by Александр on 21.06.2017.
  */
 public class Hotbar {
-    public int hotbarIdx = 0;
-
+    private int hotbarIdx;
     private InventoryItem[] hotbarRow;
     private int tileSize;
     private int margin;
@@ -26,6 +25,7 @@ public class Hotbar {
         this.hotbarRow = inventory.getHotbarRow();
         this.width = hotbarRow.length * (tileSize + margin) + margin;
         this.height = tileSize + margin * 2;
+        this.hotbarIdx = 0;
     }
 
     public void moveSelectionRight(int value){
