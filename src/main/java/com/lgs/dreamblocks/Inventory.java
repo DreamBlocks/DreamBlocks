@@ -40,8 +40,8 @@ public class Inventory implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	public InventoryItem[][] inventoryItems;
+    private InventoryItem[] hotbarRow;
 	public int tableSizeAvailable = 2;
-	public int hotbarIdx = 0;
 	
 	private int maxCount = 64;
 	private int playerRow;
@@ -57,13 +57,14 @@ public class Inventory implements java.io.Serializable {
 	
 	public Inventory(int width, int height, int craftingHeight) {
 		inventoryItems = new InventoryItem[width][height + craftingHeight];
+        hotbarRow = new InventoryItem[width];
+        playerRow = height + craftingHeight - 1;
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j < height + craftingHeight; j++) {
 				inventoryItems[i][j] = new InventoryItem(null);
 			}
+			hotbarRow[i] = inventoryItems[i][playerRow];
 		}
-		hotbarIdx = 0;
-		playerRow = height + craftingHeight - 1;
 		this.craftingHeight = craftingHeight;
 	}
 	
@@ -85,15 +86,7 @@ public class Inventory implements java.io.Serializable {
 			}
 		}
 	}
-	
-	public void decreaseSelected(int count) {
-		inventoryItems[hotbarIdx][playerRow].remove(count);
-	}
-	
-	public InventoryItem selectedItem() {
-		return inventoryItems[hotbarIdx][playerRow];
-	}
-	
+
 	// returns true if the mouse hit in the inventory
 	public boolean updateInventory(int screenWidth, int screenHeight,
 			Int2 mousePos, boolean leftClick, boolean rightClick) {
@@ -272,51 +265,23 @@ public class Inventory implements java.io.Serializable {
 		}
 		return clickPos;
 	}
-	
+
+	public InventoryItem[] getHotbarRow(){
+	    return hotbarRow;
+    }
+
 	public void draw(GraphicsHandler g, int screenWidth, int screenHeight) {
-		int tileSize = 16;
-		int seperation = 10;
-		
-		int panelWidth = inventoryItems.length * (tileSize + seperation) + seperation;
-		int panelHeight = tileSize + seperation * 2;
-		int x = screenWidth / 2 - panelWidth / 2;
-		int y = screenHeight - panelHeight - seperation;
-		
-		g.setColor(Color.gray);
-		g.fillRect(x, y, panelWidth, panelHeight);
-		
-		for (int j = 0; j < inventoryItems.length; j++) {
-			InventoryItem current = inventoryItems[j][playerRow];
-			if (hotbarIdx == j) {
-				g.setColor(Color.blue);
-				g.fillRect(x + seperation - 2, y + seperation - 2, tileSize + 4, tileSize + 4);
-			}
-			g.setColor(Color.LIGHT_GRAY);
-			g.fillRect(x + seperation, y + seperation, tileSize, tileSize);
-			// if(hotbarIdx == j)
-			// {
-			//
-			// if(current.item == null)
-			// }
-			// else
-			// {
-			// g.setColor(Color.LIGHT_GRAY);
-			// g.fillRect(x+seperation-2, y+seperation-2, tileSize+4, tileSize+4);
-			// }
-			
-			current.draw(g, x + seperation, y + seperation, tileSize);
-			x += tileSize + seperation;
-		}
 		if (!isVisible()) {
 			return;
 		}
+
+        int tileSize = 16;
+		int seperation = 15;
 		
-		seperation = 15;
-		
-		panelWidth = inventoryItems.length * (tileSize + seperation) + seperation;
-		panelHeight = inventoryItems[0].length * (tileSize + seperation) + seperation;
-		x = screenWidth / 2 - panelWidth / 2;
-		y = screenHeight / 2 - panelHeight / 2;
+		int panelWidth = inventoryItems.length * (tileSize + seperation) + seperation;
+		int panelHeight = inventoryItems[0].length * (tileSize + seperation) + seperation;
+		int x = screenWidth / 2 - panelWidth / 2;
+		int y = screenHeight / 2 - panelHeight / 2;
 		
 		g.setColor(Color.gray);
 		g.fillRect(x, y, panelWidth, panelHeight);

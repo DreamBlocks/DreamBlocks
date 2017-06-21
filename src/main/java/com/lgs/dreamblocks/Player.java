@@ -57,10 +57,6 @@ public class Player extends LivingEntity {
 		sprite = SpriteStore.get().getSprite("sprites/entities/player.gif");
 	}
 
-	public void setHotbarItem(int hotbarIdx) {
-		inventory.hotbarIdx = hotbarIdx;
-	}
-	
 	public void updateHand(GraphicsHandler g, float cameraX, float cameraY, float mouseX,
 			float mouseY, World world, int tileSize) {
 		

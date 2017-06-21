@@ -67,12 +67,7 @@ public class AwtEventsHandler {
 		@Override
 		public void mouseWheelMoved(MouseWheelEvent e) {
 			int notches = e.getWheelRotation();
-			game.player.inventory.hotbarIdx += notches;
-			if (game.player.inventory.hotbarIdx < 0) {
-				game.player.inventory.hotbarIdx = 0;
-			} else if (game.player.inventory.hotbarIdx > 9) {
-				game.player.inventory.hotbarIdx = 9;
-			}
+			game.hotbar.moveSelectionRight(notches);
 		}
 	}
 	
@@ -189,10 +184,10 @@ public class AwtEventsHandler {
 			case '7':
 			case '8':
 			case '9':
-				game.player.setHotbarItem(e.getKeyChar() - '1');
+			    game.hotbar.setHotbarIdx(e.getKeyChar() - '1');
 				break;
 			case '0':
-				game.player.setHotbarItem(9);
+			    game.hotbar.setHotbarIdx(9);
 				break;
 			case 'e': // inventory + crafting system
 				game.player.inventory.setVisible(!game.player.inventory.isVisible());

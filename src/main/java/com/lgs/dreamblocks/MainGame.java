@@ -41,6 +41,7 @@ import java.util.Optional;
 import java.util.Random;
 
 import com.lgs.dreamblocks.Constants.TileID;
+import com.lgs.dreamblocks.ui.Hotbar;
 import com.lgs.dreamblocks.ui.NewGameMenu;
 import com.lgs.dreamblocks.ui.StartMenu;
 import com.lgs.dreamblocks.ui.WORLD_WIDTH;
@@ -71,6 +72,7 @@ public class MainGame {
 	private boolean newGame = false;
 	private StartMenu startMenu;
 	private NewGameMenu newGameMenu;
+	public Hotbar hotbar;
 	public long ticksRunning;
 	private Random random = new Random();
 	
@@ -86,6 +88,9 @@ public class MainGame {
 	public MainGame() {
 		startMenu = new StartMenu(this);
 		newGameMenu = new NewGameMenu(this);
+		int tileSize = 16;
+		int margin = 10;
+		hotbar = new Hotbar(tileSize, margin);
 		GraphicsHandler.get().init(this);
 		System.gc();
 	}
@@ -97,40 +102,12 @@ public class MainGame {
 	public void startGame(boolean load, int width) {
 		inMenu = false;
 		if (load) {
-			System.out.println("Loading world, width: " + worldWidth);
+			startGameLoad();
 		} else {
-			System.out.println("Creating world, width: " + width);
-			worldWidth = width;
+			startGameNew(width);
 		}
-		
-		entities.clear();
-		if (load) {
-			// check to see loading is possible (and if so load)
-			load = SaveLoad.doLoad(this);
-		}
-		
-		if (load) {
-			for (Entity entity : entities) {
-				if (entity instanceof Player) {
-					player = (Player) entity;
-					player.widthPX = 7 * (tileSize / 8);
-					player.heightPX = 14 * (tileSize / 8);
-				}
-			}
-		}
-		if (!load) {
-			// make a new world and player
-			world = new World(worldWidth, worldHeight, random);
-			player = new Player(true, world.spawnLocation.x, world.spawnLocation.y,
-					7 * (tileSize / 8), 14 * (tileSize / 8));
-			entities.add(player);
-			if (Constants.DEBUG) {
-				player.giveItem(Constants.itemTypes.get((char) 175).clone(), 1);
-				player.giveItem(Constants.itemTypes.get((char) 88).clone(), 1);
-				player.giveItem(Constants.itemTypes.get((char) 106).clone(), 64);
-			}
-		}
-		
+
+
 		// load sprites
 		final SpriteStore ss = SpriteStore.get();
 		builderIcon = ss.getSprite("sprites/other/builder.png");
@@ -141,14 +118,46 @@ public class MainGame {
 		bubble = ss.getSprite("sprites/other/bubble.png");
 		// there's no empty bubble image, so we'll just use this for now
 		emptyBubble = ss.getSprite("sprites/other/bubble_pop2.png");
-		
+
 		breakingSprites = new Sprite[8];
 		for (int i = 0; i < 8; i++) {
 			breakingSprites[i] = ss.getSprite("sprites/tiles/break" + i + ".png");
 		}
-		
+
 		musicPlayer.play();
 		System.gc();
+	}
+
+	public void startGameLoad(){
+		System.out.println("Loading world, width: " + worldWidth);
+		entities.clear();
+		if(SaveLoad.doLoad(this)) {
+			for (Entity entity : entities) {
+				if (entity instanceof Player) {
+					player = (Player) entity;
+					hotbar.setInventory(player.inventory);
+					player.widthPX = 7 * (tileSize / 8);
+					player.heightPX = 14 * (tileSize / 8);
+				}
+			}
+		}
+	}
+
+	public void startGameNew(int width){
+		System.out.println("Creating world, width: " + width);
+		worldWidth = width;
+		entities.clear();
+		// make a new world and player
+		world = new World(worldWidth, worldHeight, random);
+		player = new Player(true, world.spawnLocation.x, world.spawnLocation.y,
+				7 * (tileSize / 8), 14 * (tileSize / 8));
+		hotbar.setInventory(player.inventory);
+		entities.add(player);
+		if (Constants.DEBUG) {
+			player.giveItem(Constants.itemTypes.get((char) 175).clone(), 1);
+			player.giveItem(Constants.itemTypes.get((char) 88).clone(), 1);
+			player.giveItem(Constants.itemTypes.get((char) 106).clone(), 64);
+		}
 	}
 	
 	public void drawCenteredX(GraphicsHandler g, Sprite s, int top, int width, int height) {
@@ -240,7 +249,7 @@ public class MainGame {
 				}
 				breakingPos = player.handBreakPos;
 				
-				InventoryItem inventoryItem = player.inventory.selectedItem();
+				InventoryItem inventoryItem = hotbar.getSelected();
 				Item item = inventoryItem.getItem();
 				int ticksNeeded = world.breakTicks(breakingPos.x, breakingPos.y, item);
 				
@@ -294,7 +303,7 @@ public class MainGame {
 				} else {
 					// placing a block
 					rightClick = false;
-					InventoryItem current = player.inventory.selectedItem();
+					InventoryItem current = hotbar.getSelected();
 					if (!current.isEmpty()) {
 						TileID itemID = Constants.tileIDs.get(current.getItem().item_id);
 						boolean isPassable = Constants.tileTypes.get(itemID).type.passable;
@@ -302,7 +311,7 @@ public class MainGame {
 						if (isPassable || !player.inBoundingBox(player.handBuildPos, tileSize)) {
 							if (world.addTile(player.handBuildPos, itemID)) {
 								// placed successfully
-								player.inventory.decreaseSelected(1);
+								hotbar.decreaseSelected(1);
 							}
 						}
 					}
@@ -344,8 +353,9 @@ public class MainGame {
 				minerIcon.draw(g, pos.x, pos.y, tileSize, tileSize);
 			}
 			
-			// draw the hotbar, and optionally the inventory screen
+			//optionally draw the inventory screen
 			player.inventory.draw(g, screenWidth, screenHeight);
+			hotbar.draw(g, screenWidth, screenHeight);
 			
 			// draw the mouse
 			Int2 mouseTest = StockMethods.computeDrawLocationInPlace(cameraX, cameraY, tileSize,
@@ -441,8 +451,7 @@ public class MainGame {
 	}
 	
 	public void tossItem() {
-		// TODO: move this into Player
-		InventoryItem inventoryItem = player.inventory.selectedItem();
+		InventoryItem inventoryItem = hotbar.getSelected();
 		if (!inventoryItem.isEmpty()) {
 			Item newItem = inventoryItem.getItem();
 			if (!(newItem instanceof Tool)) {
