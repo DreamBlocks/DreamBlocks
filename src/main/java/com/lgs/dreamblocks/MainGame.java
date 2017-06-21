@@ -41,6 +41,7 @@ import java.util.Optional;
 import java.util.Random;
 
 import com.lgs.dreamblocks.Constants.TileID;
+import com.lgs.dreamblocks.ui.Hotbar;
 import com.lgs.dreamblocks.ui.NewGameMenu;
 import com.lgs.dreamblocks.ui.StartMenu;
 import com.lgs.dreamblocks.ui.WORLD_WIDTH;
@@ -71,6 +72,7 @@ public class MainGame {
 	private boolean newGame = false;
 	private StartMenu startMenu;
 	private NewGameMenu newGameMenu;
+	public Hotbar hotbar;
 	public long ticksRunning;
 	private Random random = new Random();
 	
@@ -86,6 +88,9 @@ public class MainGame {
 	public MainGame() {
 		startMenu = new StartMenu(this);
 		newGameMenu = new NewGameMenu(this);
+		int tileSize = 16;
+		int margin = 10;
+		hotbar = new Hotbar(tileSize, margin);
 		GraphicsHandler.get().init(this);
 		System.gc();
 	}
@@ -123,6 +128,7 @@ public class MainGame {
 			world = new World(worldWidth, worldHeight, random);
 			player = new Player(true, world.spawnLocation.x, world.spawnLocation.y,
 					7 * (tileSize / 8), 14 * (tileSize / 8));
+			hotbar.setInventory(player.inventory);
 			entities.add(player);
 			if (Constants.DEBUG) {
 				player.giveItem(Constants.itemTypes.get((char) 175).clone(), 1);
@@ -240,7 +246,7 @@ public class MainGame {
 				}
 				breakingPos = player.handBreakPos;
 				
-				InventoryItem inventoryItem = player.inventory.selectedItem();
+				InventoryItem inventoryItem = hotbar.getSelected();
 				Item item = inventoryItem.getItem();
 				int ticksNeeded = world.breakTicks(breakingPos.x, breakingPos.y, item);
 				
@@ -294,7 +300,7 @@ public class MainGame {
 				} else {
 					// placing a block
 					rightClick = false;
-					InventoryItem current = player.inventory.selectedItem();
+					InventoryItem current = hotbar.getSelected();
 					if (!current.isEmpty()) {
 						TileID itemID = Constants.tileIDs.get(current.getItem().item_id);
 						boolean isPassable = Constants.tileTypes.get(itemID).type.passable;
@@ -302,7 +308,7 @@ public class MainGame {
 						if (isPassable || !player.inBoundingBox(player.handBuildPos, tileSize)) {
 							if (world.addTile(player.handBuildPos, itemID)) {
 								// placed successfully
-								player.inventory.decreaseSelected(1);
+								hotbar.decreaseSelected(1);
 							}
 						}
 					}
@@ -344,8 +350,9 @@ public class MainGame {
 				minerIcon.draw(g, pos.x, pos.y, tileSize, tileSize);
 			}
 			
-			// draw the hotbar, and optionally the inventory screen
+			//optionally draw the inventory screen
 			player.inventory.draw(g, screenWidth, screenHeight);
+			hotbar.draw(g, screenWidth, screenHeight);
 			
 			// draw the mouse
 			Int2 mouseTest = StockMethods.computeDrawLocationInPlace(cameraX, cameraY, tileSize,
@@ -441,8 +448,7 @@ public class MainGame {
 	}
 	
 	public void tossItem() {
-		// TODO: move this into Player
-		InventoryItem inventoryItem = player.inventory.selectedItem();
+		InventoryItem inventoryItem = hotbar.getSelected();
 		if (!inventoryItem.isEmpty()) {
 			Item newItem = inventoryItem.getItem();
 			if (!(newItem instanceof Tool)) {
