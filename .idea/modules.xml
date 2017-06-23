@@ -3,7 +3,10 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/DreamBlocks.iml" filepath="$PROJECT_DIR$/.idea/modules/DreamBlocks.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/DreamBlocks.iml" filepath="$PROJECT_DIR$/.idea/modules/DreamBlocks.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/DreamBlocks_main.iml" filepath="$PROJECT_DIR$/.idea/modules/DreamBlocks_main.iml" group="DreamBlocks" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/DreamBlocks_main.iml" filepath="$PROJECT_DIR$/.idea/modules/DreamBlocks_main.iml" group="DreamBlocks" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/DreamBlocks_test.iml" filepath="$PROJECT_DIR$/.idea/modules/DreamBlocks_test.iml" group="DreamBlocks" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/DreamBlocks_test.iml" filepath="$PROJECT_DIR$/.idea/modules/DreamBlocks_test.iml" group="DreamBlocks" />
     </modules>
   </component>

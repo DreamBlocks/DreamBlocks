@@ -240,80 +240,13 @@ public class MainGame {
 			}
 			
 			if (leftClick && player.handBreakPos.x != -1) {
-				if (player.handBreakPos.equals(breakingPos)) {
-					breakingTicks++;
-				} else {
-					breakingTicks = 0;
-				}
-				breakingPos = player.handBreakPos;
-				
-				InventoryItem inventoryItem = hotbar.getSelected();
-				Item item = inventoryItem.getItem();
-				int ticksNeeded = world.breakTicks(breakingPos.x, breakingPos.y, item);
-				
-				Int2 pos = StockMethods.computeDrawLocationInPlace(cameraX, cameraY, tileSize,
-						tileSize, tileSize, breakingPos.x, breakingPos.y);
-				int sprite_index = (int) (Math.min(1, (double) breakingTicks / ticksNeeded) * (breakingSprites.length - 1));
-				breakingSprites[sprite_index].draw(g, pos.x, pos.y, tileSize, tileSize);
-				
-				if (breakingTicks >= ticksNeeded) {
-					if (item != null && item.getClass() == Tool.class) {
-						Tool tool = (Tool) item;
-						tool.uses++;
-						if (tool.uses >= tool.totalUses) {
-							inventoryItem.setEmpty();
-						}
-					}
-					
-					breakingTicks = 0;
-					TileID name = world.removeTile(player.handBreakPos.x, player.handBreakPos.y);
-					if (name == TileID.GRASS) {
-						name = TileID.DIRT;
-					}
-					if (name == TileID.STONE) {
-						name = TileID.COBBLE;
-					}
-					if (name == TileID.LEAVES && random.nextDouble() < .1) {
-						name = TileID.SAPLING;
-					}
-					Item newItem = Constants.itemTypes.get((char) name.breaksInto);
-					if (newItem != null) // couldn't find that item
-					{
-						newItem = (Item) newItem.clone();
-						newItem.x = player.handBreakPos.x + random.nextFloat()
-								* (1 - (float) newItem.widthPX / tileSize);
-						newItem.y = player.handBreakPos.y + random.nextFloat()
-								* (1 - (float) newItem.widthPX / tileSize);
-						newItem.dy = -.07f;
-						entities.add(newItem);
-					}
-				}
+				methodLeftClick(cameraX, cameraY, g);
 			} else {
 				breakingTicks = 0;
 			}
 			
 			if (rightClick) {
-				if (world.isCraft(player.handBreakPos.x, player.handBreakPos.y)) {
-					// clicked on a crafting table
-					// expand this to any item with a GUI
-					player.inventory.tableSizeAvailable = 3;
-					player.inventory.setVisible(true);
-				} else {
-					// placing a block
-					rightClick = false;
-					InventoryItem current = hotbar.getSelected();
-					if (!current.isEmpty()) {
-						TileID itemID = Constants.tileIDs.get(current.getItem().item_id);
-						boolean isPassable = Constants.tileTypes.get(itemID).type.passable;
-						
-						if (isPassable || !player.inBoundingBox(player.handBuildPos, tileSize)) {
-							if (world.addTile(player.handBuildPos, itemID)) {
-								// placed successfully
-								hotbar.decreaseSelected(1);
-							}
-						}
-					}
-				}
+				methodRightClick();
 			}
 			
 			player.updateHand(g, cameraX, cameraY, worldMouseX, worldMouseY, world, tileSize);
@@ -333,22 +266,12 @@ public class MainGame {
 			}
 			
 			if (viewFPS) {
-				String fps = "Fps: " + 1 / ((float) delta / 1000) + "("
-						+ Runtime.getRuntime().freeMemory() / 1024 / 1024 + " / "
-						+ Runtime.getRuntime().totalMemory() / 1024 / 1024 + ") Free MB";
-				g.setColor(Color.white);
-				g.drawString(fps, 10, 10);
+				methodViewFPS(delta, g);
 			}
 			
 			// Draw the UI
 			if (player.handBreakPos.x != -1) {
-				Int2 pos = StockMethods.computeDrawLocationInPlace(cameraX, cameraY, tileSize,
-						tileSize, tileSize, player.handBuildPos.x, player.handBuildPos.y);
-				builderIcon.draw(g, pos.x, pos.y, tileSize, tileSize);
-				
-				pos = StockMethods.computeDrawLocationInPlace(cameraX, cameraY, tileSize, tileSize,
-						tileSize, player.handBreakPos.x, player.handBreakPos.y);
-				minerIcon.draw(g, pos.x, pos.y, tileSize, tileSize);
+				drawUI(cameraX, cameraY, g);
 			}
 			
 			//optionally draw the inventory screen
@@ -362,37 +285,138 @@ public class MainGame {
 			
 			// HACK: draw hearts for health bar
 			// TODO: move this elsewhere, don't use so many magic constants
-			int heartX = (screenWidth - 250) / 2;
-			int heartY = screenHeight - 50;
-			for (int heartIdx = 1; heartIdx <= 10; ++heartIdx) {
-				int hpDiff = player.hitPoints - heartIdx * 10;
-				if (hpDiff >= 0) {
-					fullHeart.draw(g, heartX, heartY, 10, 10);
-				} else if (hpDiff >= -5) {
-					halfHeart.draw(g, heartX, heartY, 10, 10);
-				} else {
-					emptyHeart.draw(g, heartX, heartY, 10, 10);
-				}
-				heartX += 15;
-			}
-			
+			drawHeartsForHealthBar(screenWidth, screenHeight, g);
+
 			if (player.isHeadUnderWater(world, tileSize)) {
 				// another HACK: draw air bubbles
-				int bubbleX = (screenWidth + 50) / 2;
-				int numBubbles = player.airRemaining();
-				for (int bubbleIdx = 1; bubbleIdx <= 10; ++bubbleIdx) {
-					if (bubbleIdx <= numBubbles) {
-						bubble.draw(g, bubbleX, heartY, 10, 10);
-					} else {
-						emptyBubble.draw(g, bubbleX, heartY, 10, 10);
-					}
-					bubbleX += 15;
-				}
+				int heartY = screenHeight - 50;
+				airBubbles(screenWidth, g, heartY);
 			}
 			
 			g.finishDrawing();
 			
 			SystemTimer.sleep(lastLoopTime + 16 - SystemTimer.getTime());
+		}
+	}
+
+	public void methodLeftClick(float cameraX, float cameraY, GraphicsHandler g){
+		if (player.handBreakPos.equals(breakingPos)) {
+			breakingTicks++;
+		} else {
+			breakingTicks = 0;
+		}
+		breakingPos = player.handBreakPos;
+
+		InventoryItem inventoryItem = hotbar.getSelected();
+		Item item = inventoryItem.getItem();
+		int ticksNeeded = world.breakTicks(breakingPos.x, breakingPos.y, item);
+
+		Int2 pos = StockMethods.computeDrawLocationInPlace(cameraX, cameraY, tileSize,
+				tileSize, tileSize, breakingPos.x, breakingPos.y);
+		int sprite_index = (int) (Math.min(1, (double) breakingTicks / ticksNeeded) * (breakingSprites.length - 1));
+		breakingSprites[sprite_index].draw(g, pos.x, pos.y, tileSize, tileSize);
+
+		if (breakingTicks >= ticksNeeded) {
+			if (item != null && item.getClass() == Tool.class) {
+				Tool tool = (Tool) item;
+				tool.uses++;
+				if (tool.uses >= tool.totalUses) {
+					inventoryItem.setEmpty();
+				}
+			}
+			breakingTicks = 0;
+			TileID name = world.removeTile(player.handBreakPos.x, player.handBreakPos.y);
+			if (name == TileID.GRASS) {
+				name = TileID.DIRT;
+			}
+			if (name == TileID.STONE) {
+				name = TileID.COBBLE;
+			}
+			if (name == TileID.LEAVES && random.nextDouble() < .1) {
+				name = TileID.SAPLING;
+			}
+			Item newItem = Constants.itemTypes.get((char) name.breaksInto);
+			if (newItem != null) // couldn't find that item
+			{
+				newItem = (Item) newItem.clone();
+				newItem.x = player.handBreakPos.x + random.nextFloat()
+						* (1 - (float) newItem.widthPX / tileSize);
+				newItem.y = player.handBreakPos.y + random.nextFloat()
+						* (1 - (float) newItem.widthPX / tileSize);
+				newItem.dy = -.07f;
+				entities.add(newItem);
+			}
+		}
+	}
+
+	public void methodRightClick(){
+		if (world.isCraft(player.handBreakPos.x, player.handBreakPos.y)) {
+			// clicked on a crafting table
+			// expand this to any item with a GUI
+			player.inventory.tableSizeAvailable = 3;
+			player.inventory.setVisible(true);
+		} else {
+			// placing a block
+			rightClick = false;
+			InventoryItem current = hotbar.getSelected();
+			if (!current.isEmpty()) {
+				TileID itemID = Constants.tileIDs.get(current.getItem().item_id);
+				boolean isPassable = Constants.tileTypes.get(itemID).type.passable;
+
+				if (isPassable || !player.inBoundingBox(player.handBuildPos, tileSize)) {
+					if (world.addTile(player.handBuildPos, itemID)) {
+						// placed successfully
+						hotbar.decreaseSelected(1);
+					}
+				}
+			}
+		}
+	}
+
+	public void methodViewFPS(long delta, GraphicsHandler g){
+		String fps = "Fps: " + 1 / ((float) delta / 1000) + "("
+				+ Runtime.getRuntime().freeMemory() / 1024 / 1024 + " / "
+				+ Runtime.getRuntime().totalMemory() / 1024 / 1024 + ") Free MB";
+		g.setColor(Color.white);
+		g.drawString(fps, 10, 10);
+	}
+
+	public void drawUI(float cameraX, float cameraY, GraphicsHandler g){
+		Int2 pos = StockMethods.computeDrawLocationInPlace(cameraX, cameraY, tileSize,
+				tileSize, tileSize, player.handBuildPos.x, player.handBuildPos.y);
+		builderIcon.draw(g, pos.x, pos.y, tileSize, tileSize);
+
+		pos = StockMethods.computeDrawLocationInPlace(cameraX, cameraY, tileSize, tileSize,
+				tileSize, player.handBreakPos.x, player.handBreakPos.y);
+		minerIcon.draw(g, pos.x, pos.y, tileSize, tileSize);
+	}
+
+	public void drawHeartsForHealthBar(final int screenWidth, final int screenHeight, GraphicsHandler g){
+		int heartX = (screenWidth - 250) / 2;
+		int heartY = screenHeight - 50;
+		for (int heartIdx = 1; heartIdx <= 10; ++heartIdx) {
+			int hpDiff = player.hitPoints - heartIdx * 10;
+			if (hpDiff >= 0) {
+				fullHeart.draw(g, heartX, heartY, 10, 10);
+			} else if (hpDiff >= -5) {
+				halfHeart.draw(g, heartX, heartY, 10, 10);
+			} else {
+				emptyHeart.draw(g, heartX, heartY, 10, 10);
+			}
+			heartX += 15;
+		}
+	}
+
+	public void airBubbles(final int screenWidth, GraphicsHandler g, int heartY){
+		int bubbleX = (screenWidth + 50) / 2;
+		int numBubbles = player.airRemaining();
+		for (int bubbleIdx = 1; bubbleIdx <= 10; ++bubbleIdx) {
+			if (bubbleIdx <= numBubbles) {
+				bubble.draw(g, bubbleX, heartY, 10, 10);
+			} else {
+				emptyBubble.draw(g, bubbleX, heartY, 10, 10);
+			}
+			bubbleX += 15;
 		}
 	}
 	
@@ -409,6 +433,7 @@ public class MainGame {
 				sprite.draw(g, i * tileSize, j * tileSize, tileSize, tileSize);
 			}
 		}
+
 	}
 	
 	public void zoom(int level) {
