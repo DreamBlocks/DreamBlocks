@@ -45,12 +45,11 @@ public class Inventory implements java.io.Serializable {
 	
 	private int maxCount = 64;
 	private int playerRow;
-	private boolean visible = false;
 	private InventoryItem holding = new InventoryItem(null);
 	private int holdingX;
 	private int holdingY;
-	private Int2 clickPos = new Int2(0, 0);;
-	private int craftingHeight;
+	private Int2 clickPos = new Int2(0, 0);
+	public int craftingHeight;
 	private char[][] tableTwo = new char[2][2];
 	private char[][] tableThree = new char[3][3];
 	private InventoryItem craftable = new InventoryItem(null);
@@ -90,9 +89,6 @@ public class Inventory implements java.io.Serializable {
 	// returns true if the mouse hit in the inventory
 	public boolean updateInventory(int screenWidth, int screenHeight,
 			Int2 mousePos, boolean leftClick, boolean rightClick) {
-		if (!visible) {
-			return false;
-		}
 		
 		int tileSize = 16;
 		int seperation = 15;
@@ -271,9 +267,6 @@ public class Inventory implements java.io.Serializable {
     }
 
 	public void draw(GraphicsHandler g, int screenWidth, int screenHeight) {
-		if (!isVisible()) {
-			return;
-		}
 
         int tileSize = 16;
 		int seperation = 15;
@@ -319,16 +312,5 @@ public class Inventory implements java.io.Serializable {
 		
 		craftable.draw(g, x, y, tileSize);
 		holding.draw(g, holdingX - tileSize / 2, holdingY - tileSize / 2, tileSize);
-	}
-	
-	public void setVisible(boolean visible) {
-		if (visible == false) {
-			tableSizeAvailable = 2;
-		}
-		this.visible = visible;
-	}
-	
-	public boolean isVisible() {
-		return visible;
 	}
 }
