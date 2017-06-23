@@ -163,8 +163,8 @@ public class AwtEventsHandler {
 				break;
 			// pressed ESC to return to the game menu
 			case KeyEvent.VK_ESCAPE:
-				if (game.player.inventory.isVisible()) {
-					game.player.inventory.setVisible(false);
+				if (game.isInInventory()) {
+					game.closeInventory();
 				} else {
 					game.goToMainMenu();
 				}
@@ -190,7 +190,11 @@ public class AwtEventsHandler {
 			    game.hotbar.setHotbarIdx(9);
 				break;
 			case 'e': // inventory + crafting system
-				game.player.inventory.setVisible(!game.player.inventory.isVisible());
+				if(game.isInInventory()){
+					game.closeInventory();
+				} else {
+					game.openInventory();
+				}
 				break;
 			case '+': // press + increase zoom
 				game.zoom(1);

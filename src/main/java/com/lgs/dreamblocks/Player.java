@@ -59,57 +59,7 @@ public class Player extends LivingEntity {
 
 	public void updateHand(GraphicsHandler g, float cameraX, float cameraY, float mouseX,
 			float mouseY, World world, int tileSize) {
-		
-		// float startX = this.getCenterX(tileSize);
-		// float startY = this.getCenterY(tileSize);
-		//
-		// float stepX = startX;
-		// float stepY = startY;
-		//
-		// float prevX = -1;
-		// float prevY = -1;
-		//
-		// float m;
-		// if(startX - mouseX == 0)
-		// m = Float.MAX_VALUE;
-		// else
-		// m = (startY - mouseY)/(startX - mouseX);
-		//
-		// float pixel = 1f/tileSize;
-		//
-		// float nudgeX = pixel*m;//(pixel - startY)/m + startX;
-		// float nudgeY = pixel*(1/m);//m*(startX-pixel) + startY;
-		//
-		// int steps = 0;
-		// while(!world.isBreakable((int)stepX, (int)stepY))
-		// {
-		// prevX = stepX;
-		// prevY = stepY;
-		//
-		// stepX += nudgeX;//startX + steps*pixel;
-		// stepY += nudgeY; //-m*(startX - stepX) + startY;
-		// steps++;
-		// if(steps > armLength*tileSize)
-		// {
-		// handBreakPos.x = -1;
-		// handBreakPos.y = -1;
-		//
-		// handBuildPos.x = -1;
-		// handBuildPos.y = -1;
-		// return;
-		// }
-		// }
-		//
-		//
-		// handBreakPos.x = (int)stepX;
-		// handBreakPos.y = (int)stepY;
-		//
-		// handBuildPos.x = (int)prevX;
-		// handBuildPos.y = (int)prevY;
-		//
-		// handEndX = prevX+1;
-		// handEndY = prevY;
-		
+
 		float x = .5f + (int) this.getCenterX(tileSize);
 		float y = .5f + (int) this.getCenterY(tileSize);
 		

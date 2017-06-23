@@ -38,6 +38,8 @@ package com.lgs.dreamblocks;
 
 public class Inventory implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
+    private int tileSize = 16;
+    private int seperation = 15;
 	
 	public InventoryItem[][] inventoryItems;
     private InventoryItem[] hotbarRow;
@@ -45,12 +47,13 @@ public class Inventory implements java.io.Serializable {
 	
 	private int maxCount = 64;
 	private int playerRow;
-	private boolean visible = false;
 	private InventoryItem holding = new InventoryItem(null);
 	private int holdingX;
 	private int holdingY;
-	private Int2 clickPos = new Int2(0, 0);;
-	private int craftingHeight;
+	private Int2 clickPos = new Int2(0, 0);
+    private int craftingSize = 2;
+    private InventoryItem[][] craftingGrid = new InventoryItem[craftingSize][craftingSize];
+	public int craftingHeight;
 	private char[][] tableTwo = new char[2][2];
 	private char[][] tableThree = new char[3][3];
 	private InventoryItem craftable = new InventoryItem(null);
@@ -65,6 +68,11 @@ public class Inventory implements java.io.Serializable {
 			}
 			hotbarRow[i] = inventoryItems[i][playerRow];
 		}
+        for (int rowIdx = 0; rowIdx < craftingSize; rowIdx++){
+            for (int colIdx = 0; colIdx < craftingSize; colIdx++){
+                craftingGrid[colIdx][rowIdx] = new InventoryItem(null);
+            }
+        }
 		this.craftingHeight = craftingHeight;
 	}
 	
@@ -90,13 +98,6 @@ public class Inventory implements java.io.Serializable {
 	// returns true if the mouse hit in the inventory
 	public boolean updateInventory(int screenWidth, int screenHeight,
 			Int2 mousePos, boolean leftClick, boolean rightClick) {
-		if (!visible) {
-			return false;
-		}
-		
-		int tileSize = 16;
-		int seperation = 15;
-		
 		int panelWidth = inventoryItems.length * (tileSize + seperation) + seperation;
 		int panelHeight = inventoryItems[0].length * (tileSize + seperation) + seperation;
 		int x = screenWidth / 2 - panelWidth / 2;
@@ -270,65 +271,74 @@ public class Inventory implements java.io.Serializable {
 	    return hotbarRow;
     }
 
-	public void draw(GraphicsHandler g, int screenWidth, int screenHeight) {
-		if (!isVisible()) {
-			return;
-		}
+    private void drawPanel(GraphicsHandler g, int x, int y, int panelWidth, int panelHeight){
+        g.setColor(Color.gray);
+        g.fillRect(x, y, panelWidth, panelHeight);
+    }
 
-        int tileSize = 16;
-		int seperation = 15;
-		
-		int panelWidth = inventoryItems.length * (tileSize + seperation) + seperation;
-		int panelHeight = inventoryItems[0].length * (tileSize + seperation) + seperation;
-		int x = screenWidth / 2 - panelWidth / 2;
-		int y = screenHeight / 2 - panelHeight / 2;
-		
-		g.setColor(Color.gray);
-		g.fillRect(x, y, panelWidth, panelHeight);
-		
-		g.setColor(Color.DARK_GRAY);
-		g.fillRect(x + panelWidth - tableSizeAvailable * (tileSize + seperation) - seperation, y,
-				tableSizeAvailable * (tileSize + seperation) + seperation, tableSizeAvailable
-						* (tileSize + seperation) + seperation);
-		
-		for (int i = 0; i < inventoryItems[0].length; i++) {
-			x = screenWidth / 2 - panelWidth / 2;
-			for (int j = 0; j < inventoryItems.length; j++) {
-				if ((i < craftingHeight && j < inventoryItems.length - tableSizeAvailable)
-						|| (craftingHeight != tableSizeAvailable && i == tableSizeAvailable)) {
-					x += tileSize + seperation;
-					continue;
-				}
-				
-				g.setColor(Color.LIGHT_GRAY);
-				g.fillRect(x + seperation - 2, y + seperation - 2, tileSize + 4, tileSize + 4);
-				InventoryItem current = inventoryItems[j][i];
-				current.draw(g, x + seperation, y + seperation, tileSize);
-				x += tileSize + seperation;
-			}
-			y += tileSize + seperation;
-		}
-		
-		x = screenWidth / 2 - panelWidth / 2;
-		y = screenHeight / 2 - panelHeight / 2;
-		g.setColor(Color.orange);
-		x = x + (inventoryItems.length - tableSizeAvailable - 1) * (tileSize + seperation);
-		y = y + seperation * 2 + tileSize;
-		
-		g.fillRect(x - 5, y - 5, tileSize + 10, tileSize + 10);
-		
-		craftable.draw(g, x, y, tileSize);
-		holding.draw(g, holdingX - tileSize / 2, holdingY - tileSize / 2, tileSize);
-	}
-	
-	public void setVisible(boolean visible) {
-		if (visible == false) {
-			tableSizeAvailable = 2;
-		}
-		this.visible = visible;
-	}
-	
-	public boolean isVisible() {
-		return visible;
-	}
+    private void drawCraftingBackground(GraphicsHandler g, int panelWidth, int x, int y){
+        g.setColor(Color.DARK_GRAY);
+        int widgetX = x + panelWidth - tableSizeAvailable * (tileSize + seperation) - seperation;
+        int widgetWidth = tableSizeAvailable * (tileSize + seperation) + seperation;
+        int widgetHeight = tableSizeAvailable * (tileSize + seperation) + seperation;
+        g.fillRect(widgetX, y, widgetWidth, widgetHeight);
+    }
+
+    private void drawInventoryCell(GraphicsHandler g, int x, int y, InventoryItem item){
+        g.setColor(Color.LIGHT_GRAY);
+        g.fillRect(x + seperation - 2, y + seperation - 2, tileSize + 4, tileSize + 4);
+        item.draw(g, x + seperation, y + seperation, tileSize);
+    }
+
+    private void drawCraftingResult(GraphicsHandler g, int x, int y){
+        g.setColor(Color.orange);
+        x = x + (inventoryItems.length - tableSizeAvailable - 1) * (tileSize + seperation);
+        y = y + seperation * 2 + tileSize;
+        g.fillRect(x - 5, y - 5, tileSize + 10, tileSize + 10);
+        craftable.draw(g, x, y, tileSize);
+    }
+
+    private void drawBackpack(GraphicsHandler g, int screenWidth, int screenHeight, int panelWidth, int panelHeight){
+        int x;
+        int y = screenHeight / 2 - panelHeight / 2 + (tileSize + seperation) * 3;
+        for (int rowIdx = 3; rowIdx < inventoryItems[0].length; rowIdx++){
+            x = screenWidth / 2 - panelWidth / 2;
+            for (int colIdx = 0; colIdx < inventoryItems.length; colIdx++){
+                drawInventoryCell(g, x, y, inventoryItems[colIdx][rowIdx]);
+                x += tileSize + seperation;
+            }
+            y += tileSize + seperation;
+        }
+    }
+
+    private void drawCraftingGrid(GraphicsHandler g, int screenWidth, int screenHeight, int panelWidth, int panelHeight){
+        int x;
+        int dxInItems = 8;
+        int y = screenHeight / 2 - panelHeight / 2;
+        for (int rowIdx = 0; rowIdx < craftingSize; rowIdx++){
+            x = screenWidth / 2 - panelWidth / 2 + (tileSize + seperation) * dxInItems;
+            for (int colIdx = dxInItems; colIdx < dxInItems + craftingSize; colIdx++){
+                drawInventoryCell(g, x, y, inventoryItems[colIdx][rowIdx]);
+                x += tileSize + seperation;
+            }
+            y += tileSize + seperation;
+        }
+    }
+
+    public void draw(GraphicsHandler g, int screenWidth, int screenHeight) {
+        int panelWidth, panelHeight, x, y;
+
+        panelWidth = inventoryItems.length * (tileSize + seperation) + seperation;
+        panelHeight = inventoryItems[0].length * (tileSize + seperation) + seperation;
+        x = screenWidth / 2 - panelWidth / 2;
+        y = screenHeight / 2 - panelHeight / 2;
+
+        drawPanel(g, x, y, panelWidth, panelHeight);
+        drawCraftingBackground(g, panelWidth, x, y);
+        drawCraftingGrid(g, screenWidth, screenHeight, panelWidth, panelHeight);
+        drawBackpack(g, screenWidth, screenHeight, panelWidth, panelHeight);
+        drawCraftingResult(g, x, y);
+
+        holding.draw(g, holdingX - tileSize / 2, holdingY - tileSize / 2, tileSize);
+    }
 }

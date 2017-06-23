@@ -41,10 +41,7 @@ import java.util.Optional;
 import java.util.Random;
 
 import com.lgs.dreamblocks.Constants.TileID;
-import com.lgs.dreamblocks.ui.Hotbar;
-import com.lgs.dreamblocks.ui.NewGameMenu;
-import com.lgs.dreamblocks.ui.StartMenu;
-import com.lgs.dreamblocks.ui.WORLD_WIDTH;
+import com.lgs.dreamblocks.ui.*;
 
 public class MainGame {
 	
@@ -70,6 +67,7 @@ public class MainGame {
 	public boolean viewFPS = false;
 	private boolean inMenu = true;
 	private boolean newGame = false;
+    private boolean inInventory = false;
 	private StartMenu startMenu;
 	private NewGameMenu newGameMenu;
 	public Hotbar hotbar;
@@ -89,8 +87,8 @@ public class MainGame {
 		startMenu = new StartMenu(this);
 		newGameMenu = new NewGameMenu(this);
 		int tileSize = 16;
-		int margin = 10;
-		hotbar = new Hotbar(tileSize, margin);
+        int margin = 10;
+        hotbar = new Hotbar(tileSize, margin);
 		GraphicsHandler.get().init(this);
 		System.gc();
 	}
@@ -231,26 +229,28 @@ public class MainGame {
 			
 			world.chunkUpdate();
 			world.draw(g, 0, 0, screenWidth, screenHeight, cameraX, cameraY, tileSize);
-			
-			boolean inventoryFocus = player.inventory.updateInventory(screenWidth, screenHeight,
-					screenMousePos, leftClick, rightClick);
-			if (inventoryFocus) {
-				leftClick = false;
-				rightClick = false;
-			}
-			
+
+            if (isInInventory()) {
+                boolean inventoryFocus = player.inventory.updateInventory(screenWidth, screenHeight,
+                        screenMousePos, leftClick, rightClick);
+                if (inventoryFocus) {
+                    leftClick = false;
+                    rightClick = false;
+                }
+            }
+
 			if (leftClick && player.handBreakPos.x != -1) {
 				processLeftClick(cameraX, cameraY, g);
 			} else {
 				breakingTicks = 0;
 			}
-			
+
 			if (rightClick) {
 				processRightClick();
 			}
-			
+
 			player.updateHand(g, cameraX, cameraY, worldMouseX, worldMouseY, world, tileSize);
-			
+
 			java.util.Iterator<Entity> it = entities.iterator();
 			while (it.hasNext()) {
 				Entity entity = it.next();
@@ -264,37 +264,33 @@ public class MainGame {
 				entity.updatePosition(world, tileSize);
 				entity.draw(g, cameraX, cameraY, screenWidth, screenHeight, tileSize);
 			}
-			
+
 			if (viewFPS) {
 				methodViewFPS(delta, g);
 			}
-			
-			// Draw the UI
+
 			if (player.handBreakPos.x != -1) {
 				drawUI(cameraX, cameraY, g);
 			}
-			
-			//optionally draw the inventory screen
-			player.inventory.draw(g, screenWidth, screenHeight);
+
+            if (isInInventory()){
+                player.inventory.draw(g, screenWidth, screenHeight);
+            }
 			hotbar.draw(g, screenWidth, screenHeight);
-			
+
 			// draw the mouse
 			Int2 mouseTest = StockMethods.computeDrawLocationInPlace(cameraX, cameraY, tileSize,
 					tileSize, tileSize, worldMouseX, worldMouseY);
 			drawMouse(g, mouseTest);
-			
-			// HACK: draw hearts for health bar
-			// TODO: move this elsewhere, don't use so many magic constants
 			drawHeartsForHealthBar(screenWidth, screenHeight, g);
 
 			if (player.isHeadUnderWater(world, tileSize)) {
-				// another HACK: draw air bubbles
 				int heartY = screenHeight - 50;
 				drawAirBubbles(screenWidth, g, heartY);
 			}
-			
+
 			g.finishDrawing();
-			
+
 			SystemTimer.sleep(lastLoopTime + 16 - SystemTimer.getTime());
 		}
 	}
@@ -354,7 +350,7 @@ public class MainGame {
 			// clicked on a crafting table
 			// expand this to any item with a GUI
 			player.inventory.tableSizeAvailable = 3;
-			player.inventory.setVisible(true);
+            openInventory();
 		} else {
 			// placing a block
 			placeBlock();
@@ -501,8 +497,19 @@ public class MainGame {
 		musicPlayer.pause();
 		inMenu = true; // go back to the main startMenu
 	}
-	
-	public void quit() {
+
+	public void openInventory(){
+	    inInventory = true;
+    }
+    public void closeInventory(){
+        inInventory = false;
+    }
+
+    public boolean isInInventory() {
+        return inInventory;
+    }
+
+    public void quit() {
 		musicPlayer.close();
 		System.exit(0);
 	}
