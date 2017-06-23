@@ -240,13 +240,13 @@ public class MainGame {
 			}
 			
 			if (leftClick && player.handBreakPos.x != -1) {
-				methodLeftClick(cameraX, cameraY, g);
+				processLeftClick(cameraX, cameraY, g);
 			} else {
 				breakingTicks = 0;
 			}
 			
 			if (rightClick) {
-				methodRightClick();
+				processRightClick();
 			}
 			
 			player.updateHand(g, cameraX, cameraY, worldMouseX, worldMouseY, world, tileSize);
@@ -290,7 +290,7 @@ public class MainGame {
 			if (player.isHeadUnderWater(world, tileSize)) {
 				// another HACK: draw air bubbles
 				int heartY = screenHeight - 50;
-				airBubbles(screenWidth, g, heartY);
+				drawAirBubbles(screenWidth, g, heartY);
 			}
 			
 			g.finishDrawing();
@@ -299,7 +299,7 @@ public class MainGame {
 		}
 	}
 
-	public void methodLeftClick(float cameraX, float cameraY, GraphicsHandler g){
+	public void processLeftClick(float cameraX, float cameraY, GraphicsHandler g){
 		if (player.handBreakPos.equals(breakingPos)) {
 			breakingTicks++;
 		} else {
@@ -349,7 +349,7 @@ public class MainGame {
 		}
 	}
 
-	public void methodRightClick(){
+	public void processRightClick(){
 		if (world.isCraft(player.handBreakPos.x, player.handBreakPos.y)) {
 			// clicked on a crafting table
 			// expand this to any item with a GUI
@@ -357,17 +357,21 @@ public class MainGame {
 			player.inventory.setVisible(true);
 		} else {
 			// placing a block
-			rightClick = false;
-			InventoryItem current = hotbar.getSelected();
-			if (!current.isEmpty()) {
-				TileID itemID = Constants.tileIDs.get(current.getItem().item_id);
-				boolean isPassable = Constants.tileTypes.get(itemID).type.passable;
+			placingBlock();
+		}
+	}
 
-				if (isPassable || !player.inBoundingBox(player.handBuildPos, tileSize)) {
-					if (world.addTile(player.handBuildPos, itemID)) {
-						// placed successfully
-						hotbar.decreaseSelected(1);
-					}
+	public void placingBlock (){
+		rightClick = false;
+		InventoryItem current = hotbar.getSelected();
+		if (!current.isEmpty()) {
+			TileID itemID = Constants.tileIDs.get(current.getItem().item_id);
+			boolean isPassable = Constants.tileTypes.get(itemID).type.passable;
+
+			if (isPassable || !player.inBoundingBox(player.handBuildPos, tileSize)) {
+				if (world.addTile(player.handBuildPos, itemID)) {
+					// placed successfully
+					hotbar.decreaseSelected(1);
 				}
 			}
 		}
@@ -407,7 +411,7 @@ public class MainGame {
 		}
 	}
 
-	public void airBubbles(final int screenWidth, GraphicsHandler g, int heartY){
+	public void drawAirBubbles(final int screenWidth, GraphicsHandler g, int heartY){
 		int bubbleX = (screenWidth + 50) / 2;
 		int numBubbles = player.airRemaining();
 		for (int bubbleIdx = 1; bubbleIdx <= 10; ++bubbleIdx) {
@@ -502,7 +506,6 @@ public class MainGame {
 		musicPlayer.close();
 		System.exit(0);
 	}
-	
 	/**
 	 * The entry point into the game. We'll simply create an
 	 * instance of class which will start the display and game
