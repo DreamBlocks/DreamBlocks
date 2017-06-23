@@ -357,11 +357,11 @@ public class MainGame {
 			player.inventory.setVisible(true);
 		} else {
 			// placing a block
-			placingBlock();
+			placeBlock();
 		}
 	}
 
-	public void placingBlock (){
+	public void placeBlock (){
 		rightClick = false;
 		InventoryItem current = hotbar.getSelected();
 		if (!current.isEmpty()) {
