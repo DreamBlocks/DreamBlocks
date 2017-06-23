@@ -71,7 +71,6 @@ public class MainGame {
 	private StartMenu startMenu;
 	private NewGameMenu newGameMenu;
 	public Hotbar hotbar;
-	private InventoryScreen inventoryScreen;
 	public long ticksRunning;
 	private Random random = new Random();
 	
@@ -87,10 +86,9 @@ public class MainGame {
 	public MainGame() {
 		startMenu = new StartMenu(this);
 		newGameMenu = new NewGameMenu(this);
-        inventoryScreen = new InventoryScreen();
 		int tileSize = 16;
-		int margin = 10;
-		hotbar = new Hotbar(tileSize, margin);
+        int margin = 10;
+        hotbar = new Hotbar(tileSize, margin);
 		GraphicsHandler.get().init(this);
 		System.gc();
 	}
@@ -119,7 +117,6 @@ public class MainGame {
 				if (entity instanceof Player) {
 					player = (Player) entity;
                     hotbar.setInventory(player.inventory);
-                    inventoryScreen.setInventory(player.inventory);
 					player.widthPX = 7 * (tileSize / 8);
 					player.heightPX = 14 * (tileSize / 8);
 				}
@@ -131,7 +128,6 @@ public class MainGame {
 			player = new Player(true, world.spawnLocation.x, world.spawnLocation.y,
 					7 * (tileSize / 8), 14 * (tileSize / 8));
 			hotbar.setInventory(player.inventory);
-            inventoryScreen.setInventory(player.inventory);
 			entities.add(player);
 			if (Constants.DEBUG) {
 				player.giveItem(Constants.itemTypes.get((char) 175).clone(), 1);
@@ -273,12 +269,10 @@ public class MainGame {
 				methodViewFPS(delta, g);
 			}
 
-			// Draw the UI
 			if (player.handBreakPos.x != -1) {
 				drawUI(cameraX, cameraY, g);
 			}
 
-			//optionally draw the inventory screen
             if (isInInventory()){
                 player.inventory.draw(g, screenWidth, screenHeight);
             }
@@ -288,13 +282,9 @@ public class MainGame {
 			Int2 mouseTest = StockMethods.computeDrawLocationInPlace(cameraX, cameraY, tileSize,
 					tileSize, tileSize, worldMouseX, worldMouseY);
 			drawMouse(g, mouseTest);
-
-			// HACK: draw hearts for health bar
-			// TODO: move this elsewhere, don't use so many magic constants
 			drawHeartsForHealthBar(screenWidth, screenHeight, g);
 
 			if (player.isHeadUnderWater(world, tileSize)) {
-				// another HACK: draw air bubbles
 				int heartY = screenHeight - 50;
 				drawAirBubbles(screenWidth, g, heartY);
 			}
