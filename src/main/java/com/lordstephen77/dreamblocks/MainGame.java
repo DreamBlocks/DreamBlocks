@@ -494,11 +494,11 @@ public class MainGame {
 		inMenu = true; // go back to the main startMenu
 	}
 	public void openWorkbenchInventory(){
-		player.inventory.tableSizeAvailable = 3;
+		player.inventory.setTableSizeAvailable(3);
 		inInventory = true;
 	}
 	public void openPlayerInventory(){
-		player.inventory.tableSizeAvailable = 2;
+		player.inventory.setTableSizeAvailable(2);
 	    inInventory = true;
     }
     public void closeInventory(){
