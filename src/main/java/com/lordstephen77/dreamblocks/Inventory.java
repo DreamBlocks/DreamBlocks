@@ -36,6 +36,8 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.lordstephen77.dreamblocks;
 
+import java.util.Optional;
+
 public class Inventory implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
     private int tileSize = 16;
@@ -48,9 +50,7 @@ public class Inventory implements java.io.Serializable {
 	private int maxCount = 64;
 	private int playerRow;
 	private InventoryItem holding = new InventoryItem(null);
-	private int holdingX;
-	private int holdingY;
-	private Int2 clickPos = new Int2(0, 0);
+    private Int2 clickPos = new Int2(0, 0);
     private int craftingSize = 2;
     private InventoryItem[][] craftingGrid = new InventoryItem[craftingSize][craftingSize];
 	public int craftingHeight;
@@ -98,137 +98,167 @@ public class Inventory implements java.io.Serializable {
 	// returns true if the mouse hit in the inventory
 	public boolean updateInventory(int screenWidth, int screenHeight,
 			Int2 mousePos, boolean leftClick, boolean rightClick) {
+        updateCraftingResult();
 		int panelWidth = inventoryItems.length * (tileSize + seperation) + seperation;
 		int panelHeight = inventoryItems[0].length * (tileSize + seperation) + seperation;
 		int x = screenWidth / 2 - panelWidth / 2;
 		int y = screenHeight / 2 - panelHeight / 2;
-		
-		if (mousePos.x < x || mousePos.x > x + panelWidth
-				|| mousePos.y < y || mousePos.y > y + panelHeight) {
+
+		if (!isMouseInsideInventory(mousePos, x, y, panelWidth, panelHeight)) {
 			return false;
 		}
-		
-		holdingX = mousePos.x;
-		holdingY = mousePos.y - tileSize;
-		if (!leftClick && !rightClick) {
-			return true;
-		}
-		
-		Int2 position = mouseToCoor(mousePos.x - x, mousePos.y - y, seperation, tileSize);
-		if (position != null) {
-			if (holding.isEmpty()) {
-				if (rightClick && inventoryItems[position.x][position.y].count > 1) {
-					holding.item = inventoryItems[position.x][position.y].item;
-					holding.count = (int) Math
-							.ceil((double) inventoryItems[position.x][position.y].count / 2);
-					inventoryItems[position.x][position.y].count = (int) Math
-							.floor((double) inventoryItems[position.x][position.y].count / 2);
-				} else {
-					holding.item = inventoryItems[position.x][position.y].item;
-					holding.count = inventoryItems[position.x][position.y].count;
-					inventoryItems[position.x][position.y].item = null;
-					inventoryItems[position.x][position.y].count = 0;
-				}
-			} else if (inventoryItems[position.x][position.y].item == null) {
-				if (rightClick) {
-					inventoryItems[position.x][position.y].item = holding.item;
-					inventoryItems[position.x][position.y].count = 1;
-					holding.count--;
-					if (holding.count <= 0) {
-						holding.item = null;
-					}
-				} else {
-					inventoryItems[position.x][position.y].item = holding.item;
-					inventoryItems[position.x][position.y].count = holding.count;
-					holding.item = null;
-					holding.count = 0;
-				}
-			} else if (holding.item.item_id == inventoryItems[position.x][position.y].item.item_id
-					&& inventoryItems[position.x][position.y].count < maxCount) {
-				if ((holding.item.getClass() == Tool.class)
-						|| (inventoryItems[position.x][position.y].item.getClass() == Tool.class)) {
-				} else if (rightClick) {
-					
-					inventoryItems[position.x][position.y].count++;
-					holding.count--;
-					if (holding.count <= 0) {
-						holding.item = null;
-					}
-					
-				} else {
-					inventoryItems[position.x][position.y].count += holding.count;
-					if (inventoryItems[position.x][position.y].count > maxCount) {
-						holding.count = maxCount - inventoryItems[position.x][position.y].count;
-						inventoryItems[position.x][position.y].count = maxCount;
-					} else {
-						holding.item = null;
-						holding.count = 0;
-					}
-					
-				}
-			} else {
-				Item item = inventoryItems[position.x][position.y].item;
-				int count = inventoryItems[position.x][position.y].count;
-				inventoryItems[position.x][position.y].item = holding.item;
-				inventoryItems[position.x][position.y].count = holding.count;
-				holding.item = item;
-				holding.count = count;
-			}
-		}
-		
-		x = screenWidth / 2 - panelWidth / 2;
-		y = screenHeight / 2 - panelHeight / 2;
-		x = x + (inventoryItems.length - tableSizeAvailable - 1) * (tileSize + seperation) - 5;
-		y = y + seperation * 2 + tileSize - 5;
-		
-		boolean craftThisUpdate = false;
-		if (mousePos.x >= x && mousePos.x <= x + tileSize + 10 && mousePos.y >= y
-				&& mousePos.y <= y + tileSize * 2 + 10) {
-			craftThisUpdate = true;
-		}
-		
-		// check for a construction
-		
-		craftable.item = null;
-		craftable.count = 0;
-		
-		boolean keepChecking = true;
-		while (keepChecking) {
-			keepChecking = false;
-			// only craft one at a time for now
-			char[][] currentTable = computeCraftTable();
-			for (Item entry : Constants.itemTypes.values()) {
-				craftable.item = null;
-				craftable.count = 0;
-				if (entry.template.compare(currentTable)) {
-					craftable.item = entry;
-					craftable.count = entry.template.outCount;
-					if (craftThisUpdate) {
-						if (entry.getClass() == Tool.class && !holding.isEmpty()) {
-							break;
-						}
-						craftThisUpdate = false;
-						keepChecking = true;
-						craftable.item = null;
-						craftable.count = 0;
-						for (int i = 0; i < tableSizeAvailable; i++) {
-							for (int j = 0; j < tableSizeAvailable; j++) {
-								inventoryItems[i + inventoryItems.length - tableSizeAvailable][j].count -= 1;
-								if (inventoryItems[i + inventoryItems.length - tableSizeAvailable][j].count <= 0) {
-									inventoryItems[i + inventoryItems.length - tableSizeAvailable][j].item = null;
-									inventoryItems[i + inventoryItems.length - tableSizeAvailable][j].count = 0;
-								}
-							}
-						}
-						int count = entry.template.outCount;
-						holding.add((Item) entry.clone(), count);
-					}
-					break;
-				}
-			}
-		}
-		
-		return true;
+
+		if (leftClick || rightClick) {
+            Int2 position = mouseToCoor(mousePos.x - x, mousePos.y - y, seperation, tileSize);
+            if (position != null) {
+                InventoryItem itemUnderCursor = inventoryItems[position.x][position.y];
+                if (holding.isEmpty()) {
+                    if (rightClick && itemUnderCursor.count > 1) {
+                        pickHalfOfStack(itemUnderCursor);
+                    } else {
+                        pickWholeStack(itemUnderCursor);
+                    }
+                } else if (itemUnderCursor.item == null) {
+                    if (rightClick) {
+                        dropSingleItemToEmptyTile(itemUnderCursor);
+                    } else {
+                        dropWholeStackToEmptyTile(itemUnderCursor);
+                    }
+                } else if (holding.item.item_id == itemUnderCursor.item.item_id
+                        && itemUnderCursor.count < maxCount) {
+                    if ((holding.item.getClass() == Tool.class)
+                            || (itemUnderCursor.item.getClass() == Tool.class)) {
+                    } else if (rightClick) {
+                        dropSingleItemToStack(itemUnderCursor);
+                    } else {
+                        dropStackToStack(itemUnderCursor);
+                    }
+                } else {
+                    swapItems(itemUnderCursor);
+                }
+            }
+
+            if (isMouseOverCraftingResult(screenWidth, screenHeight, panelWidth, panelHeight, mousePos)){
+                craftItem();
+            }
+        }
+        return true;
+	}
+
+    private void pickHalfOfStack(InventoryItem itemUnderCursor){
+        holding.item = itemUnderCursor.item;
+        holding.count = (int) Math.ceil((double) itemUnderCursor.count / 2);
+        itemUnderCursor.count = (int) Math.floor((double) itemUnderCursor.count / 2);
+    }
+
+    private void pickWholeStack(InventoryItem itemUnderCursor){
+        holding.item = itemUnderCursor.item;
+        holding.count = itemUnderCursor.count;
+        itemUnderCursor.item = null;
+        itemUnderCursor.count = 0;
+    }
+
+    private void dropSingleItemToEmptyTile(InventoryItem itemUnderCursor){
+        itemUnderCursor.item = holding.item;
+        itemUnderCursor.count = 1;
+        holding.count--;
+        if (holding.count <= 0) {
+            holding.item = null;
+        }
+    }
+
+    private void dropWholeStackToEmptyTile(InventoryItem itemUnderCursor){
+        itemUnderCursor.item = holding.item;
+        itemUnderCursor.count = holding.count;
+        holding.item = null;
+        holding.count = 0;
+    }
+
+    private void dropSingleItemToStack(InventoryItem itemUnderCursor){
+        itemUnderCursor.count++;
+        holding.count--;
+        if (holding.count <= 0) {
+            holding.item = null;
+        }
+    }
+
+    private void dropStackToStack(InventoryItem itemUnderCursor){
+        itemUnderCursor.count += holding.count;
+        if (itemUnderCursor.count > maxCount) {
+            holding.count = maxCount - itemUnderCursor.count;
+            itemUnderCursor.count = maxCount;
+        } else {
+            holding.item = null;
+            holding.count = 0;
+        }
+    }
+
+    private void swapItems(InventoryItem itemUnderCursor){
+        Item item = itemUnderCursor.item;
+        int count = itemUnderCursor.count;
+        itemUnderCursor.item = holding.item;
+        itemUnderCursor.count = holding.count;
+        holding.item = item;
+        holding.count = count;
+    }
+
+    private boolean isMouseInsideInventory(Int2 mousePos, int x, int y, int panelWidth, int panelHeight){
+        return x <= mousePos.x && mousePos.x <= x + panelWidth
+                && y <= mousePos.y && mousePos.y <= y + panelHeight;
+    }
+
+	private boolean isMouseOverCraftingResult(int screenWidth, int screenHeight, int panelWidth, int panelHeight, Int2 mousePos){
+	    int x, y;
+        x = screenWidth / 2 - panelWidth / 2;
+        y = screenHeight / 2 - panelHeight / 2;
+        x = x + (inventoryItems.length - tableSizeAvailable - 1) * (tileSize + seperation) - 5;
+        y = y + seperation * 2 + tileSize - 5;
+	    return mousePos.x >= x && mousePos.x <= x + tileSize + 10 && mousePos.y >= y
+                && mousePos.y <= y + tileSize * 2 + 10;
+    }
+
+	private Optional<Item> findCraftingResult(){
+        char[][] currentTable = computeCraftTable();
+        for (Item entry : Constants.itemTypes.values()) {
+            if (entry.template.compare(currentTable)) {
+                return Optional.of(entry);
+            }
+        }
+        return Optional.empty();
+    }
+
+    private void takeRecipeMaterials(){
+        for (int i = 0; i < tableSizeAvailable; i++) {
+            for (int j = 0; j < tableSizeAvailable; j++) {
+                inventoryItems[i + inventoryItems.length - tableSizeAvailable][j].count -= 1;
+                if (inventoryItems[i + inventoryItems.length - tableSizeAvailable][j].count <= 0) {
+                    inventoryItems[i + inventoryItems.length - tableSizeAvailable][j].item = null;
+                    inventoryItems[i + inventoryItems.length - tableSizeAvailable][j].count = 0;
+                }
+            }
+        }
+    }
+
+    private void craftItem(){
+        Optional<Item> recipeResult = findCraftingResult();
+        if (recipeResult.isPresent()) {
+            if (recipeResult.get().getClass() != Tool.class || holding.isEmpty()) {
+                takeRecipeMaterials();
+                int count = recipeResult.get().template.outCount;
+                holding.add(recipeResult.get().clone(), count);
+            }
+        }
+    }
+
+	private void updateCraftingResult(){
+		Optional<Item> nextResult = findCraftingResult();
+        if (nextResult.isPresent()){
+            craftable.item = nextResult.get();
+            craftable.count = nextResult.get().template.outCount;
+        } else {
+            craftable.item = null;
+            craftable.count = 0;
+        }
 	}
 	
 	private char[][] computeCraftTable() {
@@ -313,11 +343,11 @@ public class Inventory implements java.io.Serializable {
 
     private void drawCraftingGrid(GraphicsHandler g, int screenWidth, int screenHeight, int panelWidth, int panelHeight){
         int x;
-        int dxInItems = 8;
+        int dxInItems = inventoryItems.length - tableSizeAvailable;
         int y = screenHeight / 2 - panelHeight / 2;
-        for (int rowIdx = 0; rowIdx < craftingSize; rowIdx++){
+        for (int rowIdx = 0; rowIdx < tableSizeAvailable; rowIdx++){
             x = screenWidth / 2 - panelWidth / 2 + (tileSize + seperation) * dxInItems;
-            for (int colIdx = dxInItems; colIdx < dxInItems + craftingSize; colIdx++){
+            for (int colIdx = dxInItems; colIdx < inventoryItems.length; colIdx++){
                 drawInventoryCell(g, x, y, inventoryItems[colIdx][rowIdx]);
                 x += tileSize + seperation;
             }
@@ -325,7 +355,7 @@ public class Inventory implements java.io.Serializable {
         }
     }
 
-    public void draw(GraphicsHandler g, int screenWidth, int screenHeight) {
+    public void draw(GraphicsHandler g, int screenWidth, int screenHeight, Int2 mousePos) {
         int panelWidth, panelHeight, x, y;
 
         panelWidth = inventoryItems.length * (tileSize + seperation) + seperation;
@@ -339,6 +369,8 @@ public class Inventory implements java.io.Serializable {
         drawBackpack(g, screenWidth, screenHeight, panelWidth, panelHeight);
         drawCraftingResult(g, x, y);
 
-        holding.draw(g, holdingX - tileSize / 2, holdingY - tileSize / 2, tileSize);
+        int holdingX = mousePos.x - tileSize / 2;
+        int holdingY = mousePos.y - tileSize - tileSize / 2;
+        holding.draw(g, holdingX, holdingY, tileSize);
     }
 }
