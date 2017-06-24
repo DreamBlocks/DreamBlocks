@@ -274,7 +274,7 @@ public class MainGame {
 			}
 
             if (isInInventory()){
-                player.inventory.draw(g, screenWidth, screenHeight);
+                player.inventory.draw(g, screenWidth, screenHeight, screenMousePos);
             }
 			hotbar.draw(g, screenWidth, screenHeight);
 
@@ -347,12 +347,8 @@ public class MainGame {
 
 	public void processRightClick(){
 		if (world.isCraft(player.handBreakPos.x, player.handBreakPos.y)) {
-			// clicked on a crafting table
-			// expand this to any item with a GUI
-			player.inventory.tableSizeAvailable = 3;
-            openInventory();
+            openWorkbenchInventory();
 		} else {
-			// placing a block
 			placeBlock();
 		}
 	}
@@ -497,8 +493,12 @@ public class MainGame {
 		musicPlayer.pause();
 		inMenu = true; // go back to the main startMenu
 	}
-
-	public void openInventory(){
+	public void openWorkbenchInventory(){
+		player.inventory.tableSizeAvailable = 3;
+		inInventory = true;
+	}
+	public void openPlayerInventory(){
+		player.inventory.tableSizeAvailable = 2;
 	    inInventory = true;
     }
     public void closeInventory(){

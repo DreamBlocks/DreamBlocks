@@ -193,7 +193,7 @@ public class AwtEventsHandler {
 				if(game.isInInventory()){
 					game.closeInventory();
 				} else {
-					game.openInventory();
+					game.openPlayerInventory();
 				}
 				break;
 			case '+': // press + increase zoom
