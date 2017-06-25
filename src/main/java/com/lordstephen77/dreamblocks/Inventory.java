@@ -36,6 +36,8 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.lordstephen77.dreamblocks;
 
+import com.lordstephen77.dreamblocks.ui.CraftingGrid;
+
 import java.util.Optional;
 
 public class Inventory implements java.io.Serializable {
@@ -45,21 +47,21 @@ public class Inventory implements java.io.Serializable {
 	
 	public InventoryItem[][] inventoryItems;
     private InventoryItem[] hotbarRow;
-	public int tableSizeAvailable = 2;
-	
-	private int maxCount = 64;
+    private int panelWidth;
+    private int panelHeight;
+
+    private int maxCount = 64;
 	private int playerRow;
 	private InventoryItem holding = new InventoryItem(null);
+    private CraftingGrid craftingGrid;
     private Int2 clickPos = new Int2(0, 0);
-    private int craftingSize = 2;
-    private InventoryItem[][] craftingGrid = new InventoryItem[craftingSize][craftingSize];
 	public int craftingHeight;
-	private char[][] tableTwo = new char[2][2];
-	private char[][] tableThree = new char[3][3];
 	private InventoryItem craftable = new InventoryItem(null);
 	
 	public Inventory(int width, int height, int craftingHeight) {
 		inventoryItems = new InventoryItem[width][height + craftingHeight];
+        panelWidth = inventoryItems.length * (tileSize + seperation) + seperation;
+        panelHeight = inventoryItems[0].length * (tileSize + seperation) + seperation;
         hotbarRow = new InventoryItem[width];
         playerRow = height + craftingHeight - 1;
 		for (int i = 0; i < width; i++) {
@@ -68,11 +70,9 @@ public class Inventory implements java.io.Serializable {
 			}
 			hotbarRow[i] = inventoryItems[i][playerRow];
 		}
-        for (int rowIdx = 0; rowIdx < craftingSize; rowIdx++){
-            for (int colIdx = 0; colIdx < craftingSize; colIdx++){
-                craftingGrid[colIdx][rowIdx] = new InventoryItem(null);
-            }
-        }
+		craftingGrid = new CraftingGrid(tileSize, seperation);
+        craftingGrid.setInventoryItems(inventoryItems);
+
 		this.craftingHeight = craftingHeight;
 	}
 	
@@ -86,8 +86,8 @@ public class Inventory implements java.io.Serializable {
 		// try the rest
 		for (int i = 0; i < inventoryItems.length && itemsToGo > 0; i++) {
 			for (int j = 0; j < inventoryItems[0].length - 1 && itemsToGo > 0; j++) {
-				if ((j < craftingHeight && i < inventoryItems.length - tableSizeAvailable)
-						|| (craftingHeight != tableSizeAvailable && j == tableSizeAvailable)) {
+				if ((j < craftingHeight && i < inventoryItems.length - craftingGrid.getTableSizeAvailable())
+						|| (craftingHeight != craftingGrid.getTableSizeAvailable() && j == craftingGrid.getTableSizeAvailable())) {
 					continue;
 				}
 				itemsToGo = inventoryItems[i][playerRow].add(item, count);
@@ -114,27 +114,27 @@ public class Inventory implements java.io.Serializable {
                 InventoryItem itemUnderCursor = inventoryItems[position.x][position.y];
                 if (holding.isEmpty()) {
                     if (rightClick && itemUnderCursor.count > 1) {
-                        pickHalfOfStack(itemUnderCursor);
+                        pickHalfOfStack(itemUnderCursor, holding);
                     } else {
-                        pickWholeStack(itemUnderCursor);
+                        pickWholeStack(itemUnderCursor, holding);
                     }
                 } else if (itemUnderCursor.item == null) {
                     if (rightClick) {
-                        dropSingleItemToEmptyTile(itemUnderCursor);
+                        dropSingleItemToEmptyTile(itemUnderCursor, holding);
                     } else {
-                        dropWholeStackToEmptyTile(itemUnderCursor);
+                        dropWholeStackToEmptyTile(itemUnderCursor, holding);
                     }
                 } else if (holding.item.item_id == itemUnderCursor.item.item_id
                         && itemUnderCursor.count < maxCount) {
                     if ((holding.item.getClass() == Tool.class)
                             || (itemUnderCursor.item.getClass() == Tool.class)) {
                     } else if (rightClick) {
-                        dropSingleItemToStack(itemUnderCursor);
+                        dropSingleItemToStack(itemUnderCursor, holding);
                     } else {
-                        dropStackToStack(itemUnderCursor);
+                        dropStackToStack(itemUnderCursor, holding);
                     }
                 } else {
-                    swapItems(itemUnderCursor);
+                    swapItems(itemUnderCursor, holding);
                 }
             }
 
@@ -145,61 +145,61 @@ public class Inventory implements java.io.Serializable {
         return true;
 	}
 
-    private void pickHalfOfStack(InventoryItem itemUnderCursor){
-        holding.item = itemUnderCursor.item;
-        holding.count = (int) Math.ceil((double) itemUnderCursor.count / 2);
-        itemUnderCursor.count = (int) Math.floor((double) itemUnderCursor.count / 2);
+    private void pickHalfOfStack(InventoryItem grid, InventoryItem hand){
+        hand.item = grid.item;
+        hand.count = (int) Math.ceil((double) grid.count / 2);
+        grid.count = (int) Math.floor((double) grid.count / 2);
     }
 
-    private void pickWholeStack(InventoryItem itemUnderCursor){
-        holding.item = itemUnderCursor.item;
-        holding.count = itemUnderCursor.count;
-        itemUnderCursor.item = null;
-        itemUnderCursor.count = 0;
+    private void pickWholeStack(InventoryItem grid, InventoryItem hand){
+        hand.item = grid.item;
+        hand.count = grid.count;
+        grid.item = null;
+        grid.count = 0;
     }
 
-    private void dropSingleItemToEmptyTile(InventoryItem itemUnderCursor){
-        itemUnderCursor.item = holding.item;
-        itemUnderCursor.count = 1;
-        holding.count--;
-        if (holding.count <= 0) {
-            holding.item = null;
+    private void dropSingleItemToEmptyTile(InventoryItem grid, InventoryItem hand){
+        grid.item = hand.item;
+        grid.count = 1;
+        hand.count--;
+        if (hand.count <= 0) {
+            hand.item = null;
         }
     }
 
-    private void dropWholeStackToEmptyTile(InventoryItem itemUnderCursor){
-        itemUnderCursor.item = holding.item;
-        itemUnderCursor.count = holding.count;
-        holding.item = null;
-        holding.count = 0;
+    private void dropWholeStackToEmptyTile(InventoryItem grid, InventoryItem hand){
+        grid.item = hand.item;
+        grid.count = hand.count;
+        hand.item = null;
+        hand.count = 0;
     }
 
-    private void dropSingleItemToStack(InventoryItem itemUnderCursor){
-        itemUnderCursor.count++;
-        holding.count--;
-        if (holding.count <= 0) {
-            holding.item = null;
+    private void dropSingleItemToStack(InventoryItem grid, InventoryItem hand){
+        grid.count++;
+        hand.count--;
+        if (hand.count <= 0) {
+            hand.item = null;
         }
     }
 
-    private void dropStackToStack(InventoryItem itemUnderCursor){
-        itemUnderCursor.count += holding.count;
-        if (itemUnderCursor.count > maxCount) {
-            holding.count = maxCount - itemUnderCursor.count;
-            itemUnderCursor.count = maxCount;
+    private void dropStackToStack(InventoryItem grid, InventoryItem hand){
+        grid.count += hand.count;
+        if (grid.count > maxCount) {
+            hand.count = maxCount - grid.count;
+            grid.count = maxCount;
         } else {
-            holding.item = null;
-            holding.count = 0;
+            hand.item = null;
+            hand.count = 0;
         }
     }
 
-    private void swapItems(InventoryItem itemUnderCursor){
-        Item item = itemUnderCursor.item;
-        int count = itemUnderCursor.count;
-        itemUnderCursor.item = holding.item;
-        itemUnderCursor.count = holding.count;
-        holding.item = item;
-        holding.count = count;
+    private void swapItems(InventoryItem grid, InventoryItem hand){
+        Item item = grid.item;
+        int count = grid.count;
+        grid.item = hand.item;
+        grid.count = hand.count;
+        hand.item = item;
+        hand.count = count;
     }
 
     private boolean isMouseInsideInventory(Int2 mousePos, int x, int y, int panelWidth, int panelHeight){
@@ -211,36 +211,27 @@ public class Inventory implements java.io.Serializable {
 	    int x, y;
         x = screenWidth / 2 - panelWidth / 2;
         y = screenHeight / 2 - panelHeight / 2;
-        x = x + (inventoryItems.length - tableSizeAvailable - 1) * (tileSize + seperation) - 5;
+        x = x + (inventoryItems.length - craftingGrid.getTableSizeAvailable() - 1) * (tileSize + seperation) - 5;
         y = y + seperation * 2 + tileSize - 5;
 	    return mousePos.x >= x && mousePos.x <= x + tileSize + 10 && mousePos.y >= y
                 && mousePos.y <= y + tileSize * 2 + 10;
     }
 
-	private Optional<Item> findCraftingResult(){
-        char[][] currentTable = computeCraftTable();
-        for (Item entry : Constants.itemTypes.values()) {
-            if (entry.template.compare(currentTable)) {
-                return Optional.of(entry);
-            }
-        }
-        return Optional.empty();
-    }
-
     private void takeRecipeMaterials(){
-        for (int i = 0; i < tableSizeAvailable; i++) {
-            for (int j = 0; j < tableSizeAvailable; j++) {
-                inventoryItems[i + inventoryItems.length - tableSizeAvailable][j].count -= 1;
-                if (inventoryItems[i + inventoryItems.length - tableSizeAvailable][j].count <= 0) {
-                    inventoryItems[i + inventoryItems.length - tableSizeAvailable][j].item = null;
-                    inventoryItems[i + inventoryItems.length - tableSizeAvailable][j].count = 0;
+        for (int i = 0; i < craftingGrid.getTableSizeAvailable(); i++) {
+            for (int j = 0; j < craftingGrid.getTableSizeAvailable(); j++) {
+                int actualI = i + inventoryItems.length - craftingGrid.getTableSizeAvailable();
+                inventoryItems[actualI][j].count -= 1;
+                if (inventoryItems[actualI][j].count <= 0) {
+                    inventoryItems[actualI][j].item = null;
+                    inventoryItems[actualI][j].count = 0;
                 }
             }
         }
     }
 
     private void craftItem(){
-        Optional<Item> recipeResult = findCraftingResult();
+        Optional<Item> recipeResult = craftingGrid.getResult();
         if (recipeResult.isPresent()) {
             if (recipeResult.get().getClass() != Tool.class || holding.isEmpty()) {
                 takeRecipeMaterials();
@@ -251,7 +242,7 @@ public class Inventory implements java.io.Serializable {
     }
 
 	private void updateCraftingResult(){
-		Optional<Item> nextResult = findCraftingResult();
+		Optional<Item> nextResult = craftingGrid.getResult();
         if (nextResult.isPresent()){
             craftable.item = nextResult.get();
             craftable.count = nextResult.get().template.outCount;
@@ -260,58 +251,31 @@ public class Inventory implements java.io.Serializable {
             craftable.count = 0;
         }
 	}
-	
-	private char[][] computeCraftTable() {
-		char[][] currentTable;
-		if (tableSizeAvailable == 2) {
-			currentTable = tableTwo;
-		} else {
-			currentTable = tableThree;
-		}
-		
-		for (int i = 0; i < tableSizeAvailable; i++) {
-			for (int j = 0; j < tableSizeAvailable; j++) {
-				Item item = inventoryItems[i + inventoryItems.length - tableSizeAvailable][j].item;
-				if (item != null) {
-					currentTable[j][i] = (char) item.item_id;
-				} else {
-					currentTable[j][i] = (char) 0;
-				}
-			}
-		}
-		return currentTable;
-	}
-	
-	// relative x/y in px
-	private Int2 mouseToCoor(int x, int y, int seperation, int tileSize) {
-		clickPos.x = x / (seperation + tileSize);
-		clickPos.y = y / (seperation + tileSize) - 1;
-		if (clickPos.x < 0
-				|| clickPos.y < 0
-				|| clickPos.x >= inventoryItems.length
-				|| clickPos.y >= inventoryItems[0].length
-				|| ((clickPos.y < craftingHeight && clickPos.x < inventoryItems.length
-						- tableSizeAvailable) || (craftingHeight != tableSizeAvailable && clickPos.y == tableSizeAvailable))) {
-			return null;
-		}
-		return clickPos;
-	}
 
-	public InventoryItem[] getHotbarRow(){
+    // relative x/y in px
+    private Int2 mouseToCoor(int x, int y, int seperation, int tileSize) {
+        clickPos.x = x / (seperation + tileSize);
+        clickPos.y = y / (seperation + tileSize) - 1;
+        if (clickPos.x < 0
+                || clickPos.y < 0
+                || clickPos.x >= inventoryItems.length
+                || clickPos.y >= inventoryItems[0].length
+                || ((clickPos.y < craftingHeight && clickPos.x < inventoryItems.length - craftingGrid.getTableSizeAvailable())
+                || (craftingHeight != craftingGrid.getTableSizeAvailable() && clickPos.y == craftingGrid.getTableSizeAvailable()))) {
+            return null;
+        }
+        return clickPos;
+    }
+
+    public InventoryItem[] getHotbarRow(){
 	    return hotbarRow;
     }
 
-    private void drawPanel(GraphicsHandler g, int x, int y, int panelWidth, int panelHeight){
+    private void drawPanel(GraphicsHandler g, int screenWidth, int screenHeight, int panelWidth, int panelHeight){
+        int x = screenWidth / 2 - panelWidth / 2;
+        int y = screenHeight / 2 - panelHeight / 2;
         g.setColor(Color.gray);
         g.fillRect(x, y, panelWidth, panelHeight);
-    }
-
-    private void drawCraftingBackground(GraphicsHandler g, int panelWidth, int x, int y){
-        g.setColor(Color.DARK_GRAY);
-        int widgetX = x + panelWidth - tableSizeAvailable * (tileSize + seperation) - seperation;
-        int widgetWidth = tableSizeAvailable * (tileSize + seperation) + seperation;
-        int widgetHeight = tableSizeAvailable * (tileSize + seperation) + seperation;
-        g.fillRect(widgetX, y, widgetWidth, widgetHeight);
     }
 
     private void drawInventoryCell(GraphicsHandler g, int x, int y, InventoryItem item){
@@ -320,10 +284,10 @@ public class Inventory implements java.io.Serializable {
         item.draw(g, x + seperation, y + seperation, tileSize);
     }
 
-    private void drawCraftingResult(GraphicsHandler g, int x, int y){
+    private void drawCraftingResult(GraphicsHandler g, int screenWidth, int screenHeight, int panelWidth, int panelHeight){
         g.setColor(Color.orange);
-        x = x + (inventoryItems.length - tableSizeAvailable - 1) * (tileSize + seperation);
-        y = y + seperation * 2 + tileSize;
+        int x = screenWidth / 2 - panelWidth / 2 + (inventoryItems.length - craftingGrid.getTableSizeAvailable() - 1) * (tileSize + seperation);
+        int y = screenHeight / 2 - panelHeight / 2 + seperation * 2 + tileSize;
         g.fillRect(x - 5, y - 5, tileSize + 10, tileSize + 10);
         craftable.draw(g, x, y, tileSize);
     }
@@ -341,36 +305,18 @@ public class Inventory implements java.io.Serializable {
         }
     }
 
-    private void drawCraftingGrid(GraphicsHandler g, int screenWidth, int screenHeight, int panelWidth, int panelHeight){
-        int x;
-        int dxInItems = inventoryItems.length - tableSizeAvailable;
-        int y = screenHeight / 2 - panelHeight / 2;
-        for (int rowIdx = 0; rowIdx < tableSizeAvailable; rowIdx++){
-            x = screenWidth / 2 - panelWidth / 2 + (tileSize + seperation) * dxInItems;
-            for (int colIdx = dxInItems; colIdx < inventoryItems.length; colIdx++){
-                drawInventoryCell(g, x, y, inventoryItems[colIdx][rowIdx]);
-                x += tileSize + seperation;
-            }
-            y += tileSize + seperation;
-        }
-    }
-
     public void draw(GraphicsHandler g, int screenWidth, int screenHeight, Int2 mousePos) {
-        int panelWidth, panelHeight, x, y;
-
-        panelWidth = inventoryItems.length * (tileSize + seperation) + seperation;
-        panelHeight = inventoryItems[0].length * (tileSize + seperation) + seperation;
-        x = screenWidth / 2 - panelWidth / 2;
-        y = screenHeight / 2 - panelHeight / 2;
-
-        drawPanel(g, x, y, panelWidth, panelHeight);
-        drawCraftingBackground(g, panelWidth, x, y);
-        drawCraftingGrid(g, screenWidth, screenHeight, panelWidth, panelHeight);
+        drawPanel(g, screenWidth, screenHeight, panelWidth, panelHeight);
+        craftingGrid.draw(g, screenWidth, screenHeight, panelWidth, panelHeight);
         drawBackpack(g, screenWidth, screenHeight, panelWidth, panelHeight);
-        drawCraftingResult(g, x, y);
+        drawCraftingResult(g, screenWidth, screenHeight, panelWidth, panelHeight);
 
         int holdingX = mousePos.x - tileSize / 2;
         int holdingY = mousePos.y - tileSize - tileSize / 2;
         holding.draw(g, holdingX, holdingY, tileSize);
+    }
+
+    public void setTableSizeAvailable(int tableSizeAvailable) {
+        this.craftingGrid.setTableSizeAvailable(tableSizeAvailable);
     }
 }
