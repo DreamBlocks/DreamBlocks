@@ -278,6 +278,7 @@ public class World implements java.io.Serializable {
 	
 	public void draw(GraphicsHandler g, int x, int y, int screenWidth, int screenHeight,
 			float cameraX, float cameraY, int tileSize) {
+		SpriteStore spriteStore = SpriteStore.get();
 		Int2 pos;
 		
 		pos = StockMethods.computeDrawLocationInPlace(cameraX, cameraY, screenWidth, screenHeight,
@@ -296,22 +297,25 @@ public class World implements java.io.Serializable {
 					|| posY > screenHeight) {
 				continue;
 			}
-			Constants.tileTypes.get(TileID.ADMINITE).type.sprite.draw(g, posX, posY, tileSize,
-					tileSize);
+			TileType tileType = Constants.tileTypes.get(TileID.ADMINITE).type;
+			Sprite tileSprite = spriteStore.getSprite(tileType.getRef());
+			tileSprite.draw(g, posX, posY, tileSize, tileSize);
 		}
 		
 		for (int j = height / 2; j < height; j++) {
 			int posX = (int) ((-1 - cameraX) * tileSize);
 			int posY = (int) ((j - cameraY) * tileSize);
 			if (!(posX < 0 - tileSize || posX > screenWidth || posY < 0 - tileSize || posY > screenHeight)) {
-				Constants.tileTypes.get(TileID.ADMINITE).type.sprite.draw(g, posX, posY, tileSize,
-						tileSize);
+				TileType tileType = Constants.tileTypes.get(TileID.ADMINITE).type;
+				Sprite tileSprite = spriteStore.getSprite(tileType.getRef());
+				tileSprite.draw(g, posX, posY, tileSize, tileSize);
 			}
 			
 			posX = (int) ((width - cameraX) * tileSize);
 			if (!(posX < 0 - tileSize || posX > screenWidth)) {
-				Constants.tileTypes.get(TileID.ADMINITE).type.sprite.draw(g, posX, posY, tileSize,
-						tileSize);
+				TileType tileType = Constants.tileTypes.get(TileID.ADMINITE).type;
+				Sprite tileSprite = spriteStore.getSprite(tileType.getRef());
+				tileSprite.draw(g, posX, posY, tileSize, tileSize);
 			}
 		}
 		
@@ -328,7 +332,8 @@ public class World implements java.io.Serializable {
 				Color tint = new Color(16, 16, 16, 255 - lightIntensity);
 				
 				if (tiles[i][j].type.name != TileID.AIR) {
-					tiles[i][j].type.sprite.draw(g, posX, posY, tileSize, tileSize, tint);
+					Sprite tileSprite = spriteStore.getSprite(tiles[i][j].type.getRef());
+					tileSprite.draw(g, posX, posY, tileSize, tileSize, tint);
 				} else {
 					g.setColor(tint);
 					g.fillRect(posX, posY, tileSize, tileSize);

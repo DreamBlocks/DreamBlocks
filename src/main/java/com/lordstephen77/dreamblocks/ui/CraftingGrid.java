@@ -2,12 +2,15 @@ package com.lordstephen77.dreamblocks.ui;
 
 import com.lordstephen77.dreamblocks.*;
 
+import java.io.Serializable;
 import java.util.Optional;
 
 /**
  * Created by Александр on 25.06.2017.
  */
-public class CraftingGrid {
+public class CraftingGrid implements Serializable{
+    private static final long serialVersionUID = 1L;
+
     private InventoryItem[][] inventoryItems;
     private int tableSizeAvailable = 2;
     private int tileSize;
