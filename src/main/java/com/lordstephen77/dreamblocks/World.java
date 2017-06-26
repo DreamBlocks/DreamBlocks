@@ -298,7 +298,7 @@ public class World implements java.io.Serializable {
 				continue;
 			}
 			TileType tileType = Constants.tileTypes.get(TileID.ADMINITE).type;
-			Sprite tileSprite = spriteStore.getSprite(tileType.getRef());
+			Sprite tileSprite = spriteStore.getSprite(tileType.getSpriteid());
 			tileSprite.draw(g, posX, posY, tileSize, tileSize);
 		}
 		
@@ -307,14 +307,14 @@ public class World implements java.io.Serializable {
 			int posY = (int) ((j - cameraY) * tileSize);
 			if (!(posX < 0 - tileSize || posX > screenWidth || posY < 0 - tileSize || posY > screenHeight)) {
 				TileType tileType = Constants.tileTypes.get(TileID.ADMINITE).type;
-				Sprite tileSprite = spriteStore.getSprite(tileType.getRef());
+				Sprite tileSprite = spriteStore.getSprite(tileType.getSpriteid());
 				tileSprite.draw(g, posX, posY, tileSize, tileSize);
 			}
 			
 			posX = (int) ((width - cameraX) * tileSize);
 			if (!(posX < 0 - tileSize || posX > screenWidth)) {
 				TileType tileType = Constants.tileTypes.get(TileID.ADMINITE).type;
-				Sprite tileSprite = spriteStore.getSprite(tileType.getRef());
+				Sprite tileSprite = spriteStore.getSprite(tileType.getSpriteid());
 				tileSprite.draw(g, posX, posY, tileSize, tileSize);
 			}
 		}
@@ -332,7 +332,7 @@ public class World implements java.io.Serializable {
 				Color tint = new Color(16, 16, 16, 255 - lightIntensity);
 				
 				if (tiles[i][j].type.name != TileID.AIR) {
-					Sprite tileSprite = spriteStore.getSprite(tiles[i][j].type.getRef());
+					Sprite tileSprite = spriteStore.getSprite(tiles[i][j].type.getSpriteid());
 					tileSprite.draw(g, posX, posY, tileSize, tileSize, tint);
 				} else {
 					g.setColor(tint);

@@ -45,16 +45,16 @@ public class Player extends LivingEntity {
 	public float handStartY;
 	public float handEndX;
 	public float handEndY;
-	
-	private Sprite leftWalkSprite;
-	private Sprite rightWalkSprite;
+
+	private String leftWalkSpriteId;
+	private String rightWalkSpriteId;
 	
 	public Player(boolean gravityApplies, float x, float y, int width, int height) {
 		super(gravityApplies, x, y, width, height);
-		
-		leftWalkSprite = SpriteStore.get().getSprite("sprites/entities/left_man.png");
-		rightWalkSprite = SpriteStore.get().getSprite("sprites/entities/right_man.png");
-		sprite = SpriteStore.get().getSprite("sprites/entities/player.gif");
+
+		leftWalkSpriteId = "sprites/entities/left_man.png";
+		rightWalkSpriteId = "sprites/entities/right_man.png";
+		spriteId = "sprites/entities/player.gif";
 	}
 
 	public void updateHand(GraphicsHandler g, float cameraX, float cameraY, float mouseX,
@@ -180,7 +180,7 @@ public class Player extends LivingEntity {
 	}
 	
 	@Override
-	public void draw(GraphicsHandler g, float cameraX, float cameraY, int screenWidth,
+	public void draw(GraphicsHandler g, SpriteStore spriteStore, float cameraX, float cameraY, int screenWidth,
 			int screenHeight, int tileSize) {
 		Int2 pos = StockMethods.computeDrawLocationInPlace(cameraX, cameraY, screenWidth,
 				screenHeight, tileSize, x, y);
@@ -188,18 +188,24 @@ public class Player extends LivingEntity {
 			int frame = (int) x % 4;// (int) ((ticksAlive/20)%4);
 			if (facingRight) {
 				if (frame == 0 || frame == 2 || dx <= 0) {
+					Sprite sprite = spriteStore.getSprite(spriteId);
 					sprite.draw(g, pos.x, pos.y, widthPX, heightPX);
 				} else if (frame == 1) {
+					Sprite rightWalkSprite = spriteStore.getSprite(rightWalkSpriteId);
 					rightWalkSprite.draw(g, pos.x, pos.y, widthPX, heightPX);
 				} else {
+					Sprite leftWalkSprite = spriteStore.getSprite(leftWalkSpriteId);
 					leftWalkSprite.draw(g, pos.x, pos.y, widthPX, heightPX);
 				}
 			} else {
 				if (frame == 0 || frame == 2 || dx >= 0) {
+					Sprite sprite = spriteStore.getSprite(spriteId);
 					sprite.draw(g, pos.x + widthPX, pos.y, -widthPX, heightPX);
 				} else if (frame == 1) {
+					Sprite rightWalkSprite = spriteStore.getSprite(rightWalkSpriteId);
 					rightWalkSprite.draw(g, pos.x + widthPX, pos.y, -widthPX, heightPX);
 				} else {
+					Sprite leftWalkSprite = spriteStore.getSprite(leftWalkSpriteId);
 					leftWalkSprite.draw(g, pos.x + widthPX, pos.y, -widthPX, heightPX);
 				}
 			}

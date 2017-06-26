@@ -41,24 +41,24 @@ import com.lordstephen77.dreamblocks.Constants.TileID;
 public class TileType implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 
-	private String ref;
+	private String spriteid;
 	protected TileID name;
 	protected boolean passable;
 	protected boolean liquid;
 	protected int lightBlocking;
 	protected int lightEmitting;
 
-	public TileType(String ref, TileID name) {
-		this(ref, name, false, false, Constants.LIGHT_VALUE_OPAQUE);
+	public TileType(String spriteid, TileID name) {
+		this(spriteid, name, false, false, Constants.LIGHT_VALUE_OPAQUE);
 	}
 	
-	public TileType(String ref, TileID name, boolean passable, boolean liquid, int lightBlocking) {
-		this(ref, name, passable, liquid, lightBlocking, 0);
+	public TileType(String spriteid, TileID name, boolean passable, boolean liquid, int lightBlocking) {
+		this(spriteid, name, passable, liquid, lightBlocking, 0);
 	}
 	
-	public TileType(String ref, TileID name, boolean passable, boolean liquid, int lightBlocking,
-			int lightEmitting) {
-		this.ref = ref;
+	public TileType(String spriteid, TileID name, boolean passable, boolean liquid, int lightBlocking,
+					int lightEmitting) {
+		this.spriteid = spriteid;
 		this.name = name;
 		this.passable = passable;
 		this.liquid = liquid;
@@ -66,7 +66,7 @@ public class TileType implements java.io.Serializable {
 		this.lightEmitting = lightEmitting;
 	}
 
-	public String getRef() {
-		return ref;
+	public String getSpriteid() {
+		return spriteid;
 	}
 }

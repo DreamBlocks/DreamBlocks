@@ -46,15 +46,17 @@ public class NewGameMenu {
     private final Button menu_medium;
     private final Button menu_big;
 
-    private final Sprite menu_bgTile = SpriteStore.get().getSprite("sprites/tiles/cobble.png");
-    private final Sprite menu_logo = SpriteStore.get().getSprite("sprites/menus/title.png");
-    private final Sprite menu_tag = SpriteStore.get().getSprite("sprites/menus/tag.png");
+    private final Sprite menu_bgTile;
+    private final Sprite menu_logo;
+    private final Sprite menu_tag;
 
     private MainGame game;
 
-    public NewGameMenu(MainGame g) {
+    public NewGameMenu(MainGame g, SpriteStore ss) {
         this.game = g;
-        SpriteStore ss = SpriteStore.get();
+        menu_bgTile = ss.getSprite("sprites/tiles/cobble.png");
+        menu_logo = ss.getSprite("sprites/menus/title.png");
+        menu_tag = ss.getSprite("sprites/menus/tag.png");
         menu_mini = new Button(150, 160, 64, ss.getSprite("sprites/menus/mini_up.png"), ss.getSprite("sprites/menus/mini_down.png"));
         menu_medium = new Button(250, 160, 64, ss.getSprite("sprites/menus/med_up.png"), ss.getSprite("sprites/menus/med_down.png"));
         menu_big = new Button(350, 160, 64, ss.getSprite("sprites/menus/big_up.png"), ss.getSprite("sprites/menus/big_down.png"));
