@@ -49,7 +49,7 @@ public class StartMenu {
 	
 	public StartMenu(MainGame mainGame, SpriteStore ss) {
 		this.game = mainGame;
-		menu_bgTile = ss.getSprite("sprites/tiles/cobble.png");
+		menu_bgTile = ss.getSprite("sprites/tiles/wood.png");
 		menu_logo = ss.getSprite("sprites/menus/title.png");
 		menu_tag = ss.getSprite("sprites/menus/tag.png");
 		menuNew = new Button(200, 160, 64, ss.getSprite("sprites/menus/new_up.png"),  ss.getSprite("sprites/menus/new_down.png"));
