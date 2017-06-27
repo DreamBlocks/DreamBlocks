@@ -52,9 +52,9 @@ public class StartMenu {
 		menu_bgTile = ss.getSprite("sprites/tiles/cobble.png");
 		menu_logo = ss.getSprite("sprites/menus/title.png");
 		menu_tag = ss.getSprite("sprites/menus/tag.png");
-		menuNew = new Button(150, 160, 64, ss.getSprite("sprites/menus/new_up.png"),  ss.getSprite("sprites/menus/new_down.png"));
-		menuLoad = new Button(250, 160, 64, ss.getSprite("sprites/menus/load_up.png"), ss.getSprite("sprites/menus/load_down.png"));
-		menuQuit = new Button(350, 160, 64, ss.getSprite("sprites/menus/quit_up.png"), ss.getSprite("sprites/menus/quit_down.png"));
+		menuNew = new Button(200, 160, 64, ss.getSprite("sprites/menus/new_up.png"),  ss.getSprite("sprites/menus/new_down.png"));
+		menuLoad = new Button(300, 160, 64, ss.getSprite("sprites/menus/load_up.png"), ss.getSprite("sprites/menus/load_down.png"));
+		menuQuit = new Button(400, 160, 64, ss.getSprite("sprites/menus/quit_up.png"), ss.getSprite("sprites/menus/quit_down.png"));
 	}
 	// menu title + animated logo
 	public void draw(GraphicsHandler g) {
