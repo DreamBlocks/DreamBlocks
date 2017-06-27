@@ -54,7 +54,7 @@ public class NewGameMenu {
 
     public NewGameMenu(MainGame g, SpriteStore ss) {
         this.game = g;
-        menu_bgTile = ss.getSprite("sprites/tiles/cobble.png");
+        menu_bgTile = ss.getSprite("sprites/tiles/wood.png");
         menu_logo = ss.getSprite("sprites/menus/title.png");
         menu_tag = ss.getSprite("sprites/menus/tag.png");
         menu_mini = new Button(200, 160, 64, ss.getSprite("sprites/menus/mini_up.png"), ss.getSprite("sprites/menus/mini_down.png"));
