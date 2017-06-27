@@ -80,7 +80,7 @@ public class MainGame {
 	private LightingEngine lightingEngineSun;
 	private LightingEngine lightingEngineSourceBlocks;
 	
-	public MusicPlayer musicPlayer = new MusicPlayer("sounds/music.ogg");
+	public MusicPlayer musicPlayer = new MusicPlayer("res/sounds/music.ogg");
 	public Int2 screenMousePos = new Int2(0, 0);
 	
 	/**
@@ -180,6 +180,8 @@ public class MainGame {
 			case QUIT_GAME:
 				quit();
 				break;
+		default:
+			break;
 		}
 		leftClick = false;
 	}

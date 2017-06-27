@@ -57,9 +57,9 @@ public class NewGameMenu {
         menu_bgTile = ss.getSprite("sprites/tiles/cobble.png");
         menu_logo = ss.getSprite("sprites/menus/title.png");
         menu_tag = ss.getSprite("sprites/menus/tag.png");
-        menu_mini = new Button(150, 160, 64, ss.getSprite("sprites/menus/mini_up.png"), ss.getSprite("sprites/menus/mini_down.png"));
-        menu_medium = new Button(250, 160, 64, ss.getSprite("sprites/menus/med_up.png"), ss.getSprite("sprites/menus/med_down.png"));
-        menu_big = new Button(350, 160, 64, ss.getSprite("sprites/menus/big_up.png"), ss.getSprite("sprites/menus/big_down.png"));
+        menu_mini = new Button(200, 160, 64, ss.getSprite("sprites/menus/mini_up.png"), ss.getSprite("sprites/menus/mini_down.png"));
+        menu_medium = new Button(300, 160, 64, ss.getSprite("sprites/menus/med_up.png"), ss.getSprite("sprites/menus/med_down.png"));
+        menu_big = new Button(400, 160, 64, ss.getSprite("sprites/menus/big_up.png"), ss.getSprite("sprites/menus/big_down.png"));
     }
 
     // menu title + animated logo
