@@ -60,13 +60,7 @@ public class AwtSprite implements com.lordstephen77.dreamblocks.Sprite {
 	/** The image to be drawn for this sprite */
 	transient public Image image;
 	public String ref;
-	
-	// for serialization loading
-	public AwtSprite() {
-		AwtSprite s = (AwtSprite) SpriteStore.get().getSprite(ref);
-		this.image = s.image;
-	}
-	
+
 	/**
 	 * Create a new sprite based on an image
 	 * 
@@ -120,29 +114,5 @@ public class AwtSprite implements com.lordstephen77.dreamblocks.Sprite {
 	
 	public void draw(GraphicsHandler g, int x, int y, int width, int height, Color tint) {
 		g.drawImage(this, x, y, width, height, tint);
-	}
-	
-	/**
-	 * Always treat de-serialization as a full-blown constructor, by
-	 * validating the final state of the de-serialized object.
-	 */
-	@Override
-	public void readObject(ObjectInputStream aInputStream) throws ClassNotFoundException,
-			IOException {
-		// always perform the default de-serialization first
-		// aInputStream.defaultReadObject();
-		ref = (String) aInputStream.readObject();
-		this.image = ((AwtSprite) AwtSpriteStore.get().getSprite(ref)).image;
-	}
-	
-	/**
-	 * This is the default implementation of writeObject.
-	 * Customise if necessary.
-	 */
-	@Override
-	public void writeObject(ObjectOutputStream aOutputStream) throws IOException {
-		// perform the default serialization for all non-transient, non-static fields
-		aOutputStream.writeObject(ref);
-		aOutputStream.defaultWriteObject();
 	}
 }

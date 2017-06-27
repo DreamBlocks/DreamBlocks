@@ -38,18 +38,20 @@ import com.lordstephen77.dreamblocks.SpriteStore;
 public class StartMenu {
 	
 	/* menu sprites */
-	private final Sprite menu_bgTile = SpriteStore.get().getSprite("sprites/tiles/cobble.png");
-	private final Sprite menu_logo = SpriteStore.get().getSprite("sprites/menus/title.png");
+	private final Sprite menu_bgTile;
+	private final Sprite menu_logo;
 	private final Button menuNew;
 	private final Button menuLoad;
 	private final Button menuQuit;
-	private final Sprite menu_tag = SpriteStore.get().getSprite("sprites/menus/tag.png");
+	private final Sprite menu_tag;
 
 	private MainGame game;
 	
-	public StartMenu(MainGame mainGame) {
+	public StartMenu(MainGame mainGame, SpriteStore ss) {
 		this.game = mainGame;
-		SpriteStore ss = SpriteStore.get();
+		menu_bgTile = ss.getSprite("sprites/tiles/cobble.png");
+		menu_logo = ss.getSprite("sprites/menus/title.png");
+		menu_tag = ss.getSprite("sprites/menus/tag.png");
 		menuNew = new Button(150, 160, 64, ss.getSprite("sprites/menus/new_up.png"),  ss.getSprite("sprites/menus/new_down.png"));
 		menuLoad = new Button(250, 160, 64, ss.getSprite("sprites/menus/load_up.png"), ss.getSprite("sprites/menus/load_down.png"));
 		menuQuit = new Button(350, 160, 64, ss.getSprite("sprites/menus/quit_up.png"), ss.getSprite("sprites/menus/quit_down.png"));

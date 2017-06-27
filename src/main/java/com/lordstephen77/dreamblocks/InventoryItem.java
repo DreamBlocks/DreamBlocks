@@ -108,7 +108,9 @@ public class InventoryItem implements java.io.Serializable {
 		if (this.getCount() <= 0) {
 			return;
 		}
-		this.getItem().sprite.draw(g, x, y, tileSize, tileSize);
+		SpriteStore spriteStore = SpriteStore.get();
+		Sprite sprite = spriteStore.getSprite(item.getSpriteId());
+		sprite.draw(g, x, y, tileSize, tileSize);
 		if (this.getCount() > 1) {
 			g.setColor(Color.white);
 			g.drawString("" + this.getCount(), x, y + tileSize / 2);

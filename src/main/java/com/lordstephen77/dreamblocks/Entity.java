@@ -42,20 +42,22 @@ public abstract class Entity implements java.io.Serializable {
 	protected static final float gravityAcceleration = .03f;
 	protected static final float waterAcceleration = .015f;
 	protected static final float maxWaterDY = .05f;
-	
+
+	protected String spriteId;
 	public float x;
 	public float y;
 	public float dx;
 	public float dy;
-	
-	protected Sprite sprite;
+
 	protected boolean gravityApplies;
 	protected int widthPX;
 	protected int heightPX;
-	
-	public Entity(String ref, boolean gravityApplies, float x, float y, int width, int height) {
-		if (ref != null) {
-			this.sprite = SpriteStore.get().getSprite(ref);
+
+	public Entity(String spriteId, boolean gravityApplies, float x, float y, int width, int height) {
+		if (spriteId != null) {
+			this.spriteId = spriteId;
+		} else {
+			this.spriteId = "";
 		}
 		this.gravityApplies = gravityApplies;
 		this.x = x;
@@ -273,13 +275,14 @@ public abstract class Entity implements java.io.Serializable {
 		
 		return pos.x >= left && pos.x <= right && pos.y >= top && pos.y <= bottom;
 	}
-	
-	public void draw(GraphicsHandler g, float cameraX, float cameraY, int screenWidth,
+
+	public void draw(GraphicsHandler g, SpriteStore spriteStore, float cameraX, float cameraY, int screenWidth,
 			int screenHeight, int tileSize) {
+		Sprite entitySprite = spriteStore.getSprite(spriteId);
 		Int2 pos = StockMethods.computeDrawLocationInPlace(cameraX, cameraY, screenWidth,
 				screenHeight, tileSize, x, y);
 		if (StockMethods.onScreen) {
-			sprite.draw(g, pos.x, pos.y, widthPX, heightPX);
+			entitySprite.draw(g, pos.x, pos.y, widthPX, heightPX);
 		}
 	}
 	
@@ -288,5 +291,9 @@ public abstract class Entity implements java.io.Serializable {
 	}
 	
 	public void heal(int amount) {
+	}
+
+	public String getSpriteId() {
+		return spriteId;
 	}
 }

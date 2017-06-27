@@ -68,9 +68,10 @@ public class MainGame {
 	private boolean inMenu = true;
 	private boolean newGame = false;
     private boolean inInventory = false;
-	private StartMenu startMenu;
-	private NewGameMenu newGameMenu;
-	public Hotbar hotbar;
+    private final SpriteStore spriteStore;
+	private final StartMenu startMenu;
+	private final NewGameMenu newGameMenu;
+	public final Hotbar hotbar;
 	public long ticksRunning;
 	private Random random = new Random();
 	
@@ -84,8 +85,9 @@ public class MainGame {
 	 * Construct our game and set it running.
 	 */
 	public MainGame() {
-		startMenu = new StartMenu(this);
-		newGameMenu = new NewGameMenu(this);
+	    spriteStore = SpriteStore.get();
+		startMenu = new StartMenu(this, spriteStore);
+		newGameMenu = new NewGameMenu(this, spriteStore);
 		int tileSize = 16;
         int margin = 10;
         hotbar = new Hotbar(tileSize, margin);
@@ -137,19 +139,18 @@ public class MainGame {
 		}
 		
 		// load sprites
-		final SpriteStore ss = SpriteStore.get();
-		builderIcon = ss.getSprite("sprites/other/builder.png");
-		minerIcon = ss.getSprite("sprites/other/miner.png");
-		fullHeart = ss.getSprite("sprites/other/full_heart.png");
-		halfHeart = ss.getSprite("sprites/other/half_heart.png");
-		emptyHeart = ss.getSprite("sprites/other/empty_heart.png");
-		bubble = ss.getSprite("sprites/other/bubble.png");
+		builderIcon = spriteStore.getSprite("sprites/other/builder.png");
+		minerIcon = spriteStore.getSprite("sprites/other/miner.png");
+		fullHeart = spriteStore.getSprite("sprites/other/full_heart.png");
+		halfHeart = spriteStore.getSprite("sprites/other/half_heart.png");
+		emptyHeart = spriteStore.getSprite("sprites/other/empty_heart.png");
+		bubble = spriteStore.getSprite("sprites/other/bubble.png");
 		// there's no empty bubble image, so we'll just use this for now
-		emptyBubble = ss.getSprite("sprites/other/bubble_pop2.png");
+		emptyBubble = spriteStore.getSprite("sprites/other/bubble_pop2.png");
 		
 		breakingSprites = new Sprite[8];
 		for (int i = 0; i < 8; i++) {
-			breakingSprites[i] = ss.getSprite("sprites/tiles/break" + i + ".png");
+			breakingSprites[i] = spriteStore.getSprite("sprites/tiles/break" + i + ".png");
 		}
 		
 		musicPlayer.play();
@@ -262,7 +263,7 @@ public class MainGame {
 					continue;
 				}
 				entity.updatePosition(world, tileSize);
-				entity.draw(g, cameraX, cameraY, screenWidth, screenHeight, tileSize);
+				entity.draw(g, spriteStore, cameraX, cameraY, screenWidth, screenHeight, tileSize);
 			}
 
 			if (viewFPS) {
