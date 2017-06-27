@@ -89,8 +89,10 @@ public class StartMenu {
 	        return START_MENU_DIALOG_RESULT.NEW_GAME;
         } else if (menuLoad.isInside(x, y)){
             return START_MENU_DIALOG_RESULT.LOAD_GAME;
-        } else {
+        } else if (menuQuit.isInside(x, y)){
             return START_MENU_DIALOG_RESULT.QUIT_GAME;
-        }
+        } else {
+			return START_MENU_DIALOG_RESULT.NOTHING_CLICKED;
+		}
     }
 }
