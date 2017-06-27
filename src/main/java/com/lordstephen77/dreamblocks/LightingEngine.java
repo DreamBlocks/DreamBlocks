@@ -58,11 +58,11 @@ public class LightingEngine implements Serializable {
 	private Tile[][] tiles;
 	
 	private final boolean isSun;
-	
-	public LightingEngine(int width, int height, Tile[][] tiles, boolean isSun) {
-		this.width = width;
-		this.height = height;
-		this.tiles = tiles;
+
+	public LightingEngine(World world, boolean isSun){
+		this.width = world.width;
+		this.height = world.height;
+		this.tiles = world.tiles;
 		this.isSun = isSun;
 		lightValues = new int[width][height];
 		lightFlow = new Direction[width][height];
