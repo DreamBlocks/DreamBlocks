@@ -77,6 +77,8 @@ public class MainGame {
 	
 	public Player player;
 	public World world;
+	private LightingEngine lightingEngineSun;
+	private LightingEngine lightingEngineSourceBlocks;
 	
 	public MusicPlayer musicPlayer = new MusicPlayer("sounds/music.ogg");
 	public Int2 screenMousePos = new Int2(0, 0);
@@ -137,6 +139,8 @@ public class MainGame {
 				player.giveItem(Constants.itemTypes.get((char) 106).clone(), 64);
 			}
 		}
+		lightingEngineSun = new LightingEngine(world, true);
+		lightingEngineSourceBlocks = new LightingEngine(world, false);
 		
 		// load sprites
 		builderIcon = spriteStore.getSprite("sprites/other/builder.png");
@@ -199,7 +203,7 @@ public class MainGame {
 		if (Constants.DEBUG) {
 			startGame(false, 512);
 		}
-		
+
 		// keep looping round till the game ends
 		while (gameRunning) {
 			ticksRunning++;
@@ -228,8 +232,8 @@ public class MainGame {
 			float worldMouseX = (cameraX * tileSize + screenMousePos.x) / tileSize;
 			float worldMouseY = (cameraY * tileSize + screenMousePos.y) / tileSize - .5f;
 			
-			world.chunkUpdate();
-			world.draw(g, 0, 0, screenWidth, screenHeight, cameraX, cameraY, tileSize);
+			world.chunkUpdate(lightingEngineSun, lightingEngineSourceBlocks);
+			world.draw(g, 0, 0, screenWidth, screenHeight, cameraX, cameraY, tileSize, lightingEngineSun, lightingEngineSourceBlocks);
 
             if (isInInventory()) {
                 boolean inventoryFocus = player.inventory.updateInventory(screenWidth, screenHeight,
@@ -323,6 +327,10 @@ public class MainGame {
 			}
 			breakingTicks = 0;
 			TileID name = world.removeTile(player.handBreakPos.x, player.handBreakPos.y);
+			if (name != TileID.NONE){
+				lightingEngineSun.removedTile(player.handBreakPos.x, player.handBreakPos.y);
+				lightingEngineSourceBlocks.removedTile(player.handBreakPos.x, player.handBreakPos.y);
+			}
 			if (name == TileID.GRASS) {
 				name = TileID.DIRT;
 			}
@@ -362,7 +370,7 @@ public class MainGame {
 			boolean isPassable = Constants.tileTypes.get(itemID).type.passable;
 
 			if (isPassable || !player.inBoundingBox(player.handBuildPos, tileSize)) {
-				if (world.addTile(player.handBuildPos, itemID)) {
+				if (world.addTile(player.handBuildPos, itemID, lightingEngineSun, lightingEngineSourceBlocks)) {
 					// placed successfully
 					hotbar.decreaseSelected(1);
 				}

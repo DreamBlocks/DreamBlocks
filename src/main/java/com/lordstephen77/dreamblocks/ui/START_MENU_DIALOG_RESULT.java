@@ -35,5 +35,6 @@ package com.lordstephen77.dreamblocks.ui;
 public enum START_MENU_DIALOG_RESULT {
     NEW_GAME,
     QUIT_GAME,
-    LOAD_GAME
+    LOAD_GAME,
+    NOTHING_CLICKED
 }

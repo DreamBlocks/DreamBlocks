@@ -55,8 +55,6 @@ public class World implements java.io.Serializable {
 	private Random random;
 	private long ticksAlive = 0;
 	private final int dayLength = 20000;
-	private LightingEngine lightingEngineSun;
-	private LightingEngine lightingEngineSourceBlocks;
 	
 	// private int[] columnHeights;
 	
@@ -83,11 +81,9 @@ public class World implements java.io.Serializable {
 		this.chunkCount = (int) Math.ceil((double) width / chunkWidth);
 		this.chunkNeedsUpdate = 0;
 		this.random = random;
-		lightingEngineSun = new LightingEngine(width, height, tiles, true);
-		lightingEngineSourceBlocks = new LightingEngine(width, height, tiles, false);
 	}
 	
-	public void chunkUpdate() {
+	public void chunkUpdate(LightingEngine sun, LightingEngine sourceBlocks) {
 		ticksAlive++;
 		for (int i = 0; i < chunkWidth; i++) {
 			boolean isDirectLight = true;
@@ -114,22 +110,22 @@ public class World implements java.io.Serializable {
 					}
 				} else if (tiles[x][y].type.name == TileID.SAND) {
 					if (isAir(x, y + 1) || isLiquid(x, y + 1)) {
-						changeTile(x, y + 1, tiles[x][y]);
-						changeTile(x, y, Constants.tileTypes.get(TileID.AIR));
+						changeTile(x, y + 1, tiles[x][y], sun);
+						changeTile(x, y, Constants.tileTypes.get(TileID.AIR), sun);
 					}
 				} else if (tiles[x][y].type.name == TileID.SAPLING) {
 					if (random.nextDouble() < .01) {
-						addTemplate(TileTemplate.tree, x, y);
+						addTemplate(TileTemplate.tree, x, y, sun, sourceBlocks);
 					}
 				} else if (tiles[x][y].type.liquid) {
 					if (isAir(x + 1, y)) {
-						changeTile(x + 1, y, tiles[x][y]);
+						changeTile(x + 1, y, tiles[x][y], sun);
 					}
 					if (isAir(x - 1, y)) {
-						changeTile(x - 1, y, tiles[x][y]);
+						changeTile(x - 1, y, tiles[x][y], sun);
 					}
 					if (isAir(x, y + 1)) {
-						changeTile(x, y + 1, tiles[x][y]);
+						changeTile(x, y + 1, tiles[x][y], sun);
 					}
 				}
 				if ((!tiles[x][y].type.passable || tiles[x][y].type.liquid)
@@ -145,7 +141,7 @@ public class World implements java.io.Serializable {
 		
 	}
 	
-	private void addTemplate(TileTemplate tileTemplate, int x, int y) {
+	private void addTemplate(TileTemplate tileTemplate, int x, int y, LightingEngine sun, LightingEngine sourceBlocks) {
 		for (int i = 0; i < tileTemplate.template.length; i++) {
 			for (int j = 0; j < tileTemplate.template[0].length; j++) {
 				if (tileTemplate.template[i][j] != TileID.NONE && x - tileTemplate.spawnY + i >= 0
@@ -153,17 +149,17 @@ public class World implements java.io.Serializable {
 						&& y - tileTemplate.spawnX + j >= 0
 						&& y - tileTemplate.spawnX + j < tiles[0].length) {
 					addTile(x - tileTemplate.spawnY + i, y - tileTemplate.spawnX + j,
-							tileTemplate.template[i][j]);
+							tileTemplate.template[i][j], sun, sourceBlocks);
 				}
 			}
 		}
 	}
 	
-	public boolean addTile(Int2 pos, TileID name) {
-		return addTile(pos.x, pos.y, name);
+	public boolean addTile(Int2 pos, TileID name, LightingEngine sun, LightingEngine sourceBlocks) {
+		return addTile(pos.x, pos.y, name,sun, sourceBlocks);
 	}
 
-	public boolean addTile(int x, int y, TileID name) {
+	public boolean addTile(int x, int y, TileID name, LightingEngine sun, LightingEngine sourceBlocks) {
 		if (x < 0 || x >= width || y < 0 || y >= height) {
 			return false;
 		}
@@ -178,8 +174,8 @@ public class World implements java.io.Serializable {
 			}
 		}
 		tiles[x][y] = tile;
-		lightingEngineSun.addedTile(x, y);
-		lightingEngineSourceBlocks.addedTile(x, y);
+		sun.addedTile(x, y);
+		sourceBlocks.addedTile(x, y);
 		return true;
 	}
 	
@@ -189,17 +185,15 @@ public class World implements java.io.Serializable {
 		}
 		TileID name = tiles[x][y].type.name;
 		tiles[x][y] = Constants.tileTypes.get(TileID.AIR);
-		lightingEngineSun.removedTile(x, y);
-		lightingEngineSourceBlocks.removedTile(x, y);
 		return name;
 	}
 	
-	public void changeTile(int x, int y, Tile tile) {
+	public void changeTile(int x, int y, Tile tile, LightingEngine sun) {
 		tiles[x][y] = tile;
 		if (tile.type.lightBlocking > 0) {
-			lightingEngineSun.addedTile(x, y);
+			sun.addedTile(x, y);
 		} else {
-			lightingEngineSun.removedTile(x, y);
+			sun.removedTile(x, y);
 		}
 	}
 	
@@ -277,7 +271,7 @@ public class World implements java.io.Serializable {
 	}
 	
 	public void draw(GraphicsHandler g, int x, int y, int screenWidth, int screenHeight,
-			float cameraX, float cameraY, int tileSize) {
+			float cameraX, float cameraY, int tileSize, LightingEngine sun, LightingEngine sourceBlocks) {
 		SpriteStore spriteStore = SpriteStore.get();
 		Int2 pos;
 		
@@ -328,7 +322,7 @@ public class World implements java.io.Serializable {
 					continue;
 				}
 				
-				int lightIntensity = (int) (getLightValue(i, j) * 255);
+				int lightIntensity = (int) (getLightValue(i, j, sun, sourceBlocks) * 255);
 				Color tint = new Color(16, 16, 16, 255 - lightIntensity);
 				
 				if (tiles[i][j].type.name != TileID.AIR) {
@@ -386,13 +380,13 @@ public class World implements java.io.Serializable {
 	/**
 	 * @return a light value [0,1]
 	 **/
-	public float getLightValue(int x, int y) {
+	public float getLightValue(int x, int y, LightingEngine sun, LightingEngine sourceBlocks) {
 		if (Constants.DEBUG_VISIBILITY_ON)
 			return 1;
 		float daylight = getDaylight();
-		float lightValueSun = ((float) lightingEngineSun.getLightValue(x, y))
+		float lightValueSun = ((float) sun.getLightValue(x, y))
 				/ Constants.LIGHT_VALUE_SUN * daylight;
-		float lightValueSourceBlocks = ((float) lightingEngineSourceBlocks.getLightValue(x, y))
+		float lightValueSourceBlocks = ((float) sourceBlocks.getLightValue(x, y))
 				/ Constants.LIGHT_VALUE_SUN;
 		if (lightValueSun >= lightValueSourceBlocks)
 			return lightValueSun;
