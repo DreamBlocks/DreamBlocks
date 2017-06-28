@@ -64,7 +64,7 @@ public class MainGame {
 	private Sprite[] breakingSprites;
 	private Sprite fullHeart, halfHeart, emptyHeart, bubble, emptyBubble;
 	
-	public boolean viewFPS = false;
+	public boolean viewFPS = true;
 	private boolean inMenu = true;
 	private boolean newGame = false;
     private boolean inInventory = false;
@@ -385,7 +385,7 @@ public class MainGame {
 				+ Runtime.getRuntime().freeMemory() / 1024 / 1024 + " / "
 				+ Runtime.getRuntime().totalMemory() / 1024 / 1024 + ") Free MB";
 		g.setColor(Color.white);
-		g.drawString(fps, 10, 10);
+		g.drawString(fps, 10, 20);
 	}
 
 	public void drawUI(float cameraX, float cameraY, GraphicsHandler g){
