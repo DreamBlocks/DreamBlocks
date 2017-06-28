@@ -44,7 +44,7 @@ import com.lordstephen77.dreamblocks.ui.*;
 
 /**
  * <p>Main class</p>
- * @author Stefano Peris
+ * @author Stefano Peris, Sonya Sitnikova
  * @version 0.3
  */
 public class MainGame {
@@ -152,7 +152,7 @@ public class MainGame {
 		entities.clear();
 		// make a new world and player
 		world = new World(worldWidth, worldHeight, random);
-		player = new Player(true, world.spawnLocation.x, world.spawnLocation.y, +				7 * (tileSize / 8), 14 * (tileSize / 8));
+		player = new Player(true, world.spawnLocation.x, world.spawnLocation.y, + 7 * (tileSize / 8), 14 * (tileSize / 8));
 		hotbar.setInventory(player.inventory);
 		entities.add(player);
 		if (Constants.DEBUG) {
