@@ -42,9 +42,9 @@ public class InventoryItem implements java.io.Serializable {
 	public final int maxCount = 64;
 	public int count = 0;
 	public Item item;
-	
-	public InventoryItem(Item item) {
-		this.setItem(item);
+
+	public InventoryItem() {
+		this.setItem(null);
 	}
 	
 	// returns left overs
@@ -103,24 +103,35 @@ public class InventoryItem implements java.io.Serializable {
 			other.remove(other.getCount() - result);
 		}
 	}
-	
-	public void draw(GraphicsHandler g, int x, int y, int tileSize) {
+
+	public void draw(GraphicsHandler g, int x, int y, int tileSize){
 		if (this.getCount() <= 0) {
 			return;
 		}
 		SpriteStore spriteStore = SpriteStore.get();
 		Sprite sprite = spriteStore.getSprite(item.getSpriteId());
 		sprite.draw(g, x, y, tileSize, tileSize);
+	}
+
+	public void draw(GraphicsHandler g, int x, int y, int tileSize, int seperation) {
+		g.setColor(Color.LIGHT_GRAY);
+		g.fillRect(x + seperation - 2, y + seperation - 2, tileSize + 4, tileSize + 4);
+		if (this.getCount() <= 0) {
+			return;
+		}
+		SpriteStore spriteStore = SpriteStore.get();
+		Sprite sprite = spriteStore.getSprite(item.getSpriteId());
+		sprite.draw(g, x + seperation, y + seperation, tileSize, tileSize);
 		if (this.getCount() > 1) {
 			g.setColor(Color.white);
-			g.drawString("" + this.getCount(), x, y + tileSize / 2);
+			g.drawString("" + this.getCount(), x + seperation, y + seperation + tileSize / 2);
 		}
 		if (item.getClass() == Tool.class) {
 			Tool tool = (Tool) item;
 			if (tool.uses != 0) {
-				int left = x + 2;
+				int left = x + seperation + 2;
 				int width = (int) (((float) (tool.totalUses - tool.uses) / tool.totalUses) * (tileSize));
-				int top = y + tileSize - 4;
+				int top = y + seperation + tileSize - 4;
 				int height = 2;
 				g.setColor(Color.green);
 				g.fillRect(left, top, width, height);
@@ -142,5 +153,94 @@ public class InventoryItem implements java.io.Serializable {
 	
 	public int getCount() {
 		return count;
+	}
+
+	public void handleLeftClick(InventoryItem holding){
+		if (holding.isEmpty()) {
+			pickWholeStack(holding);
+		} else if (this.item == null) {
+			dropWholeStackToEmptyTile(holding);
+		} else if (holding.item.item_id == this.item.item_id && this.count < maxCount) {
+			if ((holding.item.getClass() != Tool.class) && (this.item.getClass() != Tool.class)) {
+				dropStackToStack(holding);
+			}
+		} else {
+			swapItems(holding);
+		}
+	}
+
+	public void handleRightClick(InventoryItem holding){
+		if (holding.isEmpty()) {
+			if (this.count > 1) {
+				pickHalfOfStack(holding);
+			} else {
+				pickWholeStack(holding);
+			}
+		} else if (this.item == null) {
+			dropSingleItemToEmptyTile(holding);
+		} else if (holding.item.item_id == this.item.item_id && this.count < maxCount) {
+			if ((holding.item.getClass() != Tool.class) && (this.item.getClass() != Tool.class)) {
+				dropSingleItemToStack(holding);
+			}
+		} else {
+			swapItems(holding);
+		}
+	}
+
+	public void pickHalfOfStack(InventoryItem hand){
+		hand.item = this.item;
+		hand.count = (int) Math.ceil((double) this.count / 2);
+		this.count = (int) Math.floor((double) this.count / 2);
+	}
+
+	public void pickWholeStack(InventoryItem hand){
+		hand.item = this.item;
+		hand.count = this.count;
+		this.item = null;
+		this.count = 0;
+	}
+
+	public void dropSingleItemToEmptyTile(InventoryItem hand){
+		this.item = hand.item;
+		this.count = 1;
+		hand.count--;
+		if (hand.count <= 0) {
+			hand.item = null;
+		}
+	}
+
+	public void dropWholeStackToEmptyTile(InventoryItem hand){
+		this.item = hand.item;
+		this.count = hand.count;
+		hand.item = null;
+		hand.count = 0;
+	}
+
+	public void dropSingleItemToStack(InventoryItem hand){
+		this.count++;
+		hand.count--;
+		if (hand.count <= 0) {
+			hand.item = null;
+		}
+	}
+
+	public void dropStackToStack(InventoryItem hand){
+		this.count += hand.count;
+		if (this.count > maxCount) {
+			hand.count = maxCount - this.count;
+			this.count = maxCount;
+		} else {
+			hand.item = null;
+			hand.count = 0;
+		}
+	}
+
+	public void swapItems(InventoryItem hand){
+		Item item = this.item;
+		int count = this.count;
+		this.item = hand.item;
+		this.count = hand.count;
+		hand.item = item;
+		hand.count = count;
 	}
 }

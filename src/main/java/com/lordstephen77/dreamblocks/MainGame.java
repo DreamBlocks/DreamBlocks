@@ -84,7 +84,7 @@ public class MainGame {
 	private LightingEngine lightingEngineSun;
 	private LightingEngine lightingEngineSourceBlocks;
 	
-	public MusicPlayer musicPlayer = new MusicPlayer("res/sounds/music.ogg");
+	public MusicPlayer musicPlayer = new MusicPlayer("sounds/music.ogg");
 	public Int2 screenMousePos = new Int2(0, 0);
 	
 	/**
@@ -108,7 +108,7 @@ public class MainGame {
 	public void loadSprite(){
 		lightingEngineSun = new LightingEngine(world, true);
 		lightingEngineSourceBlocks = new LightingEngine(world, false);
-
+        resize(GraphicsHandler.get().getScreenWidth(), GraphicsHandler.get().getScreenHeight());
 		// load sprites
 		builderIcon = spriteStore.getSprite("sprites/other/builder.png");
 		minerIcon = spriteStore.getSprite("sprites/other/miner.png");
@@ -200,7 +200,12 @@ public class MainGame {
 			leftClick = false;
 		}
 	}
-	
+
+	public void resize(int screenWidth, int screenHeight){
+		player.inventory.resize(screenWidth, screenHeight);
+
+	}
+
 	public void gameLoop() {
 		long lastLoopTime = System.currentTimeMillis();
 		
@@ -240,8 +245,7 @@ public class MainGame {
 			world.draw(g, 0, 0, screenWidth, screenHeight, cameraX, cameraY, tileSize, lightingEngineSun, lightingEngineSourceBlocks);
 
             if (isInInventory()) {
-                boolean inventoryFocus = player.inventory.updateInventory(screenWidth, screenHeight,
-                        screenMousePos, leftClick, rightClick);
+                boolean inventoryFocus = player.inventory.handleClick(screenMousePos, leftClick, rightClick);
                 if (inventoryFocus) {
                     leftClick = false;
                     rightClick = false;
@@ -283,7 +287,7 @@ public class MainGame {
 			}
 
             if (isInInventory()){
-                player.inventory.draw(g, screenWidth, screenHeight, screenMousePos);
+                player.inventory.draw(g, screenMousePos);
             }
 			hotbar.draw(g, screenWidth, screenHeight);
 
