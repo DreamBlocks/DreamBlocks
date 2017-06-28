@@ -64,7 +64,7 @@ public class NewGameMenu {
 
     // menu title + animated logo
     public void draw(GraphicsHandler g) {
-        game.drawTileBackground(g, menu_bgTile, 32);
+        game.drawTileBackground(g, menu_bgTile, 60);
         game.drawCenteredX(g, menu_logo, 70, 397, 50);
         float tagScale = ((float) Math.abs((game.ticksRunning % 100) - 50)) / 50 + 1;
         menu_tag.draw(g, 610, 60, (int) (60 * tagScale), (int) (37 * tagScale));
