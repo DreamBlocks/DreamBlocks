@@ -42,8 +42,9 @@ import java.util.Optional;
 
 public class Inventory implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
-    private int tileSize = 16;
-    private int seperation = 15;
+	// Size inventory panel and block cells
+    private int tileSize = 25;
+    private int seperation = 20;
 	
 	public InventoryItem[][] inventoryItems;
     private InventoryItem[] hotbarRow;
