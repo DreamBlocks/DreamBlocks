@@ -43,11 +43,6 @@ import java.util.Random;
 import com.lordstephen77.dreamblocks.Constants.TileID;
 import com.lordstephen77.dreamblocks.ui.*;
 
-/**
- * <p>Main class</p>
- * @author Stefano Peris
- * @version 0.3
- */
 public class MainGame {
 	
 	private int worldWidth = 512;
@@ -69,7 +64,7 @@ public class MainGame {
 	private Sprite[] breakingSprites;
 	private Sprite fullHeart, halfHeart, emptyHeart, bubble, emptyBubble;
 	
-	public boolean viewFPS = true;
+	public boolean viewFPS = false;
 	private boolean inMenu = true;
 	private boolean newGame = false;
     private boolean inInventory = false;
@@ -106,47 +101,10 @@ public class MainGame {
 	 * Start a fresh game, this should clear out any old data and
 	 * create a new set.
 	 */
-	public void startGame(boolean load, int width) {
-		inMenu = false;
-		if (load) {
-			System.out.println("Loading world, width: " + worldWidth);
-		} else {
-			System.out.println("Creating world, width: " + width);
-			worldWidth = width;
-		}
-		
-		entities.clear();
-		if (load) {
-			// check to see loading is possible (and if so load)
-			load = SaveLoad.doLoad(this);
-		}
-		
-		if (load) {
-			for (Entity entity : entities) {
-				if (entity instanceof Player) {
-					player = (Player) entity;
-                    hotbar.setInventory(player.inventory);
-					player.widthPX = 7 * (tileSize / 8);
-					player.heightPX = 14 * (tileSize / 8);
-				}
-			}
-		}
-		if (!load) {
-			// make a new world and player
-			world = new World(worldWidth, worldHeight, random);
-			player = new Player(true, world.spawnLocation.x, world.spawnLocation.y,
-					7 * (tileSize / 8), 14 * (tileSize / 8));
-			hotbar.setInventory(player.inventory);
-			entities.add(player);
-			if (Constants.DEBUG) {
-				player.giveItem(Constants.itemTypes.get((char) 175).clone(), 1);
-				player.giveItem(Constants.itemTypes.get((char) 88).clone(), 1);
-				player.giveItem(Constants.itemTypes.get((char) 106).clone(), 64);
-			}
-		}
+	public void loadSprite(){
 		lightingEngineSun = new LightingEngine(world, true);
 		lightingEngineSourceBlocks = new LightingEngine(world, false);
-		
+
 		// load sprites
 		builderIcon = spriteStore.getSprite("sprites/other/builder.png");
 		minerIcon = spriteStore.getSprite("sprites/other/miner.png");
@@ -156,14 +114,49 @@ public class MainGame {
 		bubble = spriteStore.getSprite("sprites/other/bubble.png");
 		// there's no empty bubble image, so we'll just use this for now
 		emptyBubble = spriteStore.getSprite("sprites/other/bubble_pop2.png");
-		
+
 		breakingSprites = new Sprite[8];
 		for (int i = 0; i < 8; i++) {
 			breakingSprites[i] = spriteStore.getSprite("sprites/tiles/break" + i + ".png");
 		}
-		
+
 		musicPlayer.play();
 		System.gc();
+	}
+
+	public void startGameLoad(int worldWidth){
+		inMenu = false;
+		System.out.println("Loading world, width: " + worldWidth);
+		entities.clear();
+		if(SaveLoad.doLoad(this)) {
+			for (Entity entity : entities) {
+				if (entity instanceof Player) {
+					player = (Player) entity;
+					hotbar.setInventory(player.inventory);
+					player.widthPX = 7 * (tileSize / 8);
+				player.heightPX = 14 * (tileSize / 8);
+				}
+			}
+		}
+		loadSprite();
+	}
+
+	public void startGameNew(int width){
+		inMenu = false;
+		System.out.println("Creating world, width: " + width);
+		worldWidth = width;
+		entities.clear();
+		// make a new world and player
+		world = new World(worldWidth, worldHeight, random);
+		player = new Player(true, world.spawnLocation.x, world.spawnLocation.y, +				7 * (tileSize / 8), 14 * (tileSize / 8));
+		hotbar.setInventory(player.inventory);
+		entities.add(player);
+		if (Constants.DEBUG) {
+			player.giveItem(Constants.itemTypes.get((char) 175).clone(), 1);
+			player.giveItem(Constants.itemTypes.get((char) 88).clone(), 1);
+			player.giveItem(Constants.itemTypes.get((char) 106).clone(), 64);
+		}
+		loadSprite();
 	}
 	
 	public void drawCenteredX(GraphicsHandler g, Sprite s, int top, int width, int height) {
@@ -177,7 +170,7 @@ public class MainGame {
 		}
 		switch (startMenu.handleClick(screenMousePos.x, screenMousePos.y)){
 			case LOAD_GAME:
-				startGame(true, WORLD_WIDTH.MEDIUM.getWidth());
+				startGameLoad(WORLD_WIDTH.MEDIUM.getWidth());
 				break;
 			case NEW_GAME:
 				newGame = true;
@@ -198,7 +191,7 @@ public class MainGame {
 		}
 		Optional<WORLD_WIDTH> result = newGameMenu.handleClick(screenMousePos.x, screenMousePos.y);
 		if (result.isPresent()) {
-			startGame(false, result.get().getWidth());
+			startGameNew(result.get().getWidth());
 			newGame = false;
 			leftClick = false;
 		}
@@ -208,7 +201,7 @@ public class MainGame {
 		long lastLoopTime = System.currentTimeMillis();
 		
 		if (Constants.DEBUG) {
-			startGame(false, 512);
+			startGameNew(512);
 		}
 
 		// keep looping round till the game ends
@@ -385,25 +378,14 @@ public class MainGame {
 		}
 	}
 
-	/**
-	 * <p>FPS - view frames per second</p>
-	 * @param delta
-	 * @param g
-	 */
 	public void methodViewFPS(long delta, GraphicsHandler g){
 		String fps = "Fps: " + 1 / ((float) delta / 1000) + "("
 				+ Runtime.getRuntime().freeMemory() / 1024 / 1024 + " / "
 				+ Runtime.getRuntime().totalMemory() / 1024 / 1024 + ") Free MB";
 		g.setColor(Color.white);
-		g.drawString(fps, 10, 20);
+		g.drawString(fps, 10, 10);
 	}
 
-	/**
-	 * 
-	 * @param cameraX
-	 * @param cameraY
-	 * @param g
-	 */
 	public void drawUI(float cameraX, float cameraY, GraphicsHandler g){
 		Int2 pos = StockMethods.computeDrawLocationInPlace(cameraX, cameraY, tileSize,
 				tileSize, tileSize, player.handBuildPos.x, player.handBuildPos.y);
@@ -414,15 +396,9 @@ public class MainGame {
 		minerIcon.draw(g, pos.x, pos.y, tileSize, tileSize);
 	}
 
-	/**
-	 * <p>Draw the bar of life (hearts)</p>
-	 * @param screenWidth
-	 * @param screenHeight
-	 * @param g
-	 */
 	public void drawHeartsForHealthBar(final int screenWidth, final int screenHeight, GraphicsHandler g){
 		int heartX = (screenWidth - 250) / 2;
-		int heartY = screenHeight - 60;
+		int heartY = screenHeight - 50;
 		for (int heartIdx = 1; heartIdx <= 10; ++heartIdx) {
 			int hpDiff = player.hitPoints - heartIdx * 10;
 			if (hpDiff >= 0) {
@@ -436,30 +412,19 @@ public class MainGame {
 		}
 	}
 
-	/**
-	 * <p>Draw the bar of air-bubbles (bubble)</p>
-	 * @param screenWidth
-	 * @param g
-	 * @param heartY
-	 */
 	public void drawAirBubbles(final int screenWidth, GraphicsHandler g, int heartY){
-		int bubbleX = (screenWidth + 60) / 2;
+		int bubbleX = (screenWidth + 50) / 2;
 		int numBubbles = player.airRemaining();
 		for (int bubbleIdx = 1; bubbleIdx <= 10; ++bubbleIdx) {
 			if (bubbleIdx <= numBubbles) {
-				bubble.draw(g, bubbleX, heartY, 10, 10); // Scaling draw
+				bubble.draw(g, bubbleX, heartY, 10, 10);
 			} else {
-				emptyBubble.draw(g, bubbleX, heartY, 10, 10); // Scaling draw
+				emptyBubble.draw(g, bubbleX, heartY, 10, 10);
 			}
-			bubbleX += 15; // separator
+			bubbleX += 15;
 		}
 	}
 	
-	/**
-	 * 
-	 * @param g
-	 * @param pos
-	 */
 	public void drawMouse(GraphicsHandler g, Int2 pos) {
 		g.setColor(Color.white);
 		g.fillOval(pos.x - 4, pos.y - 4, 8, 8);
@@ -467,12 +432,6 @@ public class MainGame {
 		g.fillOval(pos.x - 3, pos.y - 3, 6, 6);
 	}
 	
-	/**
-	 * 
-	 * @param g
-	 * @param sprite
-	 * @param tileSize
-	 */
 	public void drawTileBackground(GraphicsHandler g, Sprite sprite, int tileSize) {
 		for (int i = 0; i <= GraphicsHandler.get().getScreenWidth() / tileSize; i++) {
 			for (int j = 0; j <= GraphicsHandler.get().getScreenHeight() / tileSize; j++) {
@@ -481,10 +440,6 @@ public class MainGame {
 		}
 	}
 	
-	/**
-	 * 
-	 * @param level
-	 */
 	public void zoom(int level) {
 		if (level == 0) {
 			if (tileSize < 32) {
