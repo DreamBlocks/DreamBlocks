@@ -46,6 +46,12 @@ public class Hotbar {
         this.hotbarIdx = hotbarIdx;
     }
 
+    /**
+     * 
+     * @param g
+     * @param screenWidth
+     * @param screenHeight
+     */
     public void draw(GraphicsHandler g, int screenWidth, int screenHeight){
         int x = screenWidth / 2 - width / 2;
         int y = screenHeight - height - margin;

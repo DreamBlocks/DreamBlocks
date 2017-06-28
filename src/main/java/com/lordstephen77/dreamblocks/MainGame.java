@@ -385,6 +385,11 @@ public class MainGame {
 		}
 	}
 
+	/**
+	 * <p>FPS - view frames per second</p>
+	 * @param delta
+	 * @param g
+	 */
 	public void methodViewFPS(long delta, GraphicsHandler g){
 		String fps = "Fps: " + 1 / ((float) delta / 1000) + "("
 				+ Runtime.getRuntime().freeMemory() / 1024 / 1024 + " / "
@@ -393,6 +398,12 @@ public class MainGame {
 		g.drawString(fps, 10, 20);
 	}
 
+	/**
+	 * 
+	 * @param cameraX
+	 * @param cameraY
+	 * @param g
+	 */
 	public void drawUI(float cameraX, float cameraY, GraphicsHandler g){
 		Int2 pos = StockMethods.computeDrawLocationInPlace(cameraX, cameraY, tileSize,
 				tileSize, tileSize, player.handBuildPos.x, player.handBuildPos.y);
@@ -403,9 +414,15 @@ public class MainGame {
 		minerIcon.draw(g, pos.x, pos.y, tileSize, tileSize);
 	}
 
+	/**
+	 * <p>Draw the bar of life (hearts)</p>
+	 * @param screenWidth
+	 * @param screenHeight
+	 * @param g
+	 */
 	public void drawHeartsForHealthBar(final int screenWidth, final int screenHeight, GraphicsHandler g){
 		int heartX = (screenWidth - 250) / 2;
-		int heartY = screenHeight - 50;
+		int heartY = screenHeight - 60;
 		for (int heartIdx = 1; heartIdx <= 10; ++heartIdx) {
 			int hpDiff = player.hitPoints - heartIdx * 10;
 			if (hpDiff >= 0) {
@@ -419,6 +436,12 @@ public class MainGame {
 		}
 	}
 
+	/**
+	 * 
+	 * @param screenWidth
+	 * @param g
+	 * @param heartY
+	 */
 	public void drawAirBubbles(final int screenWidth, GraphicsHandler g, int heartY){
 		int bubbleX = (screenWidth + 50) / 2;
 		int numBubbles = player.airRemaining();
@@ -432,6 +455,11 @@ public class MainGame {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param g
+	 * @param pos
+	 */
 	public void drawMouse(GraphicsHandler g, Int2 pos) {
 		g.setColor(Color.white);
 		g.fillOval(pos.x - 4, pos.y - 4, 8, 8);
@@ -439,6 +467,12 @@ public class MainGame {
 		g.fillOval(pos.x - 3, pos.y - 3, 6, 6);
 	}
 	
+	/**
+	 * 
+	 * @param g
+	 * @param sprite
+	 * @param tileSize
+	 */
 	public void drawTileBackground(GraphicsHandler g, Sprite sprite, int tileSize) {
 		for (int i = 0; i <= GraphicsHandler.get().getScreenWidth() / tileSize; i++) {
 			for (int j = 0; j <= GraphicsHandler.get().getScreenHeight() / tileSize; j++) {
@@ -447,6 +481,10 @@ public class MainGame {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param level
+	 */
 	public void zoom(int level) {
 		if (level == 0) {
 			if (tileSize < 32) {
