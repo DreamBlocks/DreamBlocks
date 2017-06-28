@@ -103,24 +103,35 @@ public class InventoryItem implements java.io.Serializable {
 			other.remove(other.getCount() - result);
 		}
 	}
-	
-	public void draw(GraphicsHandler g, int x, int y, int tileSize) {
+
+	public void draw(GraphicsHandler g, int x, int y, int tileSize){
 		if (this.getCount() <= 0) {
 			return;
 		}
 		SpriteStore spriteStore = SpriteStore.get();
 		Sprite sprite = spriteStore.getSprite(item.getSpriteId());
 		sprite.draw(g, x, y, tileSize, tileSize);
+	}
+
+	public void draw(GraphicsHandler g, int x, int y, int tileSize, int seperation) {
+		g.setColor(Color.LIGHT_GRAY);
+		g.fillRect(x + seperation - 2, y + seperation - 2, tileSize + 4, tileSize + 4);
+		if (this.getCount() <= 0) {
+			return;
+		}
+		SpriteStore spriteStore = SpriteStore.get();
+		Sprite sprite = spriteStore.getSprite(item.getSpriteId());
+		sprite.draw(g, x + seperation, y + seperation, tileSize, tileSize);
 		if (this.getCount() > 1) {
 			g.setColor(Color.white);
-			g.drawString("" + this.getCount(), x, y + tileSize / 2);
+			g.drawString("" + this.getCount(), x + seperation, y + seperation + tileSize / 2);
 		}
 		if (item.getClass() == Tool.class) {
 			Tool tool = (Tool) item;
 			if (tool.uses != 0) {
-				int left = x + 2;
+				int left = x + seperation + 2;
 				int width = (int) (((float) (tool.totalUses - tool.uses) / tool.totalUses) * (tileSize));
-				int top = y + tileSize - 4;
+				int top = y + seperation + tileSize - 4;
 				int height = 2;
 				g.setColor(Color.green);
 				g.fillRect(left, top, width, height);

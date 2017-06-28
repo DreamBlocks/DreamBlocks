@@ -97,6 +97,7 @@ public class AwtGraphicsHandler extends com.lordstephen77.dreamblocks.GraphicsHa
 			public void componentResized(ComponentEvent e) {
 				Dimension d = e.getComponent().getSize();
 				canvas.setBounds(0, 0, d.width, d.height);
+				game.resize(d.width, d.height);
 				screenWidth = d.width;
 				screenHeight = d.height;
 			}

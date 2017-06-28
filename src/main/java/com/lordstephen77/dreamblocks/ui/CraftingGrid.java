@@ -13,14 +13,20 @@ public class CraftingGrid implements Serializable{
 
     private InventoryItem[][] inventoryItems;
     private int tableSizeAvailable = 2;
+    private int x;
+    private int y;
+    private int panelWidth;
+    private int panelHeight;
     private int tileSize;
     private int seperation;
     private char[][] tableTwo = new char[2][2];
     private char[][] tableThree = new char[3][3];
 
-    public CraftingGrid(int tileSize, int seperation){
+    public CraftingGrid(int tileSize, int seperation, int panelWidth, int panelHeight){
         this.tileSize = tileSize;
         this.seperation = seperation;
+        this.panelWidth = panelWidth;
+        this.panelHeight = panelHeight;
     }
 
     public int getTableSizeAvailable() {
@@ -35,15 +41,20 @@ public class CraftingGrid implements Serializable{
         this.inventoryItems = inventoryItems;
     }
 
-    public void draw(GraphicsHandler g, int screenWidth, int screenHeight, int panelWidth, int panelHeight){
-        drawBackground(g, screenWidth, screenHeight, panelWidth, panelHeight);
+    public void resize(int screenWidth, int screenHeight){
+        x = screenWidth / 2 - panelWidth / 2;
+        y = screenHeight / 2 - panelHeight / 2;
+    }
+
+    public void draw(GraphicsHandler g){
+        drawBackground(g);
         int x;
         int dxInItems = inventoryItems.length - tableSizeAvailable;
-        int y = screenHeight / 2 - panelHeight / 2;
+        int y = this.y;
         for (int rowIdx = 0; rowIdx < tableSizeAvailable; rowIdx++){
-            x = screenWidth / 2 - panelWidth / 2 + (tileSize + seperation) * dxInItems;
+            x = this.x + (tileSize + seperation) * dxInItems;
             for (int colIdx = dxInItems; colIdx < inventoryItems.length; colIdx++){
-                drawInventoryCell(g, x, y, inventoryItems[colIdx][rowIdx]);
+                inventoryItems[colIdx][rowIdx].draw(g, x, y, tileSize, seperation);
                 x += tileSize + seperation;
             }
             y += tileSize + seperation;
@@ -81,18 +92,11 @@ public class CraftingGrid implements Serializable{
         return currentTable;
     }
 
-    private void drawBackground(GraphicsHandler g, int panelWidth, int panelHeight, int screenWidth, int screenHeight){
+    private void drawBackground(GraphicsHandler g){
         g.setColor(Color.DARK_GRAY);
-        int x = screenWidth / 2 - panelWidth / 2 + panelWidth - tableSizeAvailable * (tileSize + seperation) - seperation;
-        int y = screenHeight / 2 - panelHeight / 2;
+        int widgetX = this.x + panelWidth - tableSizeAvailable * (tileSize + seperation) - seperation;
         int width = tableSizeAvailable * (tileSize + seperation) + seperation;
         int height = tableSizeAvailable * (tileSize + seperation) + seperation;
-        g.fillRect(x, y, width, height);
-    }
-
-    private void drawInventoryCell(GraphicsHandler g, int x, int y, InventoryItem item){
-        g.setColor(Color.LIGHT_GRAY);
-        g.fillRect(x + seperation - 2, y + seperation - 2, tileSize + 4, tileSize + 4);
-        item.draw(g, x + seperation, y + seperation, tileSize);
+        g.fillRect(widgetX, y, width, height);
     }
 }
