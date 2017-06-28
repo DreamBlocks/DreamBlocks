@@ -35,6 +35,12 @@ import com.lordstephen77.dreamblocks.MainGame;
 import com.lordstephen77.dreamblocks.Sprite;
 import com.lordstephen77.dreamblocks.SpriteStore;
 
+
+/**
+ * <p>Main menu definition class (first screen)</p>
+ * @author Stefano Peris, Александр
+ * @version 0.3
+ */
 public class StartMenu {
 	
 	/* menu sprites */

@@ -37,7 +37,9 @@ import com.lordstephen77.dreamblocks.Sprite;
 import com.lordstephen77.dreamblocks.SpriteStore;
 
 /**
- * Created by Александр on 19.06.2017.
+ * <p>World selection screen (second screen)</p>
+ * @author Александр, Stefano Peris
+ * @version 0.3
  */
 public class NewGameMenu {
 

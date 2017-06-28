@@ -38,6 +38,11 @@ package com.lordstephen77.dreamblocks;
 
 import com.lordstephen77.dreamblocks.awtgraphics.AwtGraphicsHandler;
 
+/**
+ * <p>Window set resolution</p>
+ * @author Stefano Peris
+ * @version 0.3
+ */
 public abstract class GraphicsHandler {
 	public static final boolean awtMode = true;
 	
