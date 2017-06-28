@@ -40,11 +40,17 @@ import com.lordstephen77.dreamblocks.ui.CraftingGrid;
 
 import java.util.Optional;
 
+/**
+ * <p>Property of the inventory</p>
+ * @author Stefano Peris
+ * @version 0.3
+ */
 public class Inventory implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
+	
 	// Size inventory panel and block cells
-    private int tileSize = 25;
-    private int seperation = 20;
+    private int tileSize = 25; // Cells size
+    private int seperation = 20; // Inventory size
 	
 	public InventoryItem[][] inventoryItems;
     private InventoryItem[] hotbarRow;
