@@ -437,21 +437,21 @@ public class MainGame {
 	}
 
 	/**
-	 * 
+	 * <p>Draw the bar of air-bubbles (bubble)</p>
 	 * @param screenWidth
 	 * @param g
 	 * @param heartY
 	 */
 	public void drawAirBubbles(final int screenWidth, GraphicsHandler g, int heartY){
-		int bubbleX = (screenWidth + 50) / 2;
+		int bubbleX = (screenWidth + 60) / 2;
 		int numBubbles = player.airRemaining();
 		for (int bubbleIdx = 1; bubbleIdx <= 10; ++bubbleIdx) {
 			if (bubbleIdx <= numBubbles) {
-				bubble.draw(g, bubbleX, heartY, 10, 10);
+				bubble.draw(g, bubbleX, heartY, 10, 10); // Scaling draw
 			} else {
-				emptyBubble.draw(g, bubbleX, heartY, 10, 10);
+				emptyBubble.draw(g, bubbleX, heartY, 10, 10); // Scaling draw
 			}
-			bubbleX += 15;
+			bubbleX += 15; // separator
 		}
 	}
 	
