@@ -59,6 +59,7 @@ import com.lordstephen77.dreamblocks.MainGame;
 import com.lordstephen77.dreamblocks.Sprite;
 import com.lordstephen77.dreamblocks.SpriteStore;
 
+
 public class AwtGraphicsHandler extends com.lordstephen77.dreamblocks.GraphicsHandler {
 	private Canvas canvas;
 	private BufferStrategy strategy;
@@ -73,6 +74,7 @@ public class AwtGraphicsHandler extends com.lordstephen77.dreamblocks.GraphicsHa
 		container = new JFrame("DreamBlocks");
 		
 		try {
+			// The pointer image (crossair) is not rendered. Instead, a point appears as a mouse pointer image?!?
 			ImageIcon ii = new ImageIcon(new URL("file:sprites/other/mouse.png"));
 			Image im = ii.getImage();
 			Toolkit tk = canvas.getToolkit();
@@ -104,12 +106,13 @@ public class AwtGraphicsHandler extends com.lordstephen77.dreamblocks.GraphicsHa
 		// going to do that our self in accelerated mode
 		canvas.setIgnoreRepaint(true);
 		
-		// finally make the window visible
-		container.pack();
-		container.setResizable(false);
 		// Center screen container (window)
 		container.setLocationRelativeTo(null);
+		
+		container.setResizable(false);
 		container.setVisible(true);
+		// finally make the window visible
+		container.pack();
 		
 		// add a listener to respond to the user closing the window. If they
 		// do we'd like to exit the game
