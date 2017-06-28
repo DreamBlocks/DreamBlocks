@@ -57,13 +57,12 @@ public class Inventory implements java.io.Serializable {
     private int panelWidth;
     private int panelHeight;
 
-    private int maxCount = 64;
 	private int playerRow;
-	private InventoryItem holding = new InventoryItem(null);
+	private InventoryItem holding = new InventoryItem();
     private CraftingGrid craftingGrid;
     private Int2 clickPos = new Int2(0, 0);
 	public int craftingHeight;
-	private InventoryItem craftable = new InventoryItem(null);
+	private InventoryItem craftable = new InventoryItem();
 	
 	public Inventory(int width, int height, int craftingHeight) {
 		inventoryItems = new InventoryItem[width][height + craftingHeight];
@@ -73,7 +72,7 @@ public class Inventory implements java.io.Serializable {
         playerRow = height + craftingHeight - 1;
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j < height + craftingHeight; j++) {
-				inventoryItems[i][j] = new InventoryItem(null);
+				inventoryItems[i][j] = new InventoryItem();
 			}
 			hotbarRow[i] = inventoryItems[i][playerRow];
 		}
@@ -115,99 +114,26 @@ public class Inventory implements java.io.Serializable {
 			return false;
 		}
 
-		if (leftClick || rightClick) {
+        if (leftClick){
             Int2 position = mouseToCoor(mousePos.x - x, mousePos.y - y, seperation, tileSize);
             if (position != null) {
                 InventoryItem itemUnderCursor = inventoryItems[position.x][position.y];
-                if (holding.isEmpty()) {
-                    if (rightClick && itemUnderCursor.count > 1) {
-                        pickHalfOfStack(itemUnderCursor, holding);
-                    } else {
-                        pickWholeStack(itemUnderCursor, holding);
-                    }
-                } else if (itemUnderCursor.item == null) {
-                    if (rightClick) {
-                        dropSingleItemToEmptyTile(itemUnderCursor, holding);
-                    } else {
-                        dropWholeStackToEmptyTile(itemUnderCursor, holding);
-                    }
-                } else if (holding.item.item_id == itemUnderCursor.item.item_id
-                        && itemUnderCursor.count < maxCount) {
-                    if ((holding.item.getClass() == Tool.class)
-                            || (itemUnderCursor.item.getClass() == Tool.class)) {
-                    } else if (rightClick) {
-                        dropSingleItemToStack(itemUnderCursor, holding);
-                    } else {
-                        dropStackToStack(itemUnderCursor, holding);
-                    }
-                } else {
-                    swapItems(itemUnderCursor, holding);
-                }
+                itemUnderCursor.handleLeftClick(holding);
             }
 
             if (isMouseOverCraftingResult(screenWidth, screenHeight, panelWidth, panelHeight, mousePos)){
                 craftItem();
             }
         }
+		if (rightClick) {
+            Int2 position = mouseToCoor(mousePos.x - x, mousePos.y - y, seperation, tileSize);
+            if (position != null) {
+                InventoryItem itemUnderCursor = inventoryItems[position.x][position.y];
+                itemUnderCursor.handleRightClick(holding);
+            }
+        }
         return true;
 	}
-
-    private void pickHalfOfStack(InventoryItem grid, InventoryItem hand){
-        hand.item = grid.item;
-        hand.count = (int) Math.ceil((double) grid.count / 2);
-        grid.count = (int) Math.floor((double) grid.count / 2);
-    }
-
-    private void pickWholeStack(InventoryItem grid, InventoryItem hand){
-        hand.item = grid.item;
-        hand.count = grid.count;
-        grid.item = null;
-        grid.count = 0;
-    }
-
-    private void dropSingleItemToEmptyTile(InventoryItem grid, InventoryItem hand){
-        grid.item = hand.item;
-        grid.count = 1;
-        hand.count--;
-        if (hand.count <= 0) {
-            hand.item = null;
-        }
-    }
-
-    private void dropWholeStackToEmptyTile(InventoryItem grid, InventoryItem hand){
-        grid.item = hand.item;
-        grid.count = hand.count;
-        hand.item = null;
-        hand.count = 0;
-    }
-
-    private void dropSingleItemToStack(InventoryItem grid, InventoryItem hand){
-        grid.count++;
-        hand.count--;
-        if (hand.count <= 0) {
-            hand.item = null;
-        }
-    }
-
-    private void dropStackToStack(InventoryItem grid, InventoryItem hand){
-        grid.count += hand.count;
-        if (grid.count > maxCount) {
-            hand.count = maxCount - grid.count;
-            grid.count = maxCount;
-        } else {
-            hand.item = null;
-            hand.count = 0;
-        }
-    }
-
-    private void swapItems(InventoryItem grid, InventoryItem hand){
-        Item item = grid.item;
-        int count = grid.count;
-        grid.item = hand.item;
-        grid.count = hand.count;
-        hand.item = item;
-        hand.count = count;
-    }
 
     private boolean isMouseInsideInventory(Int2 mousePos, int x, int y, int panelWidth, int panelHeight){
         return x <= mousePos.x && mousePos.x <= x + panelWidth
