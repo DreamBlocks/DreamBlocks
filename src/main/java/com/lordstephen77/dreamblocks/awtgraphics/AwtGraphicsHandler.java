@@ -106,7 +106,9 @@ public class AwtGraphicsHandler extends com.lordstephen77.dreamblocks.GraphicsHa
 		
 		// finally make the window visible
 		container.pack();
-		container.setResizable(true);
+		container.setResizable(false);
+		// Center screen container (window)
+		container.setLocationRelativeTo(null);
 		container.setVisible(true);
 		
 		// add a listener to respond to the user closing the window. If they
