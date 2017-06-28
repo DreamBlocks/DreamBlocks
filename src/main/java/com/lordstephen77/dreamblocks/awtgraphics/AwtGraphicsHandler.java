@@ -59,7 +59,11 @@ import com.lordstephen77.dreamblocks.MainGame;
 import com.lordstephen77.dreamblocks.Sprite;
 import com.lordstephen77.dreamblocks.SpriteStore;
 
-
+/**
+ * <p>Window properties setting (container)</p>
+ * @author Stefano Peris
+ * @version 0.3
+ */
 public class AwtGraphicsHandler extends com.lordstephen77.dreamblocks.GraphicsHandler {
 	private Canvas canvas;
 	private BufferStrategy strategy;

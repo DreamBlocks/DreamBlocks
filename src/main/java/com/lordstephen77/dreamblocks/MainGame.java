@@ -43,6 +43,11 @@ import java.util.Random;
 import com.lordstephen77.dreamblocks.Constants.TileID;
 import com.lordstephen77.dreamblocks.ui.*;
 
+/**
+ * <p>Main class</p>
+ * @author Stefano Peris
+ * @version 0.3
+ */
 public class MainGame {
 	
 	private int worldWidth = 512;
