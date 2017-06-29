@@ -47,26 +47,32 @@ public class TileType implements java.io.Serializable {
 	protected boolean liquid;
 	protected int lightBlocking;
 	protected int lightEmitting;
+	private char breaksInto;
 
-	public TileType(String spriteid, TileID name) {
-		this(spriteid, name, false, false, Constants.LIGHT_VALUE_OPAQUE);
+	public TileType(String spriteid, TileID name, char breaksInto) {
+		this(spriteid, name, false, false, Constants.LIGHT_VALUE_OPAQUE, breaksInto);
 	}
 	
-	public TileType(String spriteid, TileID name, boolean passable, boolean liquid, int lightBlocking) {
-		this(spriteid, name, passable, liquid, lightBlocking, 0);
+	public TileType(String spriteid, TileID name, boolean passable, boolean liquid, int lightBlocking, char breaksInto) {
+		this(spriteid, name, passable, liquid, lightBlocking, 0, breaksInto);
 	}
 	
 	public TileType(String spriteid, TileID name, boolean passable, boolean liquid, int lightBlocking,
-					int lightEmitting) {
+					int lightEmitting, char breaksInto) {
 		this.spriteid = spriteid;
 		this.name = name;
 		this.passable = passable;
 		this.liquid = liquid;
 		this.lightBlocking = lightBlocking;
 		this.lightEmitting = lightEmitting;
+		this.breaksInto = breaksInto;
 	}
 
 	public String getSpriteid() {
 		return spriteid;
+	}
+
+	public char getBreaksInto() {
+		return breaksInto;
 	}
 }

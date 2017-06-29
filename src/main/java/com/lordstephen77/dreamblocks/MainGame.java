@@ -44,7 +44,7 @@ import com.lordstephen77.dreamblocks.ui.*;
 
 /**
  * <p>Main class</p>
- * @author Stefano Peris, Sonya Sitnikova
+ * @author Stefano Peris, Sonya Sitnikova, Kryukov Alexander
  * @version 0.3
  */
 public class MainGame {
@@ -73,6 +73,7 @@ public class MainGame {
 	private boolean newGame = false;
     private boolean inInventory = false;
     private final SpriteStore spriteStore;
+	private final TileStore tileStore;
 	private final StartMenu startMenu;
 	private final NewGameMenu newGameMenu;
 	public final Hotbar hotbar;
@@ -92,6 +93,7 @@ public class MainGame {
 	 */
 	public MainGame() {
 	    spriteStore = SpriteStore.get();
+		tileStore = new TileStore();
 		startMenu = new StartMenu(this, spriteStore);
 		newGameMenu = new NewGameMenu(this, spriteStore);
 		int tileSize = 16;
@@ -151,7 +153,7 @@ public class MainGame {
 		worldWidth = width;
 		entities.clear();
 		// make a new world and player
-		world = new World(worldWidth, worldHeight, random);
+		world = new World(worldWidth, worldHeight, random, tileStore);
 		player = new Player(true, world.spawnLocation.x, world.spawnLocation.y, + 7 * (tileSize / 8), 14 * (tileSize / 8));
 		hotbar.setInventory(player.inventory);
 		entities.add(player);
@@ -241,8 +243,8 @@ public class MainGame {
 			float worldMouseX = (cameraX * tileSize + screenMousePos.x) / tileSize;
 			float worldMouseY = (cameraY * tileSize + screenMousePos.y) / tileSize - .5f;
 			
-			world.chunkUpdate(lightingEngineSun, lightingEngineSourceBlocks);
-			world.draw(g, 0, 0, screenWidth, screenHeight, cameraX, cameraY, tileSize, lightingEngineSun, lightingEngineSourceBlocks);
+			world.chunkUpdate(lightingEngineSun, lightingEngineSourceBlocks, tileStore);
+			world.draw(g, 0, 0, screenWidth, screenHeight, cameraX, cameraY, tileSize, lightingEngineSun, lightingEngineSourceBlocks, tileStore);
 
             if (isInInventory()) {
                 boolean inventoryFocus = player.inventory.handleClick(screenMousePos, leftClick, rightClick);
@@ -334,31 +336,21 @@ public class MainGame {
 				}
 			}
 			breakingTicks = 0;
-			TileID name = world.removeTile(player.handBreakPos.x, player.handBreakPos.y);
-			if (name != TileID.NONE){
-				lightingEngineSun.removedTile(player.handBreakPos.x, player.handBreakPos.y);
-				lightingEngineSourceBlocks.removedTile(player.handBreakPos.x, player.handBreakPos.y);
-			}
-			if (name == TileID.GRASS) {
-				name = TileID.DIRT;
-			}
-			if (name == TileID.STONE) {
-				name = TileID.COBBLE;
-			}
-			if (name == TileID.LEAVES && random.nextDouble() < .1) {
-				name = TileID.SAPLING;
-			}
-			Item newItem = Constants.itemTypes.get((char) name.breaksInto);
-			if (newItem != null) // couldn't find that item
-			{
-				newItem = (Item) newItem.clone();
-				newItem.x = player.handBreakPos.x + random.nextFloat()
-						* (1 - (float) newItem.widthPX / tileSize);
-				newItem.y = player.handBreakPos.y + random.nextFloat()
-						* (1 - (float) newItem.widthPX / tileSize);
-				newItem.dy = -.07f;
-				entities.add(newItem);
-			}
+			TileType oldTileType = world.removeTile(player.handBreakPos, lightingEngineSun, lightingEngineSourceBlocks);
+            //90% to produce sapling
+            boolean canProduceSapling = oldTileType.name == TileID.LEAVES && random.nextDouble() < .1;
+            boolean canProduceItem = Constants.itemTypes.containsKey(oldTileType.getBreaksInto());
+
+			if (canProduceItem || canProduceSapling) {
+                Item newItem = Constants.itemTypes.get(oldTileType.getBreaksInto());
+                newItem = (Item) newItem.clone();
+                newItem.x = player.handBreakPos.x + random.nextFloat()
+                        * (1 - (float) newItem.widthPX / tileSize);
+                newItem.y = player.handBreakPos.y + random.nextFloat()
+                        * (1 - (float) newItem.widthPX / tileSize);
+                newItem.dy = -.07f;
+                entities.add(newItem);
+            }
 		}
 	}
 
@@ -374,11 +366,11 @@ public class MainGame {
 		rightClick = false;
 		InventoryItem current = hotbar.getSelected();
 		if (!current.isEmpty()) {
-			TileID itemID = Constants.tileIDs.get(current.getItem().item_id);
-			boolean isPassable = Constants.tileTypes.get(itemID).type.passable;
+			TileID itemID = TileID.of(current.getItem().item_id);
+			boolean isPassable = tileStore.tileTypes.get(itemID).passable;
 
 			if (isPassable || !player.inBoundingBox(player.handBuildPos, tileSize)) {
-				if (world.addTile(player.handBuildPos, itemID, lightingEngineSun, lightingEngineSourceBlocks)) {
+				if (world.addTile(player.handBuildPos, itemID, lightingEngineSun, lightingEngineSourceBlocks, tileStore)) {
 					// placed successfully
 					hotbar.decreaseSelected(1);
 				}

@@ -58,7 +58,7 @@ public class World implements java.io.Serializable {
 	
 	// private int[] columnHeights;
 	
-	public World(int width, int height, Random random) {
+	public World(int width, int height, Random random, TileStore tileStore) {
 		
 		TileID[][] generated = WorldGenerator.generate(width, height, random);
 		WorldGenerator.visibility = null;
@@ -67,13 +67,7 @@ public class World implements java.io.Serializable {
 		// columnHeights = new int[width];
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j < height; j++) {
-				Tile tile = Constants.tileTypes.get(generated[i][j]);
-				if (tile == null) {
-					tiles[i][j] = Constants.tileTypes.get(TileID.AIR);
-				} else {
-					tiles[i][j] = Constants.tileTypes.get(generated[i][j]);
-				}
-				
+				tiles[i][j] = tileStore.make(generated[i][j]);
 			}
 		}
 		this.width = width;
@@ -83,7 +77,7 @@ public class World implements java.io.Serializable {
 		this.random = random;
 	}
 	
-	public void chunkUpdate(LightingEngine sun, LightingEngine sourceBlocks) {
+	public void chunkUpdate(LightingEngine sun, LightingEngine sourceBlocks, TileStore tileStore) {
 		ticksAlive++;
 		for (int i = 0; i < chunkWidth; i++) {
 			boolean isDirectLight = true;
@@ -99,23 +93,23 @@ public class World implements java.io.Serializable {
 				}
 				if (isDirectLight && tiles[x][y].type.name == TileID.DIRT) {
 					if (random.nextDouble() < .005) {
-						tiles[x][y] = Constants.tileTypes.get(TileID.GRASS);
+						tiles[x][y] = tileStore.make(TileID.GRASS);
 					}
 				} else if (tiles[x][y].type.name == TileID.GRASS
 						&& tiles[x][y - 1].type.name != TileID.AIR
 						&& tiles[x][y - 1].type.name != TileID.LEAVES
 						&& tiles[x][y - 1].type.name != TileID.WOOD) {
 					if (random.nextDouble() < .25) {
-						tiles[x][y] = Constants.tileTypes.get(TileID.DIRT);
+						tiles[x][y] = tileStore.make(TileID.DIRT);
 					}
 				} else if (tiles[x][y].type.name == TileID.SAND) {
 					if (isAir(x, y + 1) || isLiquid(x, y + 1)) {
 						changeTile(x, y + 1, tiles[x][y], sun);
-						changeTile(x, y, Constants.tileTypes.get(TileID.AIR), sun);
+						changeTile(x, y, tileStore.make(TileID.AIR), sun);
 					}
 				} else if (tiles[x][y].type.name == TileID.SAPLING) {
 					if (random.nextDouble() < .01) {
-						addTemplate(TileTemplate.tree, x, y, sun, sourceBlocks);
+						addTemplate(TileTemplate.tree, x, y, sun, sourceBlocks, tileStore);
 					}
 				} else if (tiles[x][y].type.liquid) {
 					if (isAir(x + 1, y)) {
@@ -141,7 +135,7 @@ public class World implements java.io.Serializable {
 		
 	}
 	
-	private void addTemplate(TileTemplate tileTemplate, int x, int y, LightingEngine sun, LightingEngine sourceBlocks) {
+	private void addTemplate(TileTemplate tileTemplate, int x, int y, LightingEngine sun, LightingEngine sourceBlocks, TileStore tileStore) {
 		for (int i = 0; i < tileTemplate.template.length; i++) {
 			for (int j = 0; j < tileTemplate.template[0].length; j++) {
 				if (tileTemplate.template[i][j] != TileID.NONE && x - tileTemplate.spawnY + i >= 0
@@ -149,25 +143,25 @@ public class World implements java.io.Serializable {
 						&& y - tileTemplate.spawnX + j >= 0
 						&& y - tileTemplate.spawnX + j < tiles[0].length) {
 					addTile(x - tileTemplate.spawnY + i, y - tileTemplate.spawnX + j,
-							tileTemplate.template[i][j], sun, sourceBlocks);
+							tileTemplate.template[i][j], sun, sourceBlocks, tileStore);
 				}
 			}
 		}
 	}
 	
-	public boolean addTile(Int2 pos, TileID name, LightingEngine sun, LightingEngine sourceBlocks) {
-		return addTile(pos.x, pos.y, name,sun, sourceBlocks);
+	public boolean addTile(Int2 pos, TileID name, LightingEngine sun, LightingEngine sourceBlocks, TileStore tileStore) {
+		return addTile(pos.x, pos.y, name, sun, sourceBlocks, tileStore);
 	}
 
-	public boolean addTile(int x, int y, TileID name, LightingEngine sun, LightingEngine sourceBlocks) {
+	public boolean addTile(int x, int y, TileID tileID, LightingEngine sun, LightingEngine sourceBlocks, TileStore tileStore) {
 		if (x < 0 || x >= width || y < 0 || y >= height) {
 			return false;
 		}
-		Tile tile = Constants.tileTypes.get(name);
+		Tile tile = tileStore.make(tileID);
 		if (tile == null) {
 			return false;
 		}
-		if (name == TileID.SAPLING && y + 1 < height) {
+		if (tileID == TileID.SAPLING && y + 1 < height) {
 			if (tiles[x][y + 1].type.name != TileID.DIRT
 					&& tiles[x][y + 1].type.name != TileID.GRASS) {
 				return false;
@@ -178,23 +172,44 @@ public class World implements java.io.Serializable {
 		sourceBlocks.addedTile(x, y);
 		return true;
 	}
-	
-	public TileID removeTile(int x, int y) {
-		if (x < 0 || x >= width || y < 0 || y >= height) {
-			return TileID.NONE;
+
+	/**
+	 * Removes tile at position. Places TYPE_AIR instead. Updates light values
+	 * @param pos position of tile to remove
+	 * @param sun lighting engine of sun type to update light values
+	 * @param sourceBlocks lighting engine of sourceBlocks type to update light values
+	 * @return instance of TileType of removed tile
+	 */
+	public TileType removeTile(Int2 pos, LightingEngine sun, LightingEngine sourceBlocks) {
+		if (pos.x < 0 || pos.x >= width || pos.y < 0 || pos.y >= height) {
+			return TileStore.TYPE_AIR;
 		}
-		TileID name = tiles[x][y].type.name;
-		tiles[x][y] = Constants.tileTypes.get(TileID.AIR);
-		return name;
+		TileType oldType = tiles[pos.x][pos.y].type;
+		if (oldType.name != TileID.NONE){
+			sun.addedTile(pos.x, pos.y);
+			sourceBlocks.addedTile(pos.x, pos.y);
+		}
+		tiles[pos.x][pos.y] = TileStore.TILE_AIR;
+		return oldType;
 	}
-	
-	public void changeTile(int x, int y, Tile tile, LightingEngine sun) {
+
+	/**
+	 * Changes tile at given coordinates. Updates light values.
+	 * @param x coordinate X of tile to change
+	 * @param y coordinte Y of tile to change
+	 * @param tile instance of tile to replace
+	 * @param sun lighting engine to update light values
+	 * @return instance of TileType of previous tile
+	 */
+	public TileType changeTile(int x, int y, Tile tile, LightingEngine sun) {
+		TileType oldType = tiles[x][y].type;
 		tiles[x][y] = tile;
 		if (tile.type.lightBlocking > 0) {
 			sun.addedTile(x, y);
 		} else {
 			sun.removedTile(x, y);
 		}
+		return oldType;
 	}
 	
 	private TileID[] breakWood = new TileID[] { TileID.WOOD, TileID.PLANK, TileID.CRAFTING_BENCH };
@@ -271,7 +286,7 @@ public class World implements java.io.Serializable {
 	}
 	
 	public void draw(GraphicsHandler g, int x, int y, int screenWidth, int screenHeight,
-			float cameraX, float cameraY, int tileSize, LightingEngine sun, LightingEngine sourceBlocks) {
+			float cameraX, float cameraY, int tileSize, LightingEngine sun, LightingEngine sourceBlocks, TileStore tileStore) {
 		SpriteStore spriteStore = SpriteStore.get();
 		Int2 pos;
 		
@@ -291,7 +306,7 @@ public class World implements java.io.Serializable {
 					|| posY > screenHeight) {
 				continue;
 			}
-			TileType tileType = Constants.tileTypes.get(TileID.ADMINITE).type;
+			TileType tileType = tileStore.tileTypes.get(TileID.ADMINITE);
 			Sprite tileSprite = spriteStore.getSprite(tileType.getSpriteid());
 			tileSprite.draw(g, posX, posY, tileSize, tileSize);
 		}
@@ -300,14 +315,14 @@ public class World implements java.io.Serializable {
 			int posX = (int) ((-1 - cameraX) * tileSize);
 			int posY = (int) ((j - cameraY) * tileSize);
 			if (!(posX < 0 - tileSize || posX > screenWidth || posY < 0 - tileSize || posY > screenHeight)) {
-				TileType tileType = Constants.tileTypes.get(TileID.ADMINITE).type;
+				TileType tileType = tileStore.tileTypes.get(TileID.ADMINITE);
 				Sprite tileSprite = spriteStore.getSprite(tileType.getSpriteid());
 				tileSprite.draw(g, posX, posY, tileSize, tileSize);
 			}
 			
 			posX = (int) ((width - cameraX) * tileSize);
 			if (!(posX < 0 - tileSize || posX > screenWidth)) {
-				TileType tileType = Constants.tileTypes.get(TileID.ADMINITE).type;
+				TileType tileType = tileStore.tileTypes.get(TileID.ADMINITE);
 				Sprite tileSprite = spriteStore.getSprite(tileType.getSpriteid());
 				tileSprite.draw(g, posX, posY, tileSize, tileSize);
 			}
