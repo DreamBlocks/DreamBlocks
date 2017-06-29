@@ -55,6 +55,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import com.lordstephen77.dreamblocks.Constants;
 import com.lordstephen77.dreamblocks.MainGame;
 import com.lordstephen77.dreamblocks.Sprite;
 import com.lordstephen77.dreamblocks.SpriteStore;
@@ -113,8 +114,12 @@ public class AwtGraphicsHandler extends com.lordstephen77.dreamblocks.GraphicsHa
 		
 		// Center screen container (window)
 		container.setLocationRelativeTo(null);
-		
-		container.setResizable(false);
+
+		if (Constants.DEBUG) {
+			container.setResizable(true);
+		} else {
+			container.setResizable(false);
+		}
 		container.setVisible(true);
 		// finally make the window visible
 		container.pack();
