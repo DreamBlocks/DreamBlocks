@@ -58,11 +58,10 @@ public class World implements java.io.Serializable {
 	
 	// private int[] columnHeights;
 	
-	public World(int width, int height, Random random, TileStore tileStore) {
-		
-		TileID[][] generated = WorldGenerator.generate(width, height, random);
-		WorldGenerator.visibility = null;
-		this.spawnLocation = WorldGenerator.playerLocation;
+	public World(int width, int height, Random random, TileStore tileStore, WorldGenerator worldGenerator) {
+
+		TileID[][] generated = worldGenerator.generate(width, height, random);
+		this.spawnLocation = worldGenerator.playerLocation;
 		tiles = new Tile[width][height];
 		// columnHeights = new int[width];
 		for (int i = 0; i < width; i++) {
@@ -421,7 +420,7 @@ public class World implements java.io.Serializable {
 		} else {
 			return 1;
 		}
-		
+
 	}
 	
 	// returns a float in the range [0,1)

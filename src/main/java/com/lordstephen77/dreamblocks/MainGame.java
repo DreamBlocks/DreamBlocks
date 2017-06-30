@@ -153,7 +153,7 @@ public class MainGame {
 		worldWidth = width;
 		entities.clear();
 		// make a new world and player
-		world = new World(worldWidth, worldHeight, random, tileStore);
+		world = new World(worldWidth, worldHeight, random, tileStore, new WorldGenerator());
 		player = new Player(true, world.spawnLocation.x, world.spawnLocation.y, + 7 * (tileSize / 8), 14 * (tileSize / 8));
 		hotbar.setInventory(player.inventory);
 		entities.add(player);
