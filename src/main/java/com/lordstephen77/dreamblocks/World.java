@@ -60,6 +60,9 @@ public class World implements java.io.Serializable {
 	
 	public World(int width, int height, Random random, TileStore tileStore, WorldGenerator worldGenerator) {
 
+        int seed = random.nextInt();
+        System.out.println("Seed: " + seed);
+        random.setSeed(seed);
 		TileID[][] generated = worldGenerator.generate(width, height, random);
 		this.spawnLocation = worldGenerator.playerLocation;
 		tiles = new Tile[width][height];

@@ -43,9 +43,27 @@ import com.lordstephen77.dreamblocks.Constants.TileID;
 
 public class WorldGenerator {
 
+    private final int minDirtDepth = 2;
+    private final int maxDirtDepth = 5;
+    private final int minSurface;
+    private final int maxSurface;
+    private final int width;
+    private final int height;
+    private final int median;
+    private final Random random;
+
 	public Int2 playerLocation;
+
+    public WorldGenerator(int width, int height, Random random){
+        this.width = width;
+        this.height = height;
+        this.minSurface = (int) (.25 * height);
+        this.maxSurface = (int) (.75 * height);
+        this.median = (int) (.5 * height);
+        this.random = random;
+    }
 	
-	public TileID[][] generate(int width, int height, Random random) {
+	public TileID[][] generate() {
 		TileID[][] world = new TileID[width][height];
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j < height; j++) {
@@ -54,16 +72,6 @@ public class WorldGenerator {
 		}
 
 		playerLocation = new Int2(width / 2, 5);
-		
-		int seed = random.nextInt();
-		System.out.println("Seed: " + seed);
-		random.setSeed(seed);
-		int median = (int) (.5 * height);
-		
-		int minDirtDepth = 2;
-		int maxDirtDepth = 5;
-		int minSurface = (int) (.25 * height);
-		int maxSurface = (int) (.75 * height);
 		
 		int surface = median;// maxSurface-5;
 		int dirtDepth = 3;
@@ -132,13 +140,9 @@ public class WorldGenerator {
 			
 			// flood fill down
 			for (int j = median; j < height; j++) {
-				// setVisible(i+1,j);
-				// setVisible(i,j+1);
-				// setVisible(i-1,j);
-				// setVisible(i,j-1);
 				
 				if (world[i][j] != TileID.NONE) {
-					carve(world, i, j - 1, 1 + random.nextDouble() * 2, TileID.SAND, new TileID[] {
+					carve(world, i, j - 1, (int)(1 + random.nextDouble() * 2), TileID.SAND, new TileID[] {
 							TileID.WATER, TileID.NONE }, false);
 					break;
 				}
@@ -179,7 +183,7 @@ public class WorldGenerator {
 					break;
 				}
 				double caveSize = 1 + random.nextDouble() * .45;
-				carve(world, posX, posY, caveSize, TileID.NONE, caveIgnore, false);
+				carve(world, posX, posY, (int)caveSize, TileID.NONE, caveIgnore, false);
 			}
 		}
 		
@@ -206,7 +210,7 @@ public class WorldGenerator {
 			int posY = random.nextInt(totalHeight) + minDepth;
 			if (world[posX][posY] == TileID.STONE) {
 				double mineralSize = 1 + random.nextDouble() * .6;
-				carve(world, posX, posY, mineralSize, mineral, ignoreTypes, false);
+				carve(world, posX, posY, (int)mineralSize, mineral, ignoreTypes, false);
 				added++;
 			}
 			iterations++;
@@ -214,14 +218,14 @@ public class WorldGenerator {
 	}
 
 	
-	private void carve(TileID[][] world, int x, int y, double distance, TileID type,
+	public void carve(TileID[][] world, int x, int y, int distance, TileID type,
 			TileID[] ignoreTypes, boolean left) {
-		for (int i = -(int) distance; (!left && i <= (int) distance) || (left && i <= 0); i++) {
+		for (int i = -distance; (!left && i <= distance) || (left && i <= 0); i++) {
 			int currentX = x + i;
 			if (currentX < 0 || currentX >= world.length) {
 				continue;
 			}
-			for (int j = -(int) distance; j <= (int) distance; j++) {
+			for (int j = -distance; j <= distance; j++) {
 				int currentY = y + j;
 				if (currentY < 0 || currentY >= world[0].length) {
 					continue;
