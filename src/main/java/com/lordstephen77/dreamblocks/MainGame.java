@@ -367,12 +367,14 @@ public class MainGame {
 		InventoryItem current = hotbar.getSelected();
 		if (!current.isEmpty()) {
 			TileID itemID = TileID.of(current.getItem().item_id);
-			boolean isPassable = tileStore.tileTypes.get(itemID).passable;
+			if (itemID != TileID.NONE) {
+				boolean isPassable = tileStore.tileTypes.get(itemID).passable;
 
-			if (isPassable || !player.inBoundingBox(player.handBuildPos, tileSize)) {
-				if (world.addTile(player.handBuildPos, itemID, lightingEngineSun, lightingEngineSourceBlocks, tileStore)) {
-					// placed successfully
-					hotbar.decreaseSelected(1);
+				if (isPassable || !player.inBoundingBox(player.handBuildPos, tileSize)) {
+					if (world.addTile(player.handBuildPos, itemID, lightingEngineSun, lightingEngineSourceBlocks, tileStore)) {
+						// placed successfully
+						hotbar.decreaseSelected(1);
+					}
 				}
 			}
 		}
