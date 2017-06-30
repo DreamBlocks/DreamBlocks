@@ -196,7 +196,7 @@ public class World implements java.io.Serializable {
 	/**
 	 * Changes tile at given coordinates. Updates light values.
 	 * @param x coordinate X of tile to change
-	 * @param y coordinte Y of tile to change
+	 * @param y coordinate Y of tile to change
 	 * @param tile instance of tile to replace
 	 * @param sun lighting engine to update light values
 	 * @return instance of TileType of previous tile
@@ -434,11 +434,18 @@ public class World implements java.io.Serializable {
 		return getTimeOfDay() > 0.5f;
 	}
 	
+	/**
+	 * <p>Progressive change day/night<p>
+	 */
 	static final Color dawnSky = new Color(255, 217, 92);
 	static final Color noonSky = new Color(132, 210, 230);
 	static final Color duskSky = new Color(245, 92, 32);
 	static final Color midnightSky = new Color(0, 0, 0);
 	
+	/**
+	 * 
+	 * @return The day/night cycle resumes
+	 */
 	public Color getSkyColor() {
 		float time = getTimeOfDay();
 		if (time < 0.25f) {
