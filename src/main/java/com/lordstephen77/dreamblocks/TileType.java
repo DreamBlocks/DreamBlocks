@@ -75,4 +75,8 @@ public class TileType implements java.io.Serializable {
 	public char getBreaksInto() {
 		return breaksInto;
 	}
+
+	public TileID getName(){
+		return name;
+	}
 }

@@ -39,6 +39,7 @@ package com.lordstephen77.dreamblocks;
 import java.util.Random;
 
 import com.lordstephen77.dreamblocks.Constants.TileID;
+import com.lordstephen77.dreamblocks.fillers.WaterFiller;
 
 public class World implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
@@ -60,7 +61,10 @@ public class World implements java.io.Serializable {
 	
 	public World(int width, int height, Random random, TileStore tileStore, WorldGenerator worldGenerator) {
 
-		TileID[][] generated = worldGenerator.generate(width, height, random);
+        int seed = random.nextInt();
+        System.out.println("Seed: " + seed);
+        random.setSeed(seed);
+		TileID[][] generated = worldGenerator.generate();
 		this.spawnLocation = worldGenerator.playerLocation;
 		tiles = new Tile[width][height];
 		// columnHeights = new int[width];
@@ -71,6 +75,8 @@ public class World implements java.io.Serializable {
 		}
 		this.width = width;
 		this.height = height;
+		WaterFiller waterFiller = new WaterFiller(this, random, tileStore);
+		waterFiller.fill();
 		this.chunkCount = (int) Math.ceil((double) width / chunkWidth);
 		this.chunkNeedsUpdate = 0;
 		this.random = random;
@@ -173,6 +179,21 @@ public class World implements java.io.Serializable {
 	}
 
 	/**
+	 * Returns tileID at given position.
+	 * If coordinates are out of bounds, then return NONE.
+	 * @param x - x of tile
+	 * @param y - y of tile
+	 * @return instance of TileID
+	 */
+	public TileID tileIdAt(int x, int y){
+		if (x < 0 || x >= width || y < 0 || y > height){
+			return TileID.NONE;
+		}
+		return tiles[x][y].type.getName();
+	}
+
+
+	/**
 	 * Removes tile at position. Places TYPE_AIR instead. Updates light values
 	 * @param pos position of tile to remove
 	 * @param sun lighting engine of sun type to update light values
@@ -208,6 +229,23 @@ public class World implements java.io.Serializable {
 		} else {
 			sun.removedTile(x, y);
 		}
+		return oldType;
+	}
+
+	/**
+	 * Changes tile at given coordinates.
+	 * Returns AIR if out of bounds.
+	 * @param x coordinate X of tile to change
+	 * @param y coordinate Y of tile to change
+	 * @param tile instance of tile to replace
+	 * @return instance of TileType of previous tile
+	 */
+	public TileType changeTile(int x, int y, Tile tile) {
+		if (x < 0 || x >= width || y < 0 || y > height){
+			return TileStore.TYPE_AIR;
+		}
+		TileType oldType = tiles[x][y].type;
+		tiles[x][y] = tile;
 		return oldType;
 	}
 	
