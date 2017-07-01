@@ -153,7 +153,7 @@ public class MainGame {
 		worldWidth = width;
 		entities.clear();
 		// make a new world and player
-		world = new World(worldWidth, worldHeight, random, tileStore);
+		world = new World(worldWidth, worldHeight, random, tileStore, new WorldGenerator());
 		player = new Player(true, world.spawnLocation.x, world.spawnLocation.y, + 7 * (tileSize / 8), 14 * (tileSize / 8));
 		hotbar.setInventory(player.inventory);
 		entities.add(player);
@@ -367,12 +367,14 @@ public class MainGame {
 		InventoryItem current = hotbar.getSelected();
 		if (!current.isEmpty()) {
 			TileID itemID = TileID.of(current.getItem().item_id);
-			boolean isPassable = tileStore.tileTypes.get(itemID).passable;
+			if (itemID != TileID.NONE) {
+				boolean isPassable = tileStore.tileTypes.get(itemID).passable;
 
-			if (isPassable || !player.inBoundingBox(player.handBuildPos, tileSize)) {
-				if (world.addTile(player.handBuildPos, itemID, lightingEngineSun, lightingEngineSourceBlocks, tileStore)) {
-					// placed successfully
-					hotbar.decreaseSelected(1);
+				if (isPassable || !player.inBoundingBox(player.handBuildPos, tileSize)) {
+					if (world.addTile(player.handBuildPos, itemID, lightingEngineSun, lightingEngineSourceBlocks, tileStore)) {
+						// placed successfully
+						hotbar.decreaseSelected(1);
+					}
 				}
 			}
 		}

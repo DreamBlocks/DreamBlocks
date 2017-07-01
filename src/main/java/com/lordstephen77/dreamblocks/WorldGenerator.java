@@ -42,20 +42,17 @@ import java.util.Random;
 import com.lordstephen77.dreamblocks.Constants.TileID;
 
 public class WorldGenerator {
+
+	public Int2 playerLocation;
 	
-	public static boolean[][] visibility;
-	public static Int2 playerLocation;
-	
-	public static TileID[][] generate(int width, int height, Random random) {
+	public TileID[][] generate(int width, int height, Random random) {
 		TileID[][] world = new TileID[width][height];
-		visibility = new boolean[width][height];
-		for (int i = 0; i < visibility.length; i++) {
-			for (int j = 0; j < visibility[0].length; j++) {
-				visibility[i][j] = true;
+		for (int i = 0; i < width; i++) {
+			for (int j = 0; j < height; j++) {
 				world[i][j] = TileID.NONE;
 			}
 		}
-		
+
 		playerLocation = new Int2(width / 2, 5);
 		
 		int seed = random.nextInt();
@@ -116,22 +113,14 @@ public class WorldGenerator {
 				playerLocation.y = surface - 2;
 				playerLocFound = true;
 			}
-			
-			for (int j = 0; j <= surface; j++) {
-				setVisible(i + 1, j);
-				setVisible(i, j + 1);
-				setVisible(i - 1, j);
-				setVisible(i, j - 1);
-			}
+
 			
 			world[i][surface] = TileID.GRASS;
 			for (int j = 1; j <= dirtDepth; j++) {
 				world[i][surface + j] = TileID.DIRT;
-				visibility[i][surface + j] = false;
 			}
 			for (int j = dirtDepth; surface + j < height; j++) {
 				world[i][surface + j] = TileID.STONE;
-				visibility[i][surface + j] = false;
 			}
 		}
 		
@@ -204,7 +193,7 @@ public class WorldGenerator {
 	}
 	
 	// Density [0,1]
-	private static void uniformlyAddMinerals(TileID[][] world, TileID mineral, float density,
+	private void uniformlyAddMinerals(TileID[][] world, TileID mineral, float density,
 			int minDepth, int maxDepth, TileID[] ignoreTypes, Random random) {
 		int missesAllowed = 100;
 		int width = world.length;
@@ -223,15 +212,9 @@ public class WorldGenerator {
 			iterations++;
 		}
 	}
+
 	
-	private static void setVisible(int x, int y) {
-		if (x < 0 || x >= visibility.length || y < 0 || y >= visibility[0].length) {
-			return;
-		}
-		visibility[x][y] = true;
-	}
-	
-	private static void carve(TileID[][] world, int x, int y, double distance, TileID type,
+	private void carve(TileID[][] world, int x, int y, double distance, TileID type,
 			TileID[] ignoreTypes, boolean left) {
 		for (int i = -(int) distance; (!left && i <= (int) distance) || (left && i <= 0); i++) {
 			int currentX = x + i;
@@ -259,7 +242,7 @@ public class WorldGenerator {
 		}
 	}
 	
-	private static void addTemplate(TileID[][] world, TileTemplate tileTemplate, Int2 position) {
+	private void addTemplate(TileID[][] world, TileTemplate tileTemplate, Int2 position) {
 		for (int i = 0; i < tileTemplate.template.length; i++) {
 			for (int j = 0; j < tileTemplate.template[0].length; j++) {
 				if (tileTemplate.template[i][j] != TileID.NONE
