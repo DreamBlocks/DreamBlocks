@@ -1,5 +1,6 @@
 package com.lordstephen77.dreamblocks.fillers;
 
+import com.lordstephen77.dreamblocks.TileStore;
 import com.lordstephen77.dreamblocks.World;
 
 import java.util.Random;
@@ -10,9 +11,11 @@ import java.util.Random;
 public abstract class WorldFiller {
     protected World world;
     protected Random random;
-    public WorldFiller(World world, Random random){
+    protected TileStore tileStore;
+    public WorldFiller(World world, Random random, TileStore tileStore){
         this.world = world;
         this.random = random;
+        this.tileStore = tileStore;
     }
 
     public abstract void fill();

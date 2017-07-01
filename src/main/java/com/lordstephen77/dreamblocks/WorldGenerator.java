@@ -132,24 +132,6 @@ public class WorldGenerator {
 			}
 		}
 		
-		// water
-		for (int i = 0; i < width; i++) {
-			if (world[i][median] != TileID.NONE) {
-				continue;
-			}
-			
-			// flood fill down
-			for (int j = median; j < height; j++) {
-				
-				if (world[i][j] != TileID.NONE) {
-					carve(world, i, j - 1, (int)(1 + random.nextDouble() * 2), TileID.SAND, new TileID[] {
-							TileID.WATER, TileID.NONE }, false);
-					break;
-				}
-				world[i][j] = TileID.WATER;
-			}
-		}
-		
 		uniformlyAddMinerals(world, TileID.COAL_ORE, .01f, (int) (height * .4),
 				(int) (height * .9), new TileID[] { TileID.DIRT, TileID.SAND, TileID.WATER,
 						TileID.NONE }, random);
@@ -183,7 +165,7 @@ public class WorldGenerator {
 					break;
 				}
 				double caveSize = 1 + random.nextDouble() * .45;
-				carve(world, posX, posY, (int)caveSize, TileID.NONE, caveIgnore, false);
+				carve(world, posX, posY, (int)caveSize, TileID.NONE, caveIgnore);
 			}
 		}
 		
@@ -210,17 +192,26 @@ public class WorldGenerator {
 			int posY = random.nextInt(totalHeight) + minDepth;
 			if (world[posX][posY] == TileID.STONE) {
 				double mineralSize = 1 + random.nextDouble() * .6;
-				carve(world, posX, posY, (int)mineralSize, mineral, ignoreTypes, false);
+				carve(world, posX, posY, (int)mineralSize, mineral, ignoreTypes);
 				added++;
 			}
 			iterations++;
 		}
 	}
 
-	
+	/**
+	 * Replaces tiles around given x and y with tile of "type".
+	 * Only if present tile is not in array of ignore types.
+	 * @param world - tileID data of the world
+	 * @param x - x of center
+	 * @param y - y of center
+	 * @param distance - distance by x or by y from center
+	 * @param type - new type
+	 * @param ignoreTypes - old type
+	 */
 	public void carve(TileID[][] world, int x, int y, int distance, TileID type,
-			TileID[] ignoreTypes, boolean left) {
-		for (int i = -distance; (!left && i <= distance) || (left && i <= 0); i++) {
+			TileID[] ignoreTypes) {
+		for (int i = -distance; i <= distance; i++) {
 			int currentX = x + i;
 			if (currentX < 0 || currentX >= world.length) {
 				continue;
@@ -234,6 +225,7 @@ public class WorldGenerator {
 				for (TileID ignore : ignoreTypes) {
 					if (world[currentX][currentY] == ignore) {
 						ignoreThis = true;
+						break;
 					}
 				}
 				if (ignoreThis) {
