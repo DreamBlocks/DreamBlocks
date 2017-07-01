@@ -36,10 +36,9 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.lordstephen77.dreamblocks;
 
-import java.util.ArrayList;
-import java.util.Random;
-
 import com.lordstephen77.dreamblocks.Constants.TileID;
+
+import java.util.Random;
 
 public class WorldGenerator {
 
@@ -76,8 +75,6 @@ public class WorldGenerator {
 		int surface = median;// maxSurface-5;
 		int dirtDepth = 3;
 		
-		ArrayList<Int2> trees = new ArrayList<Int2>();
-		
 		int surfaceSum = 0;
 		
 		boolean playerLocFound = false;
@@ -109,10 +106,6 @@ public class WorldGenerator {
 			}
 			if (surfaceSum < -width / 16) {
 				surface = Math.min(maxSurface, surface + 3);
-			}
-			
-			if (random.nextDouble() > .8) {
-				trees.add(new Int2(i, surface - 1));
 			}
 			
 			if (i > width / 4 && surface < median && world[i - 1][surface - 1] == TileID.NONE
@@ -166,12 +159,6 @@ public class WorldGenerator {
 				}
 				double caveSize = 1 + random.nextDouble() * .45;
 				carve(world, posX, posY, (int)caveSize, TileID.NONE, caveIgnore);
-			}
-		}
-		
-		for (Int2 pos : trees) {
-			if (world[pos.x][pos.y + 1] == TileID.GRASS) {
-				addTemplate(world, TileTemplate.tree, pos);
 			}
 		}
 		
@@ -233,21 +220,6 @@ public class WorldGenerator {
 				}
 				if (Math.sqrt(i * i + j * j) <= distance) {
 					world[currentX][currentY] = type;
-				}
-			}
-		}
-	}
-	
-	private void addTemplate(TileID[][] world, TileTemplate tileTemplate, Int2 position) {
-		for (int i = 0; i < tileTemplate.template.length; i++) {
-			for (int j = 0; j < tileTemplate.template[0].length; j++) {
-				if (tileTemplate.template[i][j] != TileID.NONE
-						&& position.x - tileTemplate.spawnY + i >= 0
-						&& position.x - tileTemplate.spawnY + i < world.length
-						&& position.y - tileTemplate.spawnX + j >= 0
-						&& position.y - tileTemplate.spawnX + j < world[0].length) {
-					world[position.x - tileTemplate.spawnY + i][position.y - tileTemplate.spawnX
-							+ j] = tileTemplate.template[i][j];
 				}
 			}
 		}

@@ -39,6 +39,7 @@ package com.lordstephen77.dreamblocks;
 import java.util.Random;
 
 import com.lordstephen77.dreamblocks.Constants.TileID;
+import com.lordstephen77.dreamblocks.fillers.TreeFiller;
 import com.lordstephen77.dreamblocks.fillers.WaterFiller;
 
 public class World implements java.io.Serializable {
@@ -77,6 +78,8 @@ public class World implements java.io.Serializable {
 		this.height = height;
 		WaterFiller waterFiller = new WaterFiller(this, random, tileStore);
 		waterFiller.fill();
+        TreeFiller treeFiller = new TreeFiller(this, random, tileStore);
+        treeFiller.fill();
 		this.chunkCount = (int) Math.ceil((double) width / chunkWidth);
 		this.chunkNeedsUpdate = 0;
 		this.random = random;
