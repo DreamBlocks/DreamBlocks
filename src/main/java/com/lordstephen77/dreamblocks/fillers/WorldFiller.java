@@ -10,13 +10,17 @@ import java.util.Random;
  */
 public abstract class WorldFiller {
     protected World world;
-    protected Random random;
-    protected TileStore tileStore;
-    public WorldFiller(World world, Random random, TileStore tileStore){
+    Random random;
+    TileStore tileStore;
+    WorldFiller(World world, Random random, TileStore tileStore){
         this.world = world;
         this.random = random;
         this.tileStore = tileStore;
     }
 
     public abstract void fill();
+
+    int getMedian(){
+        return (int) (.5 * world.height);
+    }
 }

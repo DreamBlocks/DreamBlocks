@@ -14,9 +14,9 @@ public class WaterFiller extends WorldFiller {
 
     @Override
     public void fill() {
-        int median = (int) (.5 * world.height);
+        int median = getMedian();
         for (int x = 0; x < world.width; x++) {
-            int depth = getWaterDepthAt(x);
+            int depth = getWaterDepthAt(x, getMedian());
             if (depth == 0){
                 continue;
             }
@@ -32,15 +32,15 @@ public class WaterFiller extends WorldFiller {
         }
     }
 
-    private int getWaterDepthAt(int x){
-        int median = (int) (.5 * world.height);
-        int y = median;
-        Constants.TileID tileID = world.tileIdAt(x, y);
-        while(y < world.height && tileID == Constants.TileID.AIR){
+    private int getWaterDepthAt(int px, int py){
+        int y = py;
+        boolean isAir;
+        do {
+            isAir = world.tileIdAt(px, y) == Constants.TileID.AIR;
             y++;
-            tileID = world.tileIdAt(x,y);
         }
-        return y - median;
+        while(y < world.height && isAir);
+        return y - py - 1;
     }
 
     private void fillDown(int x, int y, int amount, Constants.TileID tileID){
