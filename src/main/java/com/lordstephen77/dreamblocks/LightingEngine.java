@@ -110,7 +110,7 @@ public class LightingEngine implements Serializable {
 			spreadLightingDijkstra(getSunSources(x));
 		}
 		LightingPoint p = new LightingPoint(x, y, Direction.UNKNOWN, lightValues[x][y]);
-		spreadLightingDijkstra(getNeighbors(p, width, height));
+		spreadLightingDijkstra(getNeighbors(p));
 	}
 	
 	public void addedTile(int x, int y) {
@@ -254,18 +254,18 @@ public class LightingEngine implements Serializable {
 		}
 	}
 
-	public List<LightingPoint> getNeighbors(LightingPoint p, int width, int height) {
+	public List<LightingPoint> getNeighbors(LightingPoint p) {
 		List<LightingPoint> neighbors = new LinkedList<>();
 		if (tiles[p.x][p.y].type.lightBlocking == Constants.LIGHT_VALUE_OPAQUE) {
 			return neighbors;
 		}
 		int newValue = p.lightValue - 1 - tiles[p.x][p.y].type.lightBlocking;
-		neighbors = getExactNeighbors(width, height, newValue, p);
+		neighbors = getExactNeighbors(p, newValue);
 
 		return neighbors;
 	}
 
-	public List<LightingPoint> getExactNeighbors(int width, int height, int lightingValue, LightingPoint p) {
+	public List<LightingPoint> getExactNeighbors(LightingPoint p, int lightingValue) {
 		int x = p.x;
 		int y = p.y;
 		LinkedList<LightingPoint> neighbors = new LinkedList<>();
@@ -330,7 +330,7 @@ public class LightingEngine implements Serializable {
 					&& current.flow != Direction.SOURCE) {
 				System.out.println("There's a bug in the source map!");
 			}
-			List<LightingPoint> neighbors = getNeighbors(current, width, height);
+			List<LightingPoint> neighbors = getNeighbors(current);
 			for (LightingPoint next : neighbors) {
 				if (out.contains(next)) {
 					continue;
