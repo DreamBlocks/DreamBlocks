@@ -8,7 +8,7 @@ public enum Direction {
     LEFT(-1, 0), SOURCE(0, 0), RIGHT(1, 0),
     DOWN_LEFT(-1, 1), DOWN(0, 1), DOWN_RIGHT(1, 1),
 
-    UNKNOWN(0, 0);
+    UNKNOWN(Integer.MAX_VALUE, Integer.MAX_VALUE);
 
     public final int dx;
     public final int dy;

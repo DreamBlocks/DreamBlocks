@@ -46,18 +46,18 @@ import java.util.PriorityQueue;
 public class LightingEngine implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
-
-	;
 	
 	public Direction[][] lightFlow;
 	
 	private int[][] lightValues;
 	private int width, height;
 	private Tile[][] tiles;
+	private World world;
 	
 	private final boolean isSun;
 
 	public LightingEngine(World world, boolean isSun){
+		this.world = world;
 		this.width = world.width;
 		this.height = world.height;
 		this.tiles = world.tiles;
@@ -266,44 +266,12 @@ public class LightingEngine implements Serializable {
 			return new LinkedList<>();
 		}
 		int newValue = p.lightValue - 1 - tiles[p.x][p.y].type.lightBlocking;
-		return getExactNeighbors(p, newValue);
-	}
-
-
-
-	public List<LightingPoint> getExactNeighbors(LightingPoint p, int lightingValue) {
-		int x = p.x;
-		int y = p.y;
 		LinkedList<LightingPoint> neighbors = new LinkedList<>();
 
-		boolean bufferLeft = (x > 0);
-		boolean bufferRight = (x < width - 1);
-		boolean bufferUp = (y > 0);
-		boolean bufferDown = (y < height - 1);
-
-		if (bufferRight) {
-			neighbors.add(makeLightingPoint(x, y, Direction.RIGHT, lightingValue));
-			if (bufferUp) {
-				neighbors.add(makeLightingPoint(x, y, Direction.UP_RIGHT, lightingValue));
+		for(Direction dir : Direction.values()){
+			if (!world.isOutOfWorld(p.x, p.y, dir)){
+				neighbors.add(makeLightingPoint(p.x, p.y, dir, newValue));
 			}
-			if (bufferDown) {
-				neighbors.add(makeLightingPoint(x, y, Direction.DOWN_RIGHT, lightingValue));
-			}
-		}
-		if (bufferLeft) {
-			neighbors.add(makeLightingPoint(x, y, Direction.LEFT, lightingValue));
-			if (bufferUp) {
-				neighbors.add(makeLightingPoint(x, y, Direction.UP_LEFT, lightingValue));
-			}
-			if (bufferDown) {
-				neighbors.add(makeLightingPoint(x, y, Direction.DOWN_LEFT, lightingValue));
-			}
-		}
-		if (bufferDown) {
-			neighbors.add(makeLightingPoint(x, y, Direction.DOWN, lightingValue));
-		}
-		if (bufferUp) {
-			neighbors.add(makeLightingPoint(x, y, Direction.UP, lightingValue));
 		}
 		return neighbors;
 	}
