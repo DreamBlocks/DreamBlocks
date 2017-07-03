@@ -46,10 +46,8 @@ import java.util.PriorityQueue;
 public class LightingEngine implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
-	
-	public enum Direction {
-		RIGHT, UP_RIGHT, UP, UP_LEFT, LEFT, DOWN_LEFT, DOWN, DOWN_RIGHT, SOURCE, WELL, UNKNOWN
-	};
+
+	;
 	
 	public Direction[][] lightFlow;
 	
@@ -216,8 +214,12 @@ public class LightingEngine implements Serializable {
 	private LightingPoint getLightingPoint(int x, int y) {
 		return new LightingPoint(x, y, lightFlow[x][y], lightValues[x][y]);
 	}
+
+	private LightingPoint makeLightingPoint(int x, int y, Direction dir, int lightingValue){
+		return new LightingPoint(x + dir.dx, y + dir.dy, dir, lightingValue);
+	}
 	
-	public class LightingPoint {
+	public static class LightingPoint {
 		
 		public int x, y, lightValue;
 		public Direction flow;
@@ -228,13 +230,18 @@ public class LightingEngine implements Serializable {
 			this.flow = flow;
 			this.lightValue = lightValue;
 		}
-		
+
 		@Override
 		public boolean equals(Object o) {
-			LightingPoint other = (LightingPoint) o;
-			return other.x == this.x && other.y == this.y;
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+
+			LightingPoint that = (LightingPoint) o;
+
+			if (x != that.x) return false;
+			return y == that.y;
 		}
-		
+
 		@Override
 		public int hashCode() {
 			return x * 13 + y * 17;
@@ -255,15 +262,14 @@ public class LightingEngine implements Serializable {
 	}
 
 	public List<LightingPoint> getNeighbors(LightingPoint p) {
-		List<LightingPoint> neighbors = new LinkedList<>();
 		if (tiles[p.x][p.y].type.lightBlocking == Constants.LIGHT_VALUE_OPAQUE) {
-			return neighbors;
+			return new LinkedList<>();
 		}
 		int newValue = p.lightValue - 1 - tiles[p.x][p.y].type.lightBlocking;
-		neighbors = getExactNeighbors(p, newValue);
-
-		return neighbors;
+		return getExactNeighbors(p, newValue);
 	}
+
+
 
 	public List<LightingPoint> getExactNeighbors(LightingPoint p, int lightingValue) {
 		int x = p.x;
@@ -276,32 +282,28 @@ public class LightingEngine implements Serializable {
 		boolean bufferDown = (y < height - 1);
 
 		if (bufferRight) {
-			neighbors.add(new LightingPoint(x + 1, y, Direction.RIGHT, lightingValue));
+			neighbors.add(makeLightingPoint(x, y, Direction.RIGHT, lightingValue));
 			if (bufferUp) {
-				neighbors
-						.add(new LightingPoint(x + 1, y - 1, Direction.UP_RIGHT, lightingValue));
+				neighbors.add(makeLightingPoint(x, y, Direction.UP_RIGHT, lightingValue));
 			}
 			if (bufferDown) {
-				neighbors.add(new LightingPoint(x + 1, y + 1, Direction.DOWN_RIGHT,
-						lightingValue));
+				neighbors.add(makeLightingPoint(x, y, Direction.DOWN_RIGHT, lightingValue));
 			}
 		}
 		if (bufferLeft) {
-			neighbors.add(new LightingPoint(x - 1, y, Direction.LEFT, lightingValue));
+			neighbors.add(makeLightingPoint(x, y, Direction.LEFT, lightingValue));
 			if (bufferUp) {
-				neighbors
-						.add(new LightingPoint(x - 1, y - 1, Direction.UP_LEFT, lightingValue));
+				neighbors.add(makeLightingPoint(x, y, Direction.UP_LEFT, lightingValue));
 			}
 			if (bufferDown) {
-				neighbors
-						.add(new LightingPoint(x - 1, y + 1, Direction.DOWN_LEFT, lightingValue));
+				neighbors.add(makeLightingPoint(x, y, Direction.DOWN_LEFT, lightingValue));
 			}
 		}
 		if (bufferDown) {
-			neighbors.add(new LightingPoint(x, y + 1, Direction.DOWN, lightingValue));
+			neighbors.add(makeLightingPoint(x, y, Direction.DOWN, lightingValue));
 		}
 		if (bufferUp) {
-			neighbors.add(new LightingPoint(x, y - 1, Direction.UP, lightingValue));
+			neighbors.add(makeLightingPoint(x, y, Direction.UP, lightingValue));
 		}
 		return neighbors;
 	}

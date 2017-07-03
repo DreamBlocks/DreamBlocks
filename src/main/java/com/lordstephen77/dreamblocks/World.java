@@ -419,6 +419,13 @@ public class World implements java.io.Serializable {
 	public boolean isOutOfWorld(int x, int y){
 		return x < 0 || x >= width || y < 0 || y >= height;
 	}
+
+	public boolean isOutOfWorld(int px, int py, Direction direction){
+		int x = px + direction.dx;
+		int y = py + direction.dy;
+		return isOutOfWorld(x, y);
+	}
+
 	public boolean isClimbable(int x, int y) {
 		if (isOutOfWorld(x, y)) {
 			return false;
