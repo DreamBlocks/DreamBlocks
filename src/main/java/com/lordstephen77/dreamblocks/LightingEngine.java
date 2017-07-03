@@ -76,7 +76,7 @@ public class LightingEngine implements Serializable {
 				lightFlow[x][y] = Direction.UNKNOWN;
 			}
 		}
-		LinkedList<LightingPoint> sources = new LinkedList<LightingPoint>();
+		LinkedList<LightingPoint> sources = new LinkedList<>();
 		if (isSun) {
 			for (int x = 0; x < width; x++) {
 				sources.addAll(getSunSources(x));
@@ -136,7 +136,7 @@ public class LightingEngine implements Serializable {
 	}
 	
 	public List<LightingPoint> getSunSources(int column) {
-		LinkedList<LightingPoint> sources = new LinkedList<LightingPoint>();
+		LinkedList<LightingPoint> sources = new LinkedList<>();
 		for (int y = 0; y < height - 1; y++) {
 			if (tiles[column][y].type.lightBlocking != 0) {
 				break;
@@ -151,7 +151,7 @@ public class LightingEngine implements Serializable {
 		int right = Math.min(x + Constants.LIGHT_VALUE_SUN, width - 1);
 		int top = Math.max(y - Constants.LIGHT_VALUE_SUN, 0);
 		int bottom = Math.min(y + Constants.LIGHT_VALUE_SUN, height - 1);
-		List<LightingPoint> sources = new LinkedList<LightingPoint>();
+		List<LightingPoint> sources = new LinkedList<>();
 		
 		// safely circle around the target zeroed zone
 		boolean bufferLeft = (left > 0);
@@ -255,7 +255,7 @@ public class LightingEngine implements Serializable {
 	}
 
 	public List<LightingPoint> getNeighbors(LightingPoint p, int width, int height) {
-		List<LightingPoint> neighbors = new LinkedList<LightingPoint>();
+		List<LightingPoint> neighbors = new LinkedList<>();
 		if (tiles[p.x][p.y].type.lightBlocking == Constants.LIGHT_VALUE_OPAQUE) {
 			return neighbors;
 		}
@@ -268,7 +268,7 @@ public class LightingEngine implements Serializable {
 	public List<LightingPoint> getExactNeighbors(int width, int height, int lightingValue, LightingPoint p) {
 		int x = p.x;
 		int y = p.y;
-		LinkedList<LightingPoint> neighbors = new LinkedList<LightingPoint>();
+		LinkedList<LightingPoint> neighbors = new LinkedList<>();
 
 		boolean bufferLeft = (x > 0);
 		boolean bufferRight = (x < width - 1);
@@ -294,7 +294,7 @@ public class LightingEngine implements Serializable {
 			}
 			if (bufferDown) {
 				neighbors
-						.add(new LightingPoint(x - 1, y + 1, Direction.UP_LEFT, lightingValue));
+						.add(new LightingPoint(x - 1, y + 1, Direction.DOWN_LEFT, lightingValue));
 			}
 		}
 		if (bufferDown) {
@@ -309,9 +309,9 @@ public class LightingEngine implements Serializable {
 	private void spreadLightingDijkstra(List<LightingPoint> sources) {
 		if (sources.isEmpty())
 			return;
-		HashSet<LightingPoint> out = new HashSet<LightingPoint>();
-		PriorityQueue<LightingPoint> in = new PriorityQueue<LightingPoint>(sources.size(),
-				new LightValueComparator());
+		HashSet<LightingPoint> out = new HashSet<>();
+		PriorityQueue<LightingPoint> in = new PriorityQueue<>(sources.size(),
+                new LightValueComparator());
 		// consider that the input sources are done (this is not a good assumption if different
 		// light sources have different values......)
 		out.addAll(sources);
@@ -337,52 +337,6 @@ public class LightingEngine implements Serializable {
 				}
 				in.add(next);
 			}
-		}
-	}
-	
-	public Direction oppositeDirection(Direction direction) {
-		switch (direction) {
-		case RIGHT:
-			return Direction.LEFT;
-		case LEFT:
-			return Direction.RIGHT;
-		case UP:
-			return Direction.DOWN;
-		case DOWN:
-			return Direction.UP;
-		case UP_RIGHT:
-			return Direction.DOWN_LEFT;
-		case UP_LEFT:
-			return Direction.DOWN_RIGHT;
-		case DOWN_RIGHT:
-			return Direction.UP_LEFT;
-		case DOWN_LEFT:
-			return Direction.UP_RIGHT;
-		default:
-			return Direction.UNKNOWN;
-		}
-	}
-	
-	public Int2 followDirection(int x, int y, Direction direction) {
-		switch (direction) {
-		case RIGHT:
-			return new Int2(x + 1, y);
-		case LEFT:
-			return new Int2(x - 1, y);
-		case UP:
-			return new Int2(x, y - 1);
-		case DOWN:
-			return new Int2(x, y + 1);
-		case UP_RIGHT:
-			return new Int2(x + 1, y - 1);
-		case UP_LEFT:
-			return new Int2(x - 1, y - 1);
-		case DOWN_RIGHT:
-			return new Int2(x + 1, y + 1);
-		case DOWN_LEFT:
-			return new Int2(x - 1, y + 1);
-		default:
-			return null;
 		}
 	}
 }
