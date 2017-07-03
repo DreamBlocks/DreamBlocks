@@ -47,19 +47,17 @@ public class LightingEngine implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
-	public enum Direction {
-		RIGHT, UP_RIGHT, UP, UP_LEFT, LEFT, DOWN_LEFT, DOWN, DOWN_RIGHT, SOURCE, WELL, UNKNOWN
-	};
-	
 	public Direction[][] lightFlow;
 	
 	private int[][] lightValues;
 	private int width, height;
 	private Tile[][] tiles;
+	private World world;
 	
 	private final boolean isSun;
 
 	public LightingEngine(World world, boolean isSun){
+		this.world = world;
 		this.width = world.width;
 		this.height = world.height;
 		this.tiles = world.tiles;
@@ -76,7 +74,7 @@ public class LightingEngine implements Serializable {
 				lightFlow[x][y] = Direction.UNKNOWN;
 			}
 		}
-		LinkedList<LightingPoint> sources = new LinkedList<LightingPoint>();
+		LinkedList<LightingPoint> sources = new LinkedList<>();
 		if (isSun) {
 			for (int x = 0; x < width; x++) {
 				sources.addAll(getSunSources(x));
@@ -109,8 +107,8 @@ public class LightingEngine implements Serializable {
 		if (isSun) {
 			spreadLightingDijkstra(getSunSources(x));
 		}
-		spreadLightingDijkstra(new LightingPoint(x, y, Direction.UNKNOWN, lightValues[x][y])
-				.getNeighbors(true, width, height));
+		LightingPoint p = new LightingPoint(x, y, Direction.UNKNOWN, lightValues[x][y]);
+		spreadLightingDijkstra(getNeighbors(p));
 	}
 	
 	public void addedTile(int x, int y) {
@@ -136,7 +134,7 @@ public class LightingEngine implements Serializable {
 	}
 	
 	public List<LightingPoint> getSunSources(int column) {
-		LinkedList<LightingPoint> sources = new LinkedList<LightingPoint>();
+		LinkedList<LightingPoint> sources = new LinkedList<>();
 		for (int y = 0; y < height - 1; y++) {
 			if (tiles[column][y].type.lightBlocking != 0) {
 				break;
@@ -151,7 +149,7 @@ public class LightingEngine implements Serializable {
 		int right = Math.min(x + Constants.LIGHT_VALUE_SUN, width - 1);
 		int top = Math.max(y - Constants.LIGHT_VALUE_SUN, 0);
 		int bottom = Math.min(y + Constants.LIGHT_VALUE_SUN, height - 1);
-		List<LightingPoint> sources = new LinkedList<LightingPoint>();
+		List<LightingPoint> sources = new LinkedList<>();
 		
 		// safely circle around the target zeroed zone
 		boolean bufferLeft = (left > 0);
@@ -216,79 +214,34 @@ public class LightingEngine implements Serializable {
 	private LightingPoint getLightingPoint(int x, int y) {
 		return new LightingPoint(x, y, lightFlow[x][y], lightValues[x][y]);
 	}
+
+	private LightingPoint makeLightingPoint(int x, int y, Direction dir, int lightingValue){
+		return new LightingPoint(x + dir.dx, y + dir.dy, dir, lightingValue);
+	}
 	
-	public class LightingPoint {
+	public static class LightingPoint {
 		
 		public int x, y, lightValue;
 		public Direction flow;
-		
-		// public LightingPoint(int x, int y, Direction flow, int lightValue) {
-		// this(x, y, flow, lightValue, true);
-		// }
-		//
+
 		public LightingPoint(int x, int y, Direction flow, int lightValue) {
 			this.x = x;
 			this.y = y;
 			this.flow = flow;
 			this.lightValue = lightValue;
 		}
-		
+
 		@Override
 		public boolean equals(Object o) {
-			LightingPoint other = (LightingPoint) o;
-			return other.x == this.x && other.y == this.y;
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+
+			LightingPoint that = (LightingPoint) o;
+
+			if (x != that.x) return false;
+			return y == that.y;
 		}
-		
-		public List<LightingPoint> getNeighbors(boolean sun, int width, int height) {
-			List<LightingPoint> neighbors = new LinkedList<LightingPoint>();
-			if (tiles[x][y].type.lightBlocking == Constants.LIGHT_VALUE_OPAQUE) {
-				return neighbors;
-			}
-			int newValue = lightValue - 1 - tiles[x][y].type.lightBlocking;
-			neighbors = getExactNeighbors(width, height, newValue);
-			
-			return neighbors;
-		}
-		
-		public List<LightingPoint> getExactNeighbors(int width, int height, int lightingValue) {
-			LinkedList<LightingPoint> neighbors = new LinkedList<LightingPoint>();
-			
-			boolean bufferLeft = (x > 0);
-			boolean bufferRight = (x < width - 1);
-			boolean bufferUp = (y > 0);
-			boolean bufferDown = (y < height - 1);
-			
-			if (bufferRight) {
-				neighbors.add(new LightingPoint(x + 1, y, Direction.RIGHT, lightingValue));
-				if (bufferUp) {
-					neighbors
-							.add(new LightingPoint(x + 1, y - 1, Direction.UP_RIGHT, lightingValue));
-				}
-				if (bufferDown) {
-					neighbors.add(new LightingPoint(x + 1, y + 1, Direction.DOWN_RIGHT,
-							lightingValue));
-				}
-			}
-			if (bufferLeft) {
-				neighbors.add(new LightingPoint(x - 1, y, Direction.LEFT, lightingValue));
-				if (bufferUp) {
-					neighbors
-							.add(new LightingPoint(x - 1, y - 1, Direction.UP_LEFT, lightingValue));
-				}
-				if (bufferDown) {
-					neighbors
-							.add(new LightingPoint(x - 1, y + 1, Direction.UP_LEFT, lightingValue));
-				}
-			}
-			if (bufferDown) {
-				neighbors.add(new LightingPoint(x, y + 1, Direction.DOWN, lightingValue));
-			}
-			if (bufferUp) {
-				neighbors.add(new LightingPoint(x, y - 1, Direction.UP, lightingValue));
-			}
-			return neighbors;
-		}
-		
+
 		@Override
 		public int hashCode() {
 			return x * 13 + y * 17;
@@ -307,13 +260,28 @@ public class LightingEngine implements Serializable {
 			return 0;
 		}
 	}
-	
+
+	public List<LightingPoint> getNeighbors(LightingPoint p) {
+		if (tiles[p.x][p.y].type.lightBlocking == Constants.LIGHT_VALUE_OPAQUE) {
+			return new LinkedList<>();
+		}
+		int newValue = p.lightValue - 1 - tiles[p.x][p.y].type.lightBlocking;
+		LinkedList<LightingPoint> neighbors = new LinkedList<>();
+
+		for(Direction dir : Direction.values()){
+			if (!world.isOutOfWorld(p.x, p.y, dir)){
+				neighbors.add(makeLightingPoint(p.x, p.y, dir, newValue));
+			}
+		}
+		return neighbors;
+	}
+
 	private void spreadLightingDijkstra(List<LightingPoint> sources) {
 		if (sources.isEmpty())
 			return;
-		HashSet<LightingPoint> out = new HashSet<LightingPoint>();
-		PriorityQueue<LightingPoint> in = new PriorityQueue<LightingPoint>(sources.size(),
-				new LightValueComparator());
+		HashSet<LightingPoint> out = new HashSet<>();
+		PriorityQueue<LightingPoint> in = new PriorityQueue<>(sources.size(),
+                new LightValueComparator());
 		// consider that the input sources are done (this is not a good assumption if different
 		// light sources have different values......)
 		out.addAll(sources);
@@ -332,59 +300,13 @@ public class LightingEngine implements Serializable {
 					&& current.flow != Direction.SOURCE) {
 				System.out.println("There's a bug in the source map!");
 			}
-			List<LightingPoint> neighbors = current.getNeighbors(isSun, width, height);
+			List<LightingPoint> neighbors = getNeighbors(current);
 			for (LightingPoint next : neighbors) {
 				if (out.contains(next)) {
 					continue;
 				}
 				in.add(next);
 			}
-		}
-	}
-	
-	public Direction oppositeDirection(Direction direction) {
-		switch (direction) {
-		case RIGHT:
-			return Direction.LEFT;
-		case LEFT:
-			return Direction.RIGHT;
-		case UP:
-			return Direction.DOWN;
-		case DOWN:
-			return Direction.UP;
-		case UP_RIGHT:
-			return Direction.DOWN_LEFT;
-		case UP_LEFT:
-			return Direction.DOWN_RIGHT;
-		case DOWN_RIGHT:
-			return Direction.UP_LEFT;
-		case DOWN_LEFT:
-			return Direction.UP_RIGHT;
-		default:
-			return Direction.UNKNOWN;
-		}
-	}
-	
-	public Int2 followDirection(int x, int y, Direction direction) {
-		switch (direction) {
-		case RIGHT:
-			return new Int2(x + 1, y);
-		case LEFT:
-			return new Int2(x - 1, y);
-		case UP:
-			return new Int2(x, y - 1);
-		case DOWN:
-			return new Int2(x, y + 1);
-		case UP_RIGHT:
-			return new Int2(x + 1, y - 1);
-		case UP_LEFT:
-			return new Int2(x - 1, y - 1);
-		case DOWN_RIGHT:
-			return new Int2(x + 1, y + 1);
-		case DOWN_LEFT:
-			return new Int2(x - 1, y + 1);
-		default:
-			return null;
 		}
 	}
 }

@@ -162,7 +162,7 @@ public class World implements java.io.Serializable {
 	}
 
 	public boolean addTile(int x, int y, TileID tileID, LightingEngine sun, LightingEngine sourceBlocks, TileStore tileStore) {
-		if (x < 0 || x >= width || y < 0 || y >= height) {
+		if (isOutOfWorld(x, y)) {
 			return false;
 		}
 		Tile tile = tileStore.make(tileID);
@@ -189,7 +189,7 @@ public class World implements java.io.Serializable {
 	 * @return instance of TileID
 	 */
 	public TileID tileIdAt(int x, int y){
-		if (x < 0 || x >= width || y < 0 || y > height){
+		if (isOutOfWorld(x, y)){
 			return TileID.NONE;
 		}
 		return tiles[x][y].type.getName();
@@ -244,7 +244,7 @@ public class World implements java.io.Serializable {
 	 * @return instance of TileType of previous tile
 	 */
 	public TileType changeTile(int x, int y, Tile tile) {
-		if (x < 0 || x >= width || y < 0 || y > height){
+		if (isOutOfWorld(x, y)){
 			return TileStore.TYPE_AIR;
 		}
 		TileType oldType = tiles[x][y].type;
@@ -258,7 +258,7 @@ public class World implements java.io.Serializable {
 	private TileID[] breakDiamond = new TileID[] { TileID.DIAMOND_ORE };
 	
 	public int breakTicks(int x, int y, Item item) {
-		if (x < 0 || x >= width || y < 0 || y >= height) {
+		if (isOutOfWorld(x, y)) {
 			return Integer.MAX_VALUE;
 		}
 		TileID currentName = tiles[x][y].type.name;
@@ -392,21 +392,21 @@ public class World implements java.io.Serializable {
 	}
 	
 	public boolean passable(int x, int y) {
-		if (x < 0 || x >= width || y < 0 || y >= height) {
+		if (isOutOfWorld(x, y)) {
 			return false;
 		}
 		return tiles[x][y].type == null || tiles[x][y].type.passable;
 	}
 	
 	public boolean isLiquid(int x, int y) {
-		if (x < 0 || x >= width || y < 0 || y >= height) {
+		if (isOutOfWorld(x, y)) {
 			return false;
 		}
 		return tiles[x][y].type != null && tiles[x][y].type.liquid;
 	}
 	
 	public boolean isAir(int x, int y) {
-		if (x < 0 || x >= width || y < 0 || y >= height) {
+		if (isOutOfWorld(x, y)) {
 			return false;
 		}
 		return tiles[x][y].type != null && tiles[x][y].type.name == TileID.AIR;
@@ -415,9 +415,19 @@ public class World implements java.io.Serializable {
 	public boolean isBreakable(int x, int y) {
 		return !(isAir(x, y) || isLiquid(x, y));
 	}
-	
+
+	public boolean isOutOfWorld(int x, int y){
+		return x < 0 || x >= width || y < 0 || y >= height;
+	}
+
+	public boolean isOutOfWorld(int px, int py, Direction direction){
+		int x = px + direction.dx;
+		int y = py + direction.dy;
+		return isOutOfWorld(x, y);
+	}
+
 	public boolean isClimbable(int x, int y) {
-		if (x < 0 || x >= width || y < 0 || y >= height) {
+		if (isOutOfWorld(x, y)) {
 			return false;
 		}
 		return tiles[x][y].type != null
@@ -426,7 +436,7 @@ public class World implements java.io.Serializable {
 	}
 	
 	public boolean isCraft(int x, int y) {
-		if (x < 0 || x >= width || y < 0 || y >= height) {
+		if (isOutOfWorld(x, y)) {
 			return false;
 		}
 		return tiles[x][y].type != null && (tiles[x][y].type.name == TileID.CRAFTING_BENCH);
