@@ -210,10 +210,10 @@ public class World implements java.io.Serializable {
 		}
 		TileType oldType = tiles[pos.x][pos.y].type;
 		if (oldType.name != TileID.NONE){
-			sun.addedTile(pos.x, pos.y);
-			sourceBlocks.addedTile(pos.x, pos.y);
+			tiles[pos.x][pos.y] = TileStore.TILE_AIR;
+			sun.removedTile(pos.x, pos.y);
+			sourceBlocks.removedTile(pos.x, pos.y);
 		}
-		tiles[pos.x][pos.y] = TileStore.TILE_AIR;
 		return oldType;
 	}
 
@@ -228,7 +228,7 @@ public class World implements java.io.Serializable {
 	public TileType changeTile(int x, int y, Tile tile, LightingEngine sun, LightingEngine sourceBlocks) {
 		TileType oldType = tiles[x][y].type;
 		tiles[x][y] = tile;
-		if (tile.type.lightBlocking > 0) {
+		if (tile.type.opacity > 0) {
 			sun.addedTile(x, y);
 			sourceBlocks.addedTile(x, y);
 		} else {

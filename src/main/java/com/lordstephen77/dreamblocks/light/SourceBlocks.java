@@ -22,9 +22,9 @@ public class SourceBlocks extends LightingEngine {
         }
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                if (tiles[x][y].type.getLightEmitting() > 0) {
+                if (tiles[x][y].type.getBrightness() > 0) {
                     lightFlow[x][y] = Direction.SOURCE;
-                    lightValues[x][y] = tiles[x][y].type.getLightEmitting();
+                    lightValues[x][y] = tiles[x][y].type.getBrightness();
                 }
             }
         }
@@ -43,7 +43,7 @@ public class SourceBlocks extends LightingEngine {
 
     public void addedTile(int x, int y) {
         lightFlow[x][y] = Direction.UNKNOWN;
-        lightValues[x][y] = tiles[x][y].type.getLightEmitting();
+        lightValues[x][y] = tiles[x][y].type.getBrightness();
         lightFlow[x][y] = Direction.SOURCE;
         resetLighting(x, y);
     }

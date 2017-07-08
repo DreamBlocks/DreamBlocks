@@ -142,10 +142,10 @@ public abstract class LightingEngine implements Serializable {
 	}
 
     public List<LightingPoint> getNeighbors(LightingPoint p) {
-		if (tiles[p.x][p.y].type.getLightBlocking() == Constants.LIGHT_VALUE_OPAQUE) {
+		if (tiles[p.x][p.y].type.getOpacity() == Constants.OPAQUE) {
 			return new LinkedList<>();
 		}
-		int newValue = p.lightValue - 1 - tiles[p.x][p.y].type.getLightBlocking();
+		int newValue = p.lightValue - 1 - tiles[p.x][p.y].type.getOpacity();
 		LinkedList<LightingPoint> neighbors = new LinkedList<>();
 
 		for(Direction dir : Direction.values()){

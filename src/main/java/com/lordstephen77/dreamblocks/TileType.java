@@ -45,26 +45,26 @@ public class TileType implements java.io.Serializable {
 	protected TileID name;
 	protected boolean passable;
 	protected boolean liquid;
-	protected int lightBlocking;
-	protected int lightEmitting;
+	protected int opacity;
+	protected int brightness;
 	private char breaksInto;
 
 	public TileType(String spriteid, TileID name, char breaksInto) {
-		this(spriteid, name, false, false, Constants.LIGHT_VALUE_OPAQUE, breaksInto);
+		this(spriteid, name, false, false, Constants.OPAQUE, breaksInto);
 	}
 	
-	public TileType(String spriteid, TileID name, boolean passable, boolean liquid, int lightBlocking, char breaksInto) {
-		this(spriteid, name, passable, liquid, lightBlocking, 0, breaksInto);
+	public TileType(String spriteid, TileID name, boolean passable, boolean liquid, int opacity, char breaksInto) {
+		this(spriteid, name, passable, liquid, opacity, 0, breaksInto);
 	}
 	
-	public TileType(String spriteid, TileID name, boolean passable, boolean liquid, int lightBlocking,
-					int lightEmitting, char breaksInto) {
+	public TileType(String spriteid, TileID name, boolean passable, boolean liquid, int opacity,
+					int brightness, char breaksInto) {
 		this.spriteid = spriteid;
 		this.name = name;
 		this.passable = passable;
 		this.liquid = liquid;
-		this.lightBlocking = lightBlocking;
-		this.lightEmitting = lightEmitting;
+		this.opacity = opacity;
+		this.brightness = brightness;
 		this.breaksInto = breaksInto;
 	}
 
@@ -80,11 +80,11 @@ public class TileType implements java.io.Serializable {
 		return name;
 	}
 
-	public int getLightBlocking() {
-		return lightBlocking;
+	public int getOpacity() {
+		return opacity;
 	}
 
-	public int getLightEmitting() {
-		return lightEmitting;
+	public int getBrightness() {
+		return brightness;
 	}
 }

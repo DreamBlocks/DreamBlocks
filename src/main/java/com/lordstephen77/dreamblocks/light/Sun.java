@@ -4,9 +4,6 @@ import com.lordstephen77.dreamblocks.Constants;
 import com.lordstephen77.dreamblocks.Direction;
 import com.lordstephen77.dreamblocks.World;
 
-import java.util.LinkedList;
-import java.util.List;
-
 /**
  * Created by Александр on 08.07.2017.
  */
@@ -17,50 +14,54 @@ public class Sun extends LightingEngine {
         this.height = world.height;
         this.tiles = world.tiles;
         lightValues = new int[width][height];
-        lightFlow = new Direction[width][height];
         for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                lightValues[x][y] = 0;
-                lightFlow[x][y] = Direction.UNKNOWN;
-            }
+            updateLightValues(x);
         }
-        LinkedList<LightingPoint> sources = new LinkedList<>();
-        for (int x = 0; x < width; x++) {
-            sources.addAll(getSunSources(x));
-        }
-        spreadLightingDijkstra(sources);
     }
 
     public void removedTile(int x, int y) {
-        lightFlow[x][y] = Direction.UNKNOWN;
-        spreadLightingDijkstra(getSunSources(x));
+        updateLightValues(x);
     }
 
-    public List<LightingPoint> getSunSources(int column) {
-        LinkedList<LightingPoint> sources = new LinkedList<>();
-        for (int y = 0; y < height - 1; y++) {
-            if (tiles[column][y].type.getLightBlocking() != 0) {
-                break;
-            }
-            sources.add(new LightingPoint(column, y, Direction.SOURCE, Constants.LIGHT_VALUE_SUN));
+    private void updateLightValues(int x){
+        int y = 0;
+        while(tiles[x][y].type.getOpacity() == Constants.TRANSPARENT){
+            setLightAt(x, y, Direction.LEFT, Constants.LIGHT_VALUE_SUN - 2);
+            setLightAt(x, y, Direction.RIGHT, Constants.LIGHT_VALUE_SUN - 2);
+            setLightAt(x, y, Direction.LEFT, Constants.LIGHT_VALUE_SUN - 2);
+            lightValues[x][y] = Constants.LIGHT_VALUE_SUN;
+            y++;
         }
-        return sources;
+        while (y < height){
+            boolean sunnyLeft = getLightAt(x, y, Direction.LEFT) == Constants.LIGHT_VALUE_SUN;
+            boolean sunnyRight = getLightAt(x, y, Direction.RIGHT) == Constants.LIGHT_VALUE_SUN;
+            boolean sunnyUp = getLightAt(x, y, Direction.UP) == Constants.LIGHT_VALUE_SUN;
+            if(sunnyLeft || sunnyRight || sunnyUp){
+                lightValues[x][y] = Constants.LIGHT_VALUE_SUN - 2;
+            } else {
+                lightValues[x][y] = 0;
+            }
+            y++;
+        }
+    }
+
+    private int getLightAt(int x, int y, Direction dir){
+        if (world.isOutOfWorld(x, y, dir)){
+            return 0;
+        }
+        return lightValues[x + dir.dx][y + dir.dy];
+    }
+
+    private void setLightAt(int x, int y, Direction dir, int lightValue){
+        if (world.isOutOfWorld(x, y, dir)){
+            return;
+        }
+        if (lightValues[x + dir.dx][y + dir.dy] < Constants.LIGHT_VALUE_SUN){
+            lightValues[x + dir.dx][y + dir.dy] = lightValue;
+        }
     }
 
     public void addedTile(int x, int y) {
-        lightFlow[x][y] = Direction.UNKNOWN;
-        // redo the column for sun
-        boolean sun = true;
-        for (int i = 0; i < height; i++) {
-            if (tiles[x][i].type.getLightBlocking() != 0) {
-                sun = false;
-            }
-            if (sun) {
-                lightFlow[x][i] = Direction.SOURCE;
-            } else {
-                lightFlow[x][i] = Direction.UNKNOWN;
-            }
-        }
-        resetLighting(x, y);
+        updateLightValues(x);
     }
 }
