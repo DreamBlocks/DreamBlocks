@@ -29,9 +29,7 @@ public class Hotbar {
     }
 
     public void moveSelectionRight(int value){
-        int oldValue = hotbarIdx;
         hotbarIdx = (hotbarRow.length + hotbarIdx + value) % hotbarRow.length;
-        System.out.println("moved from " + oldValue + " to " + hotbarIdx);
     }
 
     public void decreaseSelected(int count){

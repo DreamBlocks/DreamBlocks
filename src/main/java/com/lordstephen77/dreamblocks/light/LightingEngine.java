@@ -48,12 +48,16 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 public abstract class LightingEngine implements Serializable {
-	
+
+	public static final int TORCH = 13;
+	public static final int DIRECT_SUN = 15;
+	public static final int INDIRECT_SUN = 13;
+	public static final int DARKNESS = 0;
 	private static final long serialVersionUID = 1L;
 	
 	public Direction[][] lightFlow;
 	
-	protected int[][] lightValues;
+	int[][] lightValues;
 	protected int width, height;
 	protected Tile[][] tiles;
 	protected World world;
@@ -64,17 +68,17 @@ public abstract class LightingEngine implements Serializable {
 	}
 	
 	public void resetLighting(int x, int y) {
-		int left = Math.max(x - Constants.LIGHT_VALUE_SUN, 0);
-		int right = Math.min(x + Constants.LIGHT_VALUE_SUN, width - 1);
-		int top = Math.max(y - Constants.LIGHT_VALUE_SUN, 0);
-		int bottom = Math.min(y + Constants.LIGHT_VALUE_SUN, height - 1);
+		int left = Math.max(x - DIRECT_SUN, 0);
+		int right = Math.min(x + DIRECT_SUN, width - 1);
+		int top = Math.max(y - DIRECT_SUN, 0);
+		int bottom = Math.min(y + DIRECT_SUN, height - 1);
 		List<LightingPoint> sources = new LinkedList<>();
 		
 		// safely circle around the target zeroed zone
-		boolean bufferLeft = (x - Constants.LIGHT_VALUE_SUN > 0);
-		boolean bufferRight = (x + Constants.LIGHT_VALUE_SUN < width - 1);
-		boolean bufferTop = (y - Constants.LIGHT_VALUE_SUN > 0);
-		boolean bufferBottom = (y + Constants.LIGHT_VALUE_SUN < height - 1);
+		boolean bufferLeft = (x - DIRECT_SUN > 0);
+		boolean bufferRight = (x + DIRECT_SUN < width - 1);
+		boolean bufferTop = (y - DIRECT_SUN > 0);
+		boolean bufferBottom = (y + DIRECT_SUN < height - 1);
 		if (bufferTop) {
 			if (bufferLeft) {
 				sources.add(getLightingPoint(left - 1, top - 1));

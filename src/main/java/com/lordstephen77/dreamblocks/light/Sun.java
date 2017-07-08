@@ -23,41 +23,66 @@ public class Sun extends LightingEngine {
         updateLightValues(x);
     }
 
-    private void updateLightValues(int x){
+    private int getGroundY(int x){
+        if (world.isOutOfWorld(x, 0)){
+            return Integer.MIN_VALUE;
+        }
         int y = 0;
         while(tiles[x][y].type.getOpacity() == Constants.TRANSPARENT){
-            setLightAt(x, y, Direction.LEFT, Constants.LIGHT_VALUE_SUN - 2);
-            setLightAt(x, y, Direction.RIGHT, Constants.LIGHT_VALUE_SUN - 2);
-            setLightAt(x, y, Direction.LEFT, Constants.LIGHT_VALUE_SUN - 2);
-            lightValues[x][y] = Constants.LIGHT_VALUE_SUN;
             y++;
         }
-        while (y < height){
-            boolean sunnyLeft = getLightAt(x, y, Direction.LEFT) == Constants.LIGHT_VALUE_SUN;
-            boolean sunnyRight = getLightAt(x, y, Direction.RIGHT) == Constants.LIGHT_VALUE_SUN;
-            boolean sunnyUp = getLightAt(x, y, Direction.UP) == Constants.LIGHT_VALUE_SUN;
-            if(sunnyLeft || sunnyRight || sunnyUp){
-                lightValues[x][y] = Constants.LIGHT_VALUE_SUN - 2;
-            } else {
-                lightValues[x][y] = 0;
-            }
-            y++;
+        return y;
+    }
+
+    private void lightDown(int x, int beginY, int endY, int lightValue){
+        for (int y = beginY; y < endY && y < height; y++){
+            lightValues[x][y] = lightValue;
         }
     }
 
-    private int getLightAt(int x, int y, Direction dir){
-        if (world.isOutOfWorld(x, y, dir)){
-            return 0;
+    private void updateLightValues(int x) {
+        int leftX = x + Direction.LEFT.dx;
+        int leftX2 = leftX + Direction.LEFT.dx;
+        int rightX = x + Direction.RIGHT.dx;
+        int rightX2 = rightX + Direction.RIGHT.dx;
+        int middleGroundY = getGroundY(x);
+        int leftGroundY = getGroundY(leftX);
+        int rightGroundY = getGroundY(rightX);
+        int rightGroundY2 = getGroundY(rightX2);
+        int leftGroundY2 = getGroundY(leftX2);
+        updateColumnAssumeAdjacent(x, middleGroundY, leftGroundY, rightGroundY);
+        if(!world.isOutOfWorld(leftX, 0)) {
+            updateColumnAssumeAdjacent(leftX, leftGroundY, leftGroundY2, middleGroundY);
         }
-        return lightValues[x + dir.dx][y + dir.dy];
+        if(!world.isOutOfWorld(rightX, 0)) {
+            updateColumnAssumeAdjacent(rightX, rightGroundY, middleGroundY, rightGroundY2);
+        }
     }
 
-    private void setLightAt(int x, int y, Direction dir, int lightValue){
-        if (world.isOutOfWorld(x, y, dir)){
-            return;
+    public void updateColumnAssumeAdjacent(int x, int middleGroundY, int leftGroundY, int rightGroundY){
+        //overground blocks
+        lightDown(x, 0, middleGroundY, LightingEngine.DIRECT_SUN);
+        if (middleGroundY < leftGroundY) {
+            //lit ground blocks adjacent to light
+            lightDown(x, middleGroundY, leftGroundY, LightingEngine.INDIRECT_SUN);
+            //top ground block
+            lightDown(x, leftGroundY + 1, leftGroundY + 2, LightingEngine.INDIRECT_SUN);
+            //underground blocks
+            lightDown(x, leftGroundY + 1, world.height, DARKNESS);
         }
-        if (lightValues[x + dir.dx][y + dir.dy] < Constants.LIGHT_VALUE_SUN){
-            lightValues[x + dir.dx][y + dir.dy] = lightValue;
+        if (middleGroundY < rightGroundY) {
+            //lit ground blocks adjacent to light
+            lightDown(x, middleGroundY, rightGroundY, LightingEngine.INDIRECT_SUN);
+            //top ground block
+            lightDown(x, rightGroundY + 1, rightGroundY + 2, LightingEngine.INDIRECT_SUN);
+            //underground blocks
+            lightDown(x, rightGroundY + 1, world.height, DARKNESS);
+        }
+        if (middleGroundY >= leftGroundY && middleGroundY >= rightGroundY) {
+            //top ground block
+            lightDown(x, middleGroundY, middleGroundY + 1, LightingEngine.INDIRECT_SUN);
+            //underground blocks
+            lightDown(x, middleGroundY + 1, world.height, DARKNESS);
         }
     }
 

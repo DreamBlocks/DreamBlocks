@@ -66,9 +66,7 @@ public class Constants {
 	static {
 		itemTypes = ItemLoader.loadItems(16);
 	}
-	
-	public static final int LIGHT_VALUE_TORCH = 13;
-	public static final int LIGHT_VALUE_SUN = 15;
+
 	// not final so that we can set it via command-line arg
 	public static boolean DEBUG = false;
 	public static final boolean DEBUG_VISIBILITY_ON = false;

@@ -42,25 +42,25 @@ public class TileType implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private String spriteid;
-	protected TileID name;
+	protected TileID id;
 	protected boolean passable;
 	protected boolean liquid;
 	protected int opacity;
 	protected int brightness;
 	private char breaksInto;
 
-	public TileType(String spriteid, TileID name, char breaksInto) {
-		this(spriteid, name, false, false, Constants.OPAQUE, breaksInto);
+	public TileType(String spriteid, TileID id, char breaksInto) {
+		this(spriteid, id, false, false, Constants.OPAQUE, breaksInto);
 	}
 	
-	public TileType(String spriteid, TileID name, boolean passable, boolean liquid, int opacity, char breaksInto) {
-		this(spriteid, name, passable, liquid, opacity, 0, breaksInto);
+	public TileType(String spriteid, TileID id, boolean passable, boolean liquid, int opacity, char breaksInto) {
+		this(spriteid, id, passable, liquid, opacity, 0, breaksInto);
 	}
 	
-	public TileType(String spriteid, TileID name, boolean passable, boolean liquid, int opacity,
+	public TileType(String spriteid, TileID id, boolean passable, boolean liquid, int opacity,
 					int brightness, char breaksInto) {
 		this.spriteid = spriteid;
-		this.name = name;
+		this.id = id;
 		this.passable = passable;
 		this.liquid = liquid;
 		this.opacity = opacity;
@@ -76,8 +76,8 @@ public class TileType implements java.io.Serializable {
 		return breaksInto;
 	}
 
-	public TileID getName(){
-		return name;
+	public TileID getId(){
+		return id;
 	}
 
 	public int getOpacity() {

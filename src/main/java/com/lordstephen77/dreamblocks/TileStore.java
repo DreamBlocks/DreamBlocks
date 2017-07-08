@@ -3,7 +3,7 @@ package com.lordstephen77.dreamblocks;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.lordstephen77.dreamblocks.Constants.LIGHT_VALUE_TORCH;
+import static com.lordstephen77.dreamblocks.light.LightingEngine.TORCH;
 import static com.lordstephen77.dreamblocks.Constants.TRANSPARENT;
 import static com.lordstephen77.dreamblocks.Constants.TileID;
 import static java.util.Collections.unmodifiableMap;
@@ -74,7 +74,7 @@ public class TileStore {
         subject.put(TileID.ADMINITE, new TileType("sprites/tiles/adminite.png", TileID.ADMINITE, '\0'));
         subject.put(TileID.SAPLING, new TileType("sprites/tiles/sapling.png", TileID.SAPLING, true, false, TRANSPARENT, 'S'));
         subject.put(TileID.LADDER, new TileType("sprites/tiles/ladder.png", TileID.LADDER, true, false, TRANSPARENT, 'L'));
-        subject.put(TileID.TORCH, new TileType("sprites/tiles/torch.png", TileID.TORCH, true, false, TRANSPARENT, LIGHT_VALUE_TORCH, 'j'));
+        subject.put(TileID.TORCH, new TileType("sprites/tiles/torch.png", TileID.TORCH, true, false, TRANSPARENT, TORCH, 'j'));
 
         return subject;
     }
