@@ -79,4 +79,12 @@ public class TileType implements java.io.Serializable {
 	public TileID getName(){
 		return name;
 	}
+
+	public int getLightBlocking() {
+		return lightBlocking;
+	}
+
+	public int getLightEmitting() {
+		return lightEmitting;
+	}
 }

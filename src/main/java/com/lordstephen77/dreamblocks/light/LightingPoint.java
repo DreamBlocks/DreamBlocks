@@ -1,4 +1,6 @@
-package com.lordstephen77.dreamblocks;
+package com.lordstephen77.dreamblocks.light;
+
+import com.lordstephen77.dreamblocks.Direction;
 
 import java.util.Comparator;
 

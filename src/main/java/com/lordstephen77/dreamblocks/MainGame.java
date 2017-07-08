@@ -40,6 +40,9 @@ import java.util.Optional;
 import java.util.Random;
 
 import com.lordstephen77.dreamblocks.Constants.TileID;
+import com.lordstephen77.dreamblocks.light.LightingEngine;
+import com.lordstephen77.dreamblocks.light.SourceBlocks;
+import com.lordstephen77.dreamblocks.light.Sun;
 import com.lordstephen77.dreamblocks.ui.*;
 
 /**
@@ -108,8 +111,8 @@ public class MainGame {
 	 * create a new set.
 	 */
 	public void loadSprite(){
-		lightingEngineSun = new LightingEngine(world, true);
-		lightingEngineSourceBlocks = new LightingEngine(world, false);
+		lightingEngineSun = new Sun(world);
+		lightingEngineSourceBlocks = new SourceBlocks(world);
         resize(GraphicsHandler.get().getScreenWidth(), GraphicsHandler.get().getScreenHeight());
 		// load sprites
 		builderIcon = spriteStore.getSprite("sprites/other/builder.png");

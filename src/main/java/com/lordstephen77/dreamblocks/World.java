@@ -41,6 +41,7 @@ import java.util.Random;
 import com.lordstephen77.dreamblocks.Constants.TileID;
 import com.lordstephen77.dreamblocks.fillers.TreeFiller;
 import com.lordstephen77.dreamblocks.fillers.WaterFiller;
+import com.lordstephen77.dreamblocks.light.LightingEngine;
 
 public class World implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
@@ -232,7 +233,7 @@ public class World implements java.io.Serializable {
 			sourceBlocks.addedTile(x, y);
 		} else {
 			sun.removedTile(x, y);
-			sourceBlocks.addedTile(x, y);
+			sourceBlocks.removedTile(x, y);
 		}
 		return oldType;
 	}
