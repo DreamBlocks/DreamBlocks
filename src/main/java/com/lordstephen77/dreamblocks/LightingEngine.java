@@ -37,7 +37,6 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.
 package com.lordstephen77.dreamblocks;
 
 import java.io.Serializable;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -152,10 +151,10 @@ public class LightingEngine implements Serializable {
 		List<LightingPoint> sources = new LinkedList<>();
 		
 		// safely circle around the target zeroed zone
-		boolean bufferLeft = (left > 0);
-		boolean bufferRight = (right < width - 1);
-		boolean bufferTop = (top > 0);
-		boolean bufferBottom = (bottom < height - 1);
+		boolean bufferLeft = (x - Constants.LIGHT_VALUE_SUN > 0);
+		boolean bufferRight = (x + Constants.LIGHT_VALUE_SUN < width - 1);
+		boolean bufferTop = (y - Constants.LIGHT_VALUE_SUN > 0);
+		boolean bufferBottom = (y + Constants.LIGHT_VALUE_SUN < height - 1);
 		if (bufferTop) {
 			if (bufferLeft) {
 				sources.add(getLightingPoint(left - 1, top - 1));
@@ -218,50 +217,8 @@ public class LightingEngine implements Serializable {
 	private LightingPoint makeLightingPoint(int x, int y, Direction dir, int lightingValue){
 		return new LightingPoint(x + dir.dx, y + dir.dy, dir, lightingValue);
 	}
-	
-	public static class LightingPoint {
-		
-		public int x, y, lightValue;
-		public Direction flow;
 
-		public LightingPoint(int x, int y, Direction flow, int lightValue) {
-			this.x = x;
-			this.y = y;
-			this.flow = flow;
-			this.lightValue = lightValue;
-		}
-
-		@Override
-		public boolean equals(Object o) {
-			if (this == o) return true;
-			if (o == null || getClass() != o.getClass()) return false;
-
-			LightingPoint that = (LightingPoint) o;
-
-			if (x != that.x) return false;
-			return y == that.y;
-		}
-
-		@Override
-		public int hashCode() {
-			return x * 13 + y * 17;
-			
-		}
-	}
-	
-	public class LightValueComparator implements Comparator<LightingPoint> {
-		@Override
-		public int compare(LightingPoint arg0, LightingPoint arg1) {
-			if (arg0.lightValue < arg1.lightValue) {
-				return 1;
-			} else if (arg0.lightValue > arg1.lightValue) {
-				return -1;
-			}
-			return 0;
-		}
-	}
-
-	public List<LightingPoint> getNeighbors(LightingPoint p) {
+    public List<LightingPoint> getNeighbors(LightingPoint p) {
 		if (tiles[p.x][p.y].type.lightBlocking == Constants.LIGHT_VALUE_OPAQUE) {
 			return new LinkedList<>();
 		}
@@ -281,7 +238,7 @@ public class LightingEngine implements Serializable {
 			return;
 		HashSet<LightingPoint> out = new HashSet<>();
 		PriorityQueue<LightingPoint> in = new PriorityQueue<>(sources.size(),
-                new LightValueComparator());
+                new LightingPoint.LightValueComparator());
 		// consider that the input sources are done (this is not a good assumption if different
 		// light sources have different values......)
 		out.addAll(sources);

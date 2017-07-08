@@ -112,8 +112,8 @@ public class World implements java.io.Serializable {
 					}
 				} else if (tiles[x][y].type.name == TileID.SAND) {
 					if (isAir(x, y + 1) || isLiquid(x, y + 1)) {
-						changeTile(x, y + 1, tiles[x][y], sun);
-						changeTile(x, y, tileStore.make(TileID.AIR), sun);
+						changeTile(x, y + 1, tiles[x][y], sun, sourceBlocks);
+						changeTile(x, y, tileStore.make(TileID.AIR), sun, sourceBlocks);
 					}
 				} else if (tiles[x][y].type.name == TileID.SAPLING) {
 					if (random.nextDouble() < .01) {
@@ -121,13 +121,13 @@ public class World implements java.io.Serializable {
 					}
 				} else if (tiles[x][y].type.liquid) {
 					if (isAir(x + 1, y)) {
-						changeTile(x + 1, y, tiles[x][y], sun);
+						changeTile(x + 1, y, tiles[x][y], sun, sourceBlocks);
 					}
 					if (isAir(x - 1, y)) {
-						changeTile(x - 1, y, tiles[x][y], sun);
+						changeTile(x - 1, y, tiles[x][y], sun, sourceBlocks);
 					}
 					if (isAir(x, y + 1)) {
-						changeTile(x, y + 1, tiles[x][y], sun);
+						changeTile(x, y + 1, tiles[x][y], sun, sourceBlocks);
 					}
 				}
 				if ((!tiles[x][y].type.passable || tiles[x][y].type.liquid)
@@ -224,13 +224,15 @@ public class World implements java.io.Serializable {
 	 * @param sun lighting engine to update light values
 	 * @return instance of TileType of previous tile
 	 */
-	public TileType changeTile(int x, int y, Tile tile, LightingEngine sun) {
+	public TileType changeTile(int x, int y, Tile tile, LightingEngine sun, LightingEngine sourceBlocks) {
 		TileType oldType = tiles[x][y].type;
 		tiles[x][y] = tile;
 		if (tile.type.lightBlocking > 0) {
 			sun.addedTile(x, y);
+			sourceBlocks.addedTile(x, y);
 		} else {
 			sun.removedTile(x, y);
+			sourceBlocks.addedTile(x, y);
 		}
 		return oldType;
 	}
