@@ -40,6 +40,11 @@ import java.util.Optional;
 import java.util.Random;
 
 import com.lordstephen77.dreamblocks.Constants.TileID;
+import com.lordstephen77.dreamblocks.fillers.TreeFiller;
+import com.lordstephen77.dreamblocks.fillers.WaterFiller;
+import com.lordstephen77.dreamblocks.light.LightingEngine;
+import com.lordstephen77.dreamblocks.light.SourceBlocks;
+import com.lordstephen77.dreamblocks.light.Sun;
 import com.lordstephen77.dreamblocks.ui.*;
 
 /**
@@ -108,8 +113,8 @@ public class MainGame {
 	 * create a new set.
 	 */
 	public void loadSprite(){
-		lightingEngineSun = new LightingEngine(world, true);
-		lightingEngineSourceBlocks = new LightingEngine(world, false);
+		lightingEngineSun = new Sun(world);
+		lightingEngineSourceBlocks = new SourceBlocks(world);
         resize(GraphicsHandler.get().getScreenWidth(), GraphicsHandler.get().getScreenHeight());
 		// load sprites
 		builderIcon = spriteStore.getSprite("sprites/other/builder.png");
@@ -154,7 +159,16 @@ public class MainGame {
 		entities.clear();
 		// make a new world and player
 		WorldGenerator gen = new WorldGenerator(worldWidth, worldHeight, random);
-		world = new World(worldWidth, worldHeight, random, tileStore, gen);
+
+		int seed = random.nextInt();
+		System.out.println("Seed: " + seed);
+		random.setSeed(seed);
+		world = new World(worldWidth, worldHeight, random);
+		world.fillWith(tileStore, gen);
+		WaterFiller waterFiller = new WaterFiller(world, random, tileStore);
+		waterFiller.fill();
+		TreeFiller treeFiller = new TreeFiller(world, random, tileStore);
+		treeFiller.fill();
 		player = new Player(true, world.spawnLocation.x, world.spawnLocation.y, + 7 * (tileSize / 8), 14 * (tileSize / 8));
 		hotbar.setInventory(player.inventory);
 		entities.add(player);
@@ -339,7 +353,7 @@ public class MainGame {
 			breakingTicks = 0;
 			TileType oldTileType = world.removeTile(player.handBreakPos, lightingEngineSun, lightingEngineSourceBlocks);
             //90% to produce sapling
-            boolean canProduceSapling = oldTileType.name == TileID.LEAVES && random.nextDouble() < .1;
+            boolean canProduceSapling = oldTileType.id == TileID.LEAVES && random.nextDouble() < .1;
             boolean canProduceItem = Constants.itemTypes.containsKey(oldTileType.getBreaksInto());
 
 			if (canProduceItem || canProduceSapling) {

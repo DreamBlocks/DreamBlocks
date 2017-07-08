@@ -3,6 +3,8 @@ package com.lordstephen77.dreamblocks;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.lordstephen77.dreamblocks.light.LightingEngine.TORCH;
+import static com.lordstephen77.dreamblocks.Constants.TRANSPARENT;
 import static com.lordstephen77.dreamblocks.Constants.TileID;
 import static java.util.Collections.unmodifiableMap;
 
@@ -57,12 +59,12 @@ public class TileStore {
     private Map<TileID, TileType> populate(Map<TileID, TileType> subject){
         subject.put(TileID.DIRT, new TileType("sprites/tiles/dirt.png", TileID.DIRT, 'd'));
         subject.put(TileID.GRASS, new TileType("sprites/tiles/dirtwithgrass.png", TileID.GRASS, 'd'));
-        subject.put(TileID.LEAVES, new TileType("sprites/tiles/leaves.png", TileID.LEAVES, false, false, 1, 'S'));
+        subject.put(TileID.LEAVES, new TileType("sprites/tiles/leaves.png", TileID.LEAVES, false, false, TRANSPARENT, 'S'));
         subject.put(TileID.PLANK, new TileType("sprites/tiles/plank.png", TileID.PLANK, 'p'));
-        subject.put(TileID.WOOD, new TileType("sprites/tiles/wood.png", TileID.WOOD, true, false, 0, 'w'));
+        subject.put(TileID.WOOD, new TileType("sprites/tiles/wood.png", TileID.WOOD, true, false, TRANSPARENT, 'w'));
         subject.put(TileID.AIR, TYPE_AIR);
         subject.put(TileID.STONE, new TileType("sprites/tiles/stone.png", TileID.STONE, 's'));
-        subject.put(TileID.WATER, new TileType("sprites/tiles/water.png", TileID.WATER, true, true, 1, '\0'));
+        subject.put(TileID.WATER, new TileType("sprites/tiles/water.png", TileID.WATER, true, true, TRANSPARENT, '\0'));
         subject.put(TileID.SAND, new TileType("sprites/tiles/sand.png", TileID.SAND, 'n'));
         subject.put(TileID.IRON_ORE, new TileType("sprites/tiles/ironore.png", TileID.IRON_ORE, 'i'));
         subject.put(TileID.COAL_ORE, new TileType("sprites/tiles/coalore.png", TileID.COAL_ORE, 'c'));
@@ -70,9 +72,10 @@ public class TileStore {
         subject.put(TileID.COBBLE, new TileType("sprites/tiles/cobble.png", TileID.COBBLE, 'b'));
         subject.put(TileID.CRAFTING_BENCH, new TileType("sprites/tiles/craft.png", TileID.CRAFTING_BENCH, 'f'));
         subject.put(TileID.ADMINITE, new TileType("sprites/tiles/adminite.png", TileID.ADMINITE, '\0'));
-        subject.put(TileID.SAPLING, new TileType("sprites/tiles/sapling.png", TileID.SAPLING, true, false, 0, 'S'));
-        subject.put(TileID.LADDER, new TileType("sprites/tiles/ladder.png", TileID.LADDER, true, false, 0, 'L'));
-        subject.put(TileID.TORCH, new TileType("sprites/tiles/torch.png", TileID.TORCH, true, false, 0, Constants.LIGHT_VALUE_TORCH, 'j'));
+        subject.put(TileID.SAPLING, new TileType("sprites/tiles/sapling.png", TileID.SAPLING, true, false, TRANSPARENT, 'S'));
+        subject.put(TileID.LADDER, new TileType("sprites/tiles/ladder.png", TileID.LADDER, true, false, TRANSPARENT, 'L'));
+        subject.put(TileID.TORCH, new TileType("sprites/tiles/torch.png", TileID.TORCH, true, false, TRANSPARENT, TORCH, 'j'));
+
         return subject;
     }
 }
