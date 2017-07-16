@@ -504,5 +504,13 @@ public class World implements java.io.Serializable {
 			return midnightSky.interpolateTo(dawnSky, 4 * (time - 0.75f));
 		}
 	}
-	
+
+	public Ray<Tile> castRay(int x, int y, Direction dir){
+		return new Ray<>(this.tiles, x, y, dir.angleInRad);
+	}
+
+	public Ray<Tile> castRay(int x, int y, double angleInRad){
+		return new Ray<>(this.tiles, x, y, angleInRad);
+	}
+
 }
