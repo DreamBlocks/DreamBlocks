@@ -40,10 +40,11 @@ public class SunTest3x4 {
 
     @Test
     public void flatSurface(){
-        worldGenerator.setWorldData(new TileID[][]{
-            {AIR, AIR, AIR, STONE},
-            {AIR, AIR, AIR, STONE},
-            {AIR, AIR, AIR, STONE}
+        worldGenerator.transposeWorldData(new TileID[][]{
+            {AIR,AIR,AIR},
+            {AIR,AIR,AIR},
+            {AIR,AIR,AIR},
+            {STONE,STONE,STONE}
         });
         world.fillWith(tileStore, worldGenerator);
         sun = new Sun(world);
@@ -58,10 +59,11 @@ public class SunTest3x4 {
 
     @Test
     public void onlyRightColumnHigherOneBlock(){
-        worldGenerator.setWorldData(new TileID[][]{
-            {AIR, AIR, AIR, STONE},
-            {AIR, AIR, AIR, STONE},
-            {AIR, AIR, STONE, STONE}
+        worldGenerator.transposeWorldData(new TileID[][]{
+            {AIR,AIR,AIR},
+            {AIR,AIR,AIR},
+            {STONE,AIR,AIR},
+            {STONE,STONE,STONE}
         });
         world.fillWith(tileStore, worldGenerator);
         sun = new Sun(world);
@@ -76,10 +78,11 @@ public class SunTest3x4 {
 
     @Test
     public void onlyRightColumnHigherTwoBlocks(){
-        worldGenerator.setWorldData(new TileID[][]{
-            {AIR, AIR, AIR, STONE},
-            {AIR, AIR, AIR, STONE},
-            {AIR, STONE, STONE, STONE}
+        worldGenerator.transposeWorldData(new TileID[][]{
+            {AIR,AIR,AIR},
+            {STONE,AIR,AIR},
+            {STONE,AIR,AIR},
+            {STONE,STONE,STONE}
         });
         world.fillWith(tileStore, worldGenerator);
         sun = new Sun(world);
@@ -94,10 +97,11 @@ public class SunTest3x4 {
 
     @Test
     public void onlyMiddleColHigherOneBlock(){
-        worldGenerator.setWorldData(new TileID[][]{
-            {AIR, AIR, AIR, STONE},
-            {AIR, AIR, STONE, STONE},
-            {AIR, AIR, AIR, STONE}
+        worldGenerator.transposeWorldData(new TileID[][]{
+            {AIR,AIR,AIR},
+            {AIR,AIR,AIR},
+            {AIR,STONE,AIR},
+            {STONE,STONE,STONE}
         });
         world.fillWith(tileStore, worldGenerator);
         sun = new Sun(world);
@@ -112,10 +116,11 @@ public class SunTest3x4 {
 
     @Test
     public void onlyMiddleColHigherTwoBlocks(){
-        worldGenerator.setWorldData(new TileID[][]{
-            {AIR, AIR, AIR, STONE},
-            {AIR, STONE, STONE, STONE},
-            {AIR, AIR, AIR, STONE}
+        worldGenerator.transposeWorldData(new TileID[][]{
+            {AIR,AIR,AIR},
+            {AIR,STONE,AIR},
+            {AIR,STONE,AIR},
+            {STONE,STONE,STONE}
         });
         world.fillWith(tileStore, worldGenerator);
         sun = new Sun(world);
@@ -130,10 +135,11 @@ public class SunTest3x4 {
     
     @Test
     public void OnlyLeftColHigherOneBlock(){
-        worldGenerator.setWorldData(new TileID[][]{
-            {AIR, AIR, STONE, STONE},
-            {AIR, AIR, AIR, STONE},
-            {AIR, AIR, AIR, STONE}
+        worldGenerator.transposeWorldData(new TileID[][]{
+            {AIR,AIR,AIR},
+            {AIR,AIR,AIR},
+            {AIR,AIR,STONE},
+            {STONE,STONE,STONE}
         });
         world.fillWith(tileStore, worldGenerator);
         sun = new Sun(world);
@@ -148,10 +154,11 @@ public class SunTest3x4 {
     
     @Test
     public void onlyLeftColHigherTwoBlocks(){
-        worldGenerator.setWorldData(new TileID[][]{
-            {AIR, STONE, STONE, STONE},
-            {AIR, AIR, AIR, STONE},
-            {AIR, AIR, AIR, STONE}
+        worldGenerator.transposeWorldData(new TileID[][]{
+            {AIR,AIR,AIR},
+            {AIR,AIR,STONE},
+            {AIR,AIR,STONE},
+            {STONE,STONE,STONE}
         });
         world.fillWith(tileStore, worldGenerator);
         sun = new Sun(world);
@@ -166,10 +173,11 @@ public class SunTest3x4 {
     
     @Test
     public void rightOneLeftOne(){
-        worldGenerator.setWorldData(new TileID[][]{
-            {AIR, AIR, STONE, STONE},
-            {AIR, AIR, AIR, STONE},
-            {AIR, AIR, STONE, STONE}
+        worldGenerator.transposeWorldData(new TileID[][]{
+            {AIR,AIR,AIR},
+            {AIR,AIR,AIR},
+            {STONE,AIR,STONE},
+            {STONE,STONE,STONE}
         });
         world.fillWith(tileStore, worldGenerator);
         sun = new Sun(world);
@@ -184,10 +192,11 @@ public class SunTest3x4 {
     
     @Test
     public void rightTwoLeftOne(){
-        worldGenerator.setWorldData(new TileID[][]{
-            {AIR, AIR, STONE, STONE},
-            {AIR, AIR, AIR, STONE},
-            {AIR, STONE, STONE, STONE}
+        worldGenerator.transposeWorldData(new TileID[][]{
+            {AIR,AIR,AIR},
+            {STONE,AIR,AIR},
+            {STONE,AIR,STONE},
+            {STONE,STONE,STONE}
         });
         world.fillWith(tileStore, worldGenerator);
         sun = new Sun(world);
@@ -202,10 +211,11 @@ public class SunTest3x4 {
     
     @Test
     public void rightTwoLeftTwo(){
-        worldGenerator.setWorldData(new TileID[][]{
-            {AIR, STONE, STONE, STONE},
-            {AIR, AIR, AIR, STONE},
-            {AIR, STONE, STONE, STONE}
+        worldGenerator.transposeWorldData(new TileID[][]{
+            {AIR,AIR,AIR},
+            {STONE,AIR,STONE},
+            {STONE,AIR,STONE},
+            {STONE,STONE,STONE}
         });
         world.fillWith(tileStore, worldGenerator);
         sun = new Sun(world);
