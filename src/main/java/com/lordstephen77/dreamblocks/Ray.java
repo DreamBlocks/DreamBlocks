@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 public class Ray<T> implements Iterator<T> {
     private T[][] scope;
     private double angleInRad;
+    private int x0;
     private int x;
     private int y;
     private int nextX;
@@ -22,11 +23,17 @@ public class Ray<T> implements Iterator<T> {
      */
     public Ray(T[][] scope, int x0, int y0, double angleInRad) {
         this.scope = scope;
+        reset(x0, y0, angleInRad);
+    }
+
+    public Ray<T> reset(int x0, int y0, double angleInRad){
+        this.x0 = x0;
         this.x = x0;
         this.y = y0;
         this.nextX = x;
         this.nextY = y;
         this.angleInRad = angleInRad;
+        return this;
     }
 
     public double getA() {
@@ -40,7 +47,7 @@ public class Ray<T> implements Iterator<T> {
         } else {
             tY = y - 1;
         }
-        double tX = tY / getA();
+        double tX = tY / getA() + x0;
         double delta = tX - x;
         if (Math.abs(delta) < 1) {//nextX ~= x
             nextX = x;
@@ -95,4 +102,14 @@ public class Ray<T> implements Iterator<T> {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Function is used to find possible source of ray cast at target point
+     * @param x - target x
+     * @param y - target y
+     * @param angleInRad - angle between horizontal axis(X) and ray
+     * @return x at y=0
+     */
+    public static int getX0of(int x, int y, double angleInRad){
+        return (int) (x - y / Math.tan(angleInRad));
+    }
 }

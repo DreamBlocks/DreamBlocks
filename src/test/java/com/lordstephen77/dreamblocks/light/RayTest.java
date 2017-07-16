@@ -62,6 +62,24 @@ public class RayTest {
     }
 
     @Test
+    public void castX1Y2A60(){
+        Ray<Tile> iterator = world.castRay(1, 2, Math.toRadians(60));
+        Assert.assertTrue(iterator.hasNext());
+        Assert.assertEquals(COBBLE, iterator.next().type.getId());
+        Assert.assertTrue(iterator.hasNext());
+        Assert.assertEquals(STONE, iterator.next().type.getId());
+        Assert.assertTrue(iterator.hasNext());
+        Assert.assertEquals(COAL_ORE, iterator.next().type.getId());
+        Assert.assertTrue(iterator.hasNext());
+        Assert.assertEquals(IRON_ORE, iterator.next().type.getId());
+        Assert.assertTrue(iterator.hasNext());
+        Assert.assertEquals(STONE, iterator.next().type.getId());
+        Assert.assertTrue(iterator.hasNext());
+        Assert.assertEquals(STONE, iterator.next().type.getId());
+        Assert.assertFalse(iterator.hasNext());
+    }
+
+    @Test
     public void castX0Y0A30(){
         Ray<Tile> iterator = world.castRay(0, 0, Math.toRadians(30));
         Assert.assertTrue(iterator.hasNext());
@@ -153,15 +171,20 @@ public class RayTest {
         Assert.assertFalse(iterator.hasNext());
     }
 
+
     @Test
-    public void castX1Y2A60(){
-        Ray<Tile> iterator = world.castRay(1, 2, Math.toRadians(60));
+    public void castX2Y0A60(){
+        Ray<Tile> iterator = world.castRay(2, 0, Math.toRadians(60));
         Assert.assertTrue(iterator.hasNext());
-        Assert.assertEquals(SAND, iterator.next().type.getId());
+        Assert.assertEquals(LEAVES, iterator.next().type.getId());
         Assert.assertTrue(iterator.hasNext());
         Assert.assertEquals(STONE, iterator.next().type.getId());
         Assert.assertTrue(iterator.hasNext());
-        Assert.assertEquals(COBBLE, iterator.next().type.getId());
+        Assert.assertEquals(DIRT, iterator.next().type.getId());
+        Assert.assertTrue(iterator.hasNext());
+        Assert.assertEquals(COAL_ORE, iterator.next().type.getId());
+        Assert.assertTrue(iterator.hasNext());
+        Assert.assertEquals(STONE, iterator.next().type.getId());
         Assert.assertTrue(iterator.hasNext());
         Assert.assertEquals(IRON_ORE, iterator.next().type.getId());
         Assert.assertTrue(iterator.hasNext());
