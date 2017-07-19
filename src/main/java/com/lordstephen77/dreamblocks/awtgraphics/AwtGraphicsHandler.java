@@ -36,14 +36,7 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.lordstephen77.dreamblocks.awtgraphics;
 
-import java.awt.Canvas;
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Point;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
@@ -59,7 +52,6 @@ import com.lordstephen77.dreamblocks.Constants;
 import com.lordstephen77.dreamblocks.MainGame;
 import com.lordstephen77.dreamblocks.Sprite;
 import com.lordstephen77.dreamblocks.SpriteStore;
-import com.lordstephen77.dreamblocks.ui.Rectangle;
 
 /**
  * <p>Window properties setting (container)</p>
@@ -187,7 +179,7 @@ public class AwtGraphicsHandler extends com.lordstephen77.dreamblocks.GraphicsHa
 
 	@Override
 	public void drawImage(Sprite sprite, Rectangle rectangle){
-		drawImage(sprite, rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight());
+		drawImage(sprite, (int)rectangle.getX(), (int)rectangle.getY(), (int)rectangle.getWidth(), (int)rectangle.getHeight());
 	}
 
 	@Override

@@ -36,10 +36,6 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.lordstephen77.dreamblocks;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-
 public interface Sprite extends java.io.Serializable {
 	
 	/**

@@ -52,7 +52,7 @@ import com.lordstephen77.dreamblocks.ui.*;
  * @author Stefano Peris, Sonya Sitnikova, Kryukov Alexander
  * @version 0.3
  */
-public class MainGame {
+public class MainGame implements Resizable {
 	
 	private int worldWidth = 512;
 	private int worldHeight = 256;
@@ -218,9 +218,11 @@ public class MainGame {
 		}
 	}
 
+	@Override
 	public void resize(int screenWidth, int screenHeight){
 		player.inventory.resize(screenWidth, screenHeight);
 		newGameMenu.resize(screenWidth, screenHeight);
+		startMenu.resize(screenWidth, screenHeight);
 	}
 
 	public void gameLoop() {

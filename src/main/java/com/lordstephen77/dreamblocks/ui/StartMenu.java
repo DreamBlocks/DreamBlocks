@@ -41,7 +41,7 @@ import com.lordstephen77.dreamblocks.SpriteStore;
  * @author Stefano Peris, Александр
  * @version 0.3
  */
-public class StartMenu {
+public class StartMenu implements Resizable {
 	
 	/* menu sprites */
 	private final Sprite menu_bgTile;
@@ -62,6 +62,14 @@ public class StartMenu {
 		menuLoad = new Button(300, 160, 64, ss.getSprite("sprites/menus/load_up.png"), ss.getSprite("sprites/menus/load_down.png"));
 		menuQuit = new Button(400, 160, 64, ss.getSprite("sprites/menus/quit_up.png"), ss.getSprite("sprites/menus/quit_down.png"));
 	}
+
+	@Override
+	public void resize(int screenWidth, int screenHeight){
+		menuNew.resize(screenWidth, screenHeight);
+		menuLoad.resize(screenWidth, screenHeight);
+		menuQuit.resize(screenWidth, screenHeight);
+	}
+
 	// menu title + animated logo
 	public void draw(GraphicsHandler g) {
 		game.drawTileBackground(g, menu_bgTile, 60);
@@ -69,25 +77,9 @@ public class StartMenu {
 		float tagScale = ((float) Math.abs((game.ticksRunning % 100) - 50)) / 50 + 1;
 		g.drawImage(menu_tag, 610, 60, (int) (60 * tagScale), (int) (37 * tagScale));
 
-		int mouseY = game.screenMousePos.y;
-		int mouseX = game.screenMousePos.x;
-		if (menuNew.isInside(mouseX, mouseY)){
-			g.drawImage(menuNew.getSpriteHover(), menuNew);
-		} else {
-			g.drawImage(menuNew.getSpriteDefault(), menuNew);
-		}
-
-		if (menuLoad.isInside(mouseX, mouseY)){
-			g.drawImage(menuLoad.getSpriteHover(), menuLoad);
-		} else {
-			g.drawImage(menuLoad.getSpriteDefault(), menuLoad);
-		}
-
-		if (menuQuit.isInside(mouseX, mouseY)){
-			g.drawImage(menuQuit.getSpriteHover(), menuQuit);
-		} else {
-			g.drawImage(menuQuit.getSpriteDefault(), menuQuit);
-		}
+		g.drawImage(menuNew.getSprite(game.screenMousePos), menuNew.getBounds());
+		g.drawImage(menuLoad.getSprite(game.screenMousePos), menuLoad.getBounds());
+		g.drawImage(menuQuit.getSprite(game.screenMousePos), menuQuit.getBounds());
 	}
 
 	public START_MENU_DIALOG_RESULT handleClick(int x, int y){

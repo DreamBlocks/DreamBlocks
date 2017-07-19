@@ -37,7 +37,7 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.
 package com.lordstephen77.dreamblocks;
 
 import com.lordstephen77.dreamblocks.awtgraphics.AwtGraphicsHandler;
-import com.lordstephen77.dreamblocks.ui.Rectangle;
+import java.awt.Rectangle;
 
 /**
  * <p>Window set resolution</p>
