@@ -41,16 +41,16 @@ import java.io.InputStream;
 import java.util.Scanner;
 
 public final class StockMethods {
-	public static Boolean onScreen = true;
-	public static Int2 pos = new Int2(0, 0);
-	
-	public static Int2 computeDrawLocationInPlace(float cameraX, float cameraY, int width,
-			int height, int tileSize, float positionX, float positionY) {
-		StockMethods.pos.x = Math.round((positionX - cameraX) * tileSize);
-		StockMethods.pos.y = Math.round((positionY - cameraY) * tileSize);
-		onScreen = !(pos.x + tileSize < 0 || pos.x > width * tileSize || pos.y + tileSize < 0 || pos.y > height
+	public static boolean isOnScreen(Int2 pos, int tileSize, float width, float height){
+		return !(pos.x + tileSize < 0 || pos.x > width * tileSize || pos.y + tileSize < 0 || pos.y > height
 				* tileSize);
-		return StockMethods.pos;
+	}
+
+	public static Int2 calculatePosition(float positionX, float positionY, float cameraX, float cameraY, int tileSize){
+		return new Int2(
+			Math.round((positionX - cameraX) * tileSize),
+			Math.round((positionY - cameraY) * tileSize)
+		);
 	}
 	
 	public static String readFile(String pathname) throws IOException {

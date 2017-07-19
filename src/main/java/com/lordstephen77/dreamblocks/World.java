@@ -324,14 +324,12 @@ public class World implements java.io.Serializable {
 			float cameraX, float cameraY, int tileSize, LightingEngine sun, LightingEngine sourceBlocks, TileStore tileStore) {
 		SpriteStore spriteStore = SpriteStore.get();
 		Int2 pos;
-		
-		pos = StockMethods.computeDrawLocationInPlace(cameraX, cameraY, screenWidth, screenHeight,
-				tileSize, 0, height / 2);
+
+		pos = StockMethods.calculatePosition(0, height / 2, cameraX, cameraY, tileSize);
 		g.setColor(Color.darkGray);
 		g.fillRect(pos.x, pos.y, width * tileSize, height * tileSize / 2);
-		
-		pos = StockMethods.computeDrawLocationInPlace(cameraX, cameraY, screenWidth, screenHeight,
-				tileSize, 0, 0);
+
+		pos = StockMethods.calculatePosition(0, 0, cameraX, cameraY, tileSize);
 		g.setColor(getSkyColor());
 		g.fillRect(pos.x, pos.y, width * tileSize, height * tileSize / 2 - 1);
 		for (int i = 0; i < width; i++) {

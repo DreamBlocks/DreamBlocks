@@ -311,8 +311,7 @@ public class MainGame implements Resizable {
 			hotbar.draw(g, screenWidth, screenHeight);
 
 			// draw the mouse
-			Int2 mouseTest = StockMethods.computeDrawLocationInPlace(cameraX, cameraY, tileSize,
-					tileSize, tileSize, worldMouseX, worldMouseY);
+			Int2 mouseTest = StockMethods.calculatePosition(worldMouseX, worldMouseY, cameraX, cameraY, tileSize);
 			drawMouse(g, mouseTest);
 			drawHeartsForHealthBar(screenWidth, screenHeight, g);
 
@@ -339,8 +338,7 @@ public class MainGame implements Resizable {
 		Item item = inventoryItem.getItem();
 		int ticksNeeded = world.breakTicks(breakingPos.x, breakingPos.y, item);
 
-		Int2 pos = StockMethods.computeDrawLocationInPlace(cameraX, cameraY, tileSize,
-				tileSize, tileSize, breakingPos.x, breakingPos.y);
+		Int2 pos = StockMethods.calculatePosition(breakingPos.x, breakingPos.y, cameraX, cameraY, tileSize);
 		int sprite_index = (int) (Math.min(1, (double) breakingTicks / ticksNeeded) * (breakingSprites.length - 1));
 		g.drawImage(breakingSprites[sprite_index], pos.x, pos.y, tileSize, tileSize);
 
@@ -417,12 +415,10 @@ public class MainGame implements Resizable {
 	 * @param g
 	 */
 	public void drawUI(float cameraX, float cameraY, GraphicsHandler g){
-		Int2 pos = StockMethods.computeDrawLocationInPlace(cameraX, cameraY, tileSize,
-				tileSize, tileSize, player.handBuildPos.x, player.handBuildPos.y);
+		Int2 pos = StockMethods.calculatePosition(player.handBuildPos.x, player.handBuildPos.y, cameraX, cameraY, tileSize);
 		g.drawImage(builderIcon, pos.x, pos.y, tileSize, tileSize);
 
-		pos = StockMethods.computeDrawLocationInPlace(cameraX, cameraY, tileSize, tileSize,
-				tileSize, player.handBreakPos.x, player.handBreakPos.y);
+		pos = StockMethods.calculatePosition(player.handBreakPos.x, player.handBreakPos.y, cameraX, cameraY, tileSize);
 		g.drawImage(minerIcon, pos.x, pos.y, tileSize, tileSize);
 	}
 

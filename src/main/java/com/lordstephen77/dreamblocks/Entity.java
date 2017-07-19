@@ -279,9 +279,8 @@ public abstract class Entity implements java.io.Serializable {
 	public void draw(GraphicsHandler g, SpriteStore spriteStore, float cameraX, float cameraY, int screenWidth,
 			int screenHeight, int tileSize) {
 		Sprite entitySprite = spriteStore.getSprite(spriteId);
-		Int2 pos = StockMethods.computeDrawLocationInPlace(cameraX, cameraY, screenWidth,
-				screenHeight, tileSize, x, y);
-		if (StockMethods.onScreen) {
+		Int2 pos = StockMethods.calculatePosition(x, y, cameraX, cameraY, tileSize);
+		if (StockMethods.isOnScreen(pos, tileSize, screenWidth, screenHeight)) {
 			g.drawImage(entitySprite, pos.x, pos.y, widthPX, heightPX);
 		}
 	}

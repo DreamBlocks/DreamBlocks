@@ -182,9 +182,8 @@ public class Player extends LivingEntity {
 	@Override
 	public void draw(GraphicsHandler g, SpriteStore spriteStore, float cameraX, float cameraY, int screenWidth,
 			int screenHeight, int tileSize) {
-		Int2 pos = StockMethods.computeDrawLocationInPlace(cameraX, cameraY, screenWidth,
-				screenHeight, tileSize, x, y);
-		if (StockMethods.onScreen) {
+		Int2 pos = StockMethods.calculatePosition(x, y, cameraX, cameraY, tileSize);
+		if (StockMethods.isOnScreen(pos, tileSize, screenWidth, screenHeight)) {
 			int frame = (int) x % 4;// (int) ((ticksAlive/20)%4);
 			if (facingRight) {
 				if (frame == 0 || frame == 2 || dx <= 0) {
