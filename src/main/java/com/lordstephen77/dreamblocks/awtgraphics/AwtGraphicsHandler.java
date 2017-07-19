@@ -59,6 +59,7 @@ import com.lordstephen77.dreamblocks.Constants;
 import com.lordstephen77.dreamblocks.MainGame;
 import com.lordstephen77.dreamblocks.Sprite;
 import com.lordstephen77.dreamblocks.SpriteStore;
+import com.lordstephen77.dreamblocks.ui.Rectangle;
 
 /**
  * <p>Window properties setting (container)</p>
@@ -183,7 +184,12 @@ public class AwtGraphicsHandler extends com.lordstephen77.dreamblocks.GraphicsHa
 	public void fillOval(int x, int y, int width, int height) {
 		g.fillOval(x, y, width, height);
 	}
-	
+
+	@Override
+	public void drawImage(Sprite sprite, Rectangle rectangle){
+		drawImage(sprite, rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight());
+	}
+
 	@Override
 	public void drawImage(Sprite sprite, int x, int y) {
 		// TODO: This is inefficient, and serialization should be done more neatly

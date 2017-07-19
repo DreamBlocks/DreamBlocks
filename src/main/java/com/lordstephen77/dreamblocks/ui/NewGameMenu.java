@@ -64,29 +64,35 @@ public class NewGameMenu {
         menu_big = new Button(400, 160, 64, ss.getSprite("sprites/menus/big_up.png"), ss.getSprite("sprites/menus/big_down.png"));
     }
 
+    public void resize(int screenWidth, int screenHeight){
+        menu_mini.resize(screenWidth, screenHeight);
+        menu_medium.resize(screenWidth, screenHeight);
+        menu_big.resize(screenWidth, screenHeight);
+    }
+
     // menu title + animated logo
     public void draw(GraphicsHandler g) {
         game.drawTileBackground(g, menu_bgTile, 60);
         game.drawCenteredX(g, menu_logo, 70, 397, 50);
         float tagScale = ((float) Math.abs((game.ticksRunning % 100) - 50)) / 50 + 1;
-        menu_tag.draw(g, 610, 60, (int) (60 * tagScale), (int) (37 * tagScale));
+        g.drawImage(menu_tag, 610, 60, (int) (60 * tagScale), (int) (37 * tagScale));
 
         int mouseX = game.screenMousePos.x;
         int mouseY = game.screenMousePos.y;
         if (menu_mini.isInside(mouseX, mouseY)) {
-            menu_mini.drawHover(g);
+            g.drawImage(menu_mini.getSpriteHover(), menu_mini);
         } else {
-            menu_mini.drawUp(g);
+            g.drawImage(menu_mini.getSpriteDefault(), menu_mini);
         }
         if (menu_medium.isInside(mouseX, mouseY)){
-            menu_medium.drawHover(g);
+            g.drawImage(menu_medium.getSpriteHover(), menu_medium);
         } else {
-            menu_medium.drawUp(g);
+            g.drawImage(menu_medium.getSpriteDefault(), menu_medium);
         }
         if (menu_big.isInside(mouseX, mouseY)){
-            menu_big.drawHover(g);
+            g.drawImage(menu_big.getSpriteHover(), menu_big);
         } else {
-            menu_big.drawUp(g);
+            g.drawImage(menu_big.getSpriteDefault(), menu_big);
         }
     }
 

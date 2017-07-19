@@ -34,7 +34,7 @@ import com.lordstephen77.dreamblocks.Sprite;
 /**
  * Created by Александр on 19.06.2017.
  */
-public class Button {
+public class Button implements Rectangle {
     private Sprite spriteHover;
     private Sprite spriteDefault;
     private int x;
@@ -59,14 +59,24 @@ public class Button {
         return y;
     }
 
-    public void drawHover(GraphicsHandler g){
-        this.x = g.getScreenWidth() / 2 - width / 2;
-        spriteHover.draw(g, x, y, width, height);
+    public Sprite getSpriteHover() {
+        return spriteHover;
     }
 
-    public  void drawUp(GraphicsHandler g){
-        this.x = g.getScreenWidth() / 2 - width / 2;
-        spriteDefault.draw(g, x, y, width, height);
+    public Sprite getSpriteDefault() {
+        return spriteDefault;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void resize(int screenWidth, int screenHeight){
+        this.x = screenWidth / 2 - width / 2;
     }
 
     public boolean isInside(int cx, int cy){

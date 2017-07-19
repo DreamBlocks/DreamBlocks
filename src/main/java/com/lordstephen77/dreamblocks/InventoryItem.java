@@ -110,7 +110,7 @@ public class InventoryItem implements java.io.Serializable {
 		}
 		SpriteStore spriteStore = SpriteStore.get();
 		Sprite sprite = spriteStore.getSprite(item.getSpriteId());
-		sprite.draw(g, x, y, tileSize, tileSize);
+		g.drawImage(sprite, x, y, tileSize, tileSize);
 	}
 
 	public void draw(GraphicsHandler g, int x, int y, int tileSize, int seperation) {
@@ -121,7 +121,7 @@ public class InventoryItem implements java.io.Serializable {
 		}
 		SpriteStore spriteStore = SpriteStore.get();
 		Sprite sprite = spriteStore.getSprite(item.getSpriteId());
-		sprite.draw(g, x + seperation, y + seperation, tileSize, tileSize);
+		g.drawImage(sprite, x + seperation, y + seperation, tileSize, tileSize);
 		if (this.getCount() > 1) {
 			g.setColor(Color.white);
 			g.drawString("" + this.getCount(), x + seperation, y + seperation + tileSize / 2);

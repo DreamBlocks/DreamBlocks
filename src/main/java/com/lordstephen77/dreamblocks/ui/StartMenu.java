@@ -67,26 +67,26 @@ public class StartMenu {
 		game.drawTileBackground(g, menu_bgTile, 60);
 		game.drawCenteredX(g, menu_logo, 70, 397, 50);
 		float tagScale = ((float) Math.abs((game.ticksRunning % 100) - 50)) / 50 + 1;
-		menu_tag.draw(g, 610, 60, (int) (60 * tagScale), (int) (37 * tagScale));
+		g.drawImage(menu_tag, 610, 60, (int) (60 * tagScale), (int) (37 * tagScale));
 
 		int mouseY = game.screenMousePos.y;
 		int mouseX = game.screenMousePos.x;
 		if (menuNew.isInside(mouseX, mouseY)){
-			menuNew.drawHover(g);
+			g.drawImage(menuNew.getSpriteHover(), menuNew);
 		} else {
-			menuNew.drawUp(g);
+			g.drawImage(menuNew.getSpriteDefault(), menuNew);
 		}
 
 		if (menuLoad.isInside(mouseX, mouseY)){
-			menuLoad.drawHover(g);
+			g.drawImage(menuLoad.getSpriteHover(), menuLoad);
 		} else {
-			menuLoad.drawUp(g);
+			g.drawImage(menuLoad.getSpriteDefault(), menuLoad);
 		}
 
 		if (menuQuit.isInside(mouseX, mouseY)){
-			menuQuit.drawHover(g);
+			g.drawImage(menuQuit.getSpriteHover(), menuQuit);
 		} else {
-			menuQuit.drawUp(g);
+			g.drawImage(menuQuit.getSpriteDefault(), menuQuit);
 		}
 	}
 

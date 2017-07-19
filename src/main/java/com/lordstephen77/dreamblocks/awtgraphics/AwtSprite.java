@@ -89,30 +89,4 @@ public class AwtSprite implements com.lordstephen77.dreamblocks.Sprite {
 	public int getHeight() {
 		return image.getHeight(null);
 	}
-	
-	/**
-	 * Draw the sprite onto the graphics context provided
-	 * 
-	 * @param g
-	 *            The graphics context on which to draw the sprite
-	 * @param x
-	 *            The x location at which to draw the sprite
-	 * @param y
-	 *            The y location at which to draw the sprite
-	 */
-	public void draw(GraphicsHandler g, int x, int y) {
-		g.drawImage(this, x, y);
-	}
-	
-	public void draw(GraphicsHandler g, int x, int y, Color tint) {
-		g.drawImage(this, x, y, tint);
-	}
-	
-	public void draw(GraphicsHandler g, int x, int y, int width, int height) {
-		g.drawImage(this, x, y, width, height);
-	}
-	
-	public void draw(GraphicsHandler g, int x, int y, int width, int height, Color tint) {
-		g.drawImage(this, x, y, width, height, tint);
-	}
 }

@@ -181,7 +181,7 @@ public class MainGame {
 	}
 	
 	public void drawCenteredX(GraphicsHandler g, Sprite s, int top, int width, int height) {
-		s.draw(g, g.getScreenWidth() / 2 - width / 2, top, width, height);
+		g.drawImage(s, g.getScreenWidth() / 2 - width / 2, top, width, height);
 	}
 
 	public void processStartMenu(GraphicsHandler g){
@@ -220,7 +220,7 @@ public class MainGame {
 
 	public void resize(int screenWidth, int screenHeight){
 		player.inventory.resize(screenWidth, screenHeight);
-
+		newGameMenu.resize(screenWidth, screenHeight);
 	}
 
 	public void gameLoop() {
@@ -340,7 +340,7 @@ public class MainGame {
 		Int2 pos = StockMethods.computeDrawLocationInPlace(cameraX, cameraY, tileSize,
 				tileSize, tileSize, breakingPos.x, breakingPos.y);
 		int sprite_index = (int) (Math.min(1, (double) breakingTicks / ticksNeeded) * (breakingSprites.length - 1));
-		breakingSprites[sprite_index].draw(g, pos.x, pos.y, tileSize, tileSize);
+		g.drawImage(breakingSprites[sprite_index], pos.x, pos.y, tileSize, tileSize);
 
 		if (breakingTicks >= ticksNeeded) {
 			if (item != null && item.getClass() == Tool.class) {
@@ -417,11 +417,11 @@ public class MainGame {
 	public void drawUI(float cameraX, float cameraY, GraphicsHandler g){
 		Int2 pos = StockMethods.computeDrawLocationInPlace(cameraX, cameraY, tileSize,
 				tileSize, tileSize, player.handBuildPos.x, player.handBuildPos.y);
-		builderIcon.draw(g, pos.x, pos.y, tileSize, tileSize);
+		g.drawImage(builderIcon, pos.x, pos.y, tileSize, tileSize);
 
 		pos = StockMethods.computeDrawLocationInPlace(cameraX, cameraY, tileSize, tileSize,
 				tileSize, player.handBreakPos.x, player.handBreakPos.y);
-		minerIcon.draw(g, pos.x, pos.y, tileSize, tileSize);
+		g.drawImage(minerIcon, pos.x, pos.y, tileSize, tileSize);
 	}
 
 	/**
@@ -436,11 +436,11 @@ public class MainGame {
 		for (int heartIdx = 1; heartIdx <= 10; ++heartIdx) {
 			int hpDiff = player.hitPoints - heartIdx * 10;
 			if (hpDiff >= 0) {
-				fullHeart.draw(g, heartX, heartY, 10, 10);
+				g.drawImage(fullHeart, heartX, heartY, 10, 10);
 			} else if (hpDiff >= -5) {
-				halfHeart.draw(g, heartX, heartY, 10, 10);
+				g.drawImage(halfHeart, heartX, heartY, 10, 10);
 			} else {
-				emptyHeart.draw(g, heartX, heartY, 10, 10);
+				g.drawImage(emptyHeart, heartX, heartY, 10, 10);
 			}
 			heartX += 15;
 		}
@@ -457,9 +457,9 @@ public class MainGame {
 		int numBubbles = player.airRemaining();
 		for (int bubbleIdx = 1; bubbleIdx <= 10; ++bubbleIdx) {
 			if (bubbleIdx <= numBubbles) {
-				bubble.draw(g, bubbleX, heartY, 10, 10); // Scaling draw
+				g.drawImage(bubble, bubbleX, heartY, 10, 10); // Scaling draw
 			} else {
-				emptyBubble.draw(g, bubbleX, heartY, 10, 10); // Scaling draw
+				g.drawImage(emptyBubble, bubbleX, heartY, 10, 10); // Scaling draw
 			}
 			bubbleX += 15; // separator
 		}
@@ -486,7 +486,7 @@ public class MainGame {
 	public void drawTileBackground(GraphicsHandler g, Sprite sprite, int tileSize) {
 		for (int i = 0; i <= GraphicsHandler.get().getScreenWidth() / tileSize; i++) {
 			for (int j = 0; j <= GraphicsHandler.get().getScreenHeight() / tileSize; j++) {
-				sprite.draw(g, i * tileSize, j * tileSize, tileSize, tileSize);
+				g.drawImage(sprite, i * tileSize, j * tileSize, tileSize, tileSize);
 			}
 		}
 	}

@@ -37,6 +37,7 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.
 package com.lordstephen77.dreamblocks;
 
 import com.lordstephen77.dreamblocks.awtgraphics.AwtGraphicsHandler;
+import com.lordstephen77.dreamblocks.ui.Rectangle;
 
 /**
  * <p>Window set resolution</p>
@@ -83,6 +84,8 @@ public abstract class GraphicsHandler {
 	public abstract void drawString(String string, int x, int y);
 	
 	public abstract void fillOval(int x, int y, int width, int height);
+
+	public abstract void drawImage(Sprite sprite, Rectangle shape);
 	
 	public abstract void drawImage(Sprite sprite, int x, int y);
 

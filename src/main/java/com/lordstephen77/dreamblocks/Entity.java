@@ -282,7 +282,7 @@ public abstract class Entity implements java.io.Serializable {
 		Int2 pos = StockMethods.computeDrawLocationInPlace(cameraX, cameraY, screenWidth,
 				screenHeight, tileSize, x, y);
 		if (StockMethods.onScreen) {
-			entitySprite.draw(g, pos.x, pos.y, widthPX, heightPX);
+			g.drawImage(entitySprite, pos.x, pos.y, widthPX, heightPX);
 		}
 	}
 	

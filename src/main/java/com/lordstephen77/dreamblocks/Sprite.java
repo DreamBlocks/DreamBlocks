@@ -55,22 +55,4 @@ public interface Sprite extends java.io.Serializable {
 	 * @return The height in pixels of this sprite
 	 */
 	public int getHeight();
-	
-	/**
-	 * Draw the sprite onto the graphics context provided
-	 * 
-	 * @param g
-	 *            The graphics context on which to draw the sprite
-	 * @param x
-	 *            The x location at which to draw the sprite
-	 * @param y
-	 *            The y location at which to draw the sprite
-	 */
-	public void draw(GraphicsHandler g, int x, int y);
-	
-	public void draw(GraphicsHandler g, int x, int y, Color tint);
-	
-	public void draw(GraphicsHandler g, int x, int y, int width, int height);
-	
-	public void draw(GraphicsHandler g, int x, int y, int width, int height, Color tint);
 };

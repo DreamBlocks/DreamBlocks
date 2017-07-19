@@ -189,24 +189,24 @@ public class Player extends LivingEntity {
 			if (facingRight) {
 				if (frame == 0 || frame == 2 || dx <= 0) {
 					Sprite sprite = spriteStore.getSprite(spriteId);
-					sprite.draw(g, pos.x, pos.y, widthPX, heightPX);
+					g.drawImage(sprite, pos.x, pos.y, widthPX, heightPX);
 				} else if (frame == 1) {
 					Sprite rightWalkSprite = spriteStore.getSprite(rightWalkSpriteId);
-					rightWalkSprite.draw(g, pos.x, pos.y, widthPX, heightPX);
+					g.drawImage(rightWalkSprite, pos.x, pos.y, widthPX, heightPX);
 				} else {
 					Sprite leftWalkSprite = spriteStore.getSprite(leftWalkSpriteId);
-					leftWalkSprite.draw(g, pos.x, pos.y, widthPX, heightPX);
+					g.drawImage(leftWalkSprite, pos.x, pos.y, widthPX, heightPX);
 				}
 			} else {
 				if (frame == 0 || frame == 2 || dx >= 0) {
 					Sprite sprite = spriteStore.getSprite(spriteId);
-					sprite.draw(g, pos.x + widthPX, pos.y, -widthPX, heightPX);
+					g.drawImage(sprite, pos.x + widthPX, pos.y, -widthPX, heightPX);
 				} else if (frame == 1) {
 					Sprite rightWalkSprite = spriteStore.getSprite(rightWalkSpriteId);
-					rightWalkSprite.draw(g, pos.x + widthPX, pos.y, -widthPX, heightPX);
+					g.drawImage(rightWalkSprite, pos.x + widthPX, pos.y, -widthPX, heightPX);
 				} else {
 					Sprite leftWalkSprite = spriteStore.getSprite(leftWalkSpriteId);
-					leftWalkSprite.draw(g, pos.x + widthPX, pos.y, -widthPX, heightPX);
+					g.drawImage(leftWalkSprite, pos.x + widthPX, pos.y, -widthPX, heightPX);
 				}
 			}
 		}
