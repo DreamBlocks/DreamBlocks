@@ -28,49 +28,43 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package com.lordstephen77.dreamblocks.ui;
 
-import com.lordstephen77.dreamblocks.GraphicsHandler;
+import com.lordstephen77.dreamblocks.Int2;
 import com.lordstephen77.dreamblocks.Sprite;
+
+import java.awt.Rectangle;
 
 /**
  * Created by Александр on 19.06.2017.
  */
-public class Button {
+public class Button implements Resizable {
     private Sprite spriteHover;
     private Sprite spriteDefault;
-    private int x;
-    private int width;
-    private int height;
-    private int y;
+    private Rectangle bounds;
 
     public Button(int y, int width, int height, Sprite spriteDefault, Sprite spriteHover){
-        this.x = 0;
-        this.y = y;
-        this.width = width;
-        this.height = height;
+        this.bounds = new Rectangle(0, y, width, height);
         this.spriteHover = spriteHover;
         this.spriteDefault = spriteDefault;
     }
 
-    public int getX() {
-        return x;
+    public Sprite getSprite(Int2 mousePos){
+        if (isInside(mousePos.x, mousePos.y)){
+            return spriteHover;
+        } else {
+            return spriteDefault;
+        }
     }
 
-    public int getY() {
-        return y;
+    public Rectangle getBounds(){
+        return this.bounds;
     }
 
-    public void drawHover(GraphicsHandler g){
-        this.x = g.getScreenWidth() / 2 - width / 2;
-        spriteHover.draw(g, x, y, width, height);
-    }
-
-    public  void drawUp(GraphicsHandler g){
-        this.x = g.getScreenWidth() / 2 - width / 2;
-        spriteDefault.draw(g, x, y, width, height);
+    @Override
+    public void resize(int screenWidth, int screenHeight){
+        this.bounds.x = screenWidth / 2 - this.bounds.width / 2;
     }
 
     public boolean isInside(int cx, int cy){
-        return x <= cx && cx <= x + width
-            && y <= cy && cy <= y + height;
+        return this.bounds.contains(cx, cy);
     }
 }

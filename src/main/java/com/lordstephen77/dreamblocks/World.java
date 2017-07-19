@@ -324,14 +324,12 @@ public class World implements java.io.Serializable {
 			float cameraX, float cameraY, int tileSize, LightingEngine sun, LightingEngine sourceBlocks, TileStore tileStore) {
 		SpriteStore spriteStore = SpriteStore.get();
 		Int2 pos;
-		
-		pos = StockMethods.computeDrawLocationInPlace(cameraX, cameraY, screenWidth, screenHeight,
-				tileSize, 0, height / 2);
+
+		pos = StockMethods.calculatePosition(0, height / 2, cameraX, cameraY, tileSize);
 		g.setColor(Color.darkGray);
 		g.fillRect(pos.x, pos.y, width * tileSize, height * tileSize / 2);
-		
-		pos = StockMethods.computeDrawLocationInPlace(cameraX, cameraY, screenWidth, screenHeight,
-				tileSize, 0, 0);
+
+		pos = StockMethods.calculatePosition(0, 0, cameraX, cameraY, tileSize);
 		g.setColor(getSkyColor());
 		g.fillRect(pos.x, pos.y, width * tileSize, height * tileSize / 2 - 1);
 		for (int i = 0; i < width; i++) {
@@ -343,7 +341,7 @@ public class World implements java.io.Serializable {
 			}
 			TileType tileType = tileStore.tileTypes.get(TileID.ADMINITE);
 			Sprite tileSprite = spriteStore.getSprite(tileType.getSpriteid());
-			tileSprite.draw(g, posX, posY, tileSize, tileSize);
+			g.drawImage(tileSprite, posX, posY, tileSize, tileSize);
 		}
 		
 		for (int j = height / 2; j < height; j++) {
@@ -352,14 +350,14 @@ public class World implements java.io.Serializable {
 			if (!(posX < 0 - tileSize || posX > screenWidth || posY < 0 - tileSize || posY > screenHeight)) {
 				TileType tileType = tileStore.tileTypes.get(TileID.ADMINITE);
 				Sprite tileSprite = spriteStore.getSprite(tileType.getSpriteid());
-				tileSprite.draw(g, posX, posY, tileSize, tileSize);
+				g.drawImage(tileSprite, posX, posY, tileSize, tileSize);
 			}
 			
 			posX = (int) ((width - cameraX) * tileSize);
 			if (!(posX < 0 - tileSize || posX > screenWidth)) {
 				TileType tileType = tileStore.tileTypes.get(TileID.ADMINITE);
 				Sprite tileSprite = spriteStore.getSprite(tileType.getSpriteid());
-				tileSprite.draw(g, posX, posY, tileSize, tileSize);
+				g.drawImage(tileSprite, posX, posY, tileSize, tileSize);
 			}
 		}
 		
@@ -377,7 +375,7 @@ public class World implements java.io.Serializable {
 				
 				if (tiles[i][j].type.id != TileID.AIR) {
 					Sprite tileSprite = spriteStore.getSprite(tiles[i][j].type.getSpriteid());
-					tileSprite.draw(g, posX, posY, tileSize, tileSize, tint);
+					g.drawImage(tileSprite, posX, posY, tileSize, tileSize, tint);
 				} else {
 					g.setColor(tint);
 					g.fillRect(posX, posY, tileSize, tileSize);

@@ -182,31 +182,30 @@ public class Player extends LivingEntity {
 	@Override
 	public void draw(GraphicsHandler g, SpriteStore spriteStore, float cameraX, float cameraY, int screenWidth,
 			int screenHeight, int tileSize) {
-		Int2 pos = StockMethods.computeDrawLocationInPlace(cameraX, cameraY, screenWidth,
-				screenHeight, tileSize, x, y);
-		if (StockMethods.onScreen) {
+		Int2 pos = StockMethods.calculatePosition(x, y, cameraX, cameraY, tileSize);
+		if (StockMethods.isOnScreen(pos, tileSize, screenWidth, screenHeight)) {
 			int frame = (int) x % 4;// (int) ((ticksAlive/20)%4);
 			if (facingRight) {
 				if (frame == 0 || frame == 2 || dx <= 0) {
 					Sprite sprite = spriteStore.getSprite(spriteId);
-					sprite.draw(g, pos.x, pos.y, widthPX, heightPX);
+					g.drawImage(sprite, pos.x, pos.y, widthPX, heightPX);
 				} else if (frame == 1) {
 					Sprite rightWalkSprite = spriteStore.getSprite(rightWalkSpriteId);
-					rightWalkSprite.draw(g, pos.x, pos.y, widthPX, heightPX);
+					g.drawImage(rightWalkSprite, pos.x, pos.y, widthPX, heightPX);
 				} else {
 					Sprite leftWalkSprite = spriteStore.getSprite(leftWalkSpriteId);
-					leftWalkSprite.draw(g, pos.x, pos.y, widthPX, heightPX);
+					g.drawImage(leftWalkSprite, pos.x, pos.y, widthPX, heightPX);
 				}
 			} else {
 				if (frame == 0 || frame == 2 || dx >= 0) {
 					Sprite sprite = spriteStore.getSprite(spriteId);
-					sprite.draw(g, pos.x + widthPX, pos.y, -widthPX, heightPX);
+					g.drawImage(sprite, pos.x + widthPX, pos.y, -widthPX, heightPX);
 				} else if (frame == 1) {
 					Sprite rightWalkSprite = spriteStore.getSprite(rightWalkSpriteId);
-					rightWalkSprite.draw(g, pos.x + widthPX, pos.y, -widthPX, heightPX);
+					g.drawImage(rightWalkSprite, pos.x + widthPX, pos.y, -widthPX, heightPX);
 				} else {
 					Sprite leftWalkSprite = spriteStore.getSprite(leftWalkSpriteId);
-					leftWalkSprite.draw(g, pos.x + widthPX, pos.y, -widthPX, heightPX);
+					g.drawImage(leftWalkSprite, pos.x + widthPX, pos.y, -widthPX, heightPX);
 				}
 			}
 		}

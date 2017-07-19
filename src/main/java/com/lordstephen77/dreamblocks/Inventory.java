@@ -37,6 +37,7 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.
 package com.lordstephen77.dreamblocks;
 
 import com.lordstephen77.dreamblocks.ui.CraftingGrid;
+import com.lordstephen77.dreamblocks.ui.Resizable;
 
 import java.util.Optional;
 
@@ -45,7 +46,7 @@ import java.util.Optional;
  * @author Stefano Peris
  * @version 0.3
  */
-public class Inventory implements java.io.Serializable {
+public class Inventory implements java.io.Serializable, Resizable {
 	private static final long serialVersionUID = 1L;
 	
 	// Size inventory panel and block cells
@@ -103,6 +104,7 @@ public class Inventory implements java.io.Serializable {
 		}
 	}
 
+    @Override
     public void resize(int screenWidth, int screenHeight){
         this.x = screenWidth / 2 - panelWidth / 2;
         this.y = screenHeight / 2 - panelHeight / 2;
