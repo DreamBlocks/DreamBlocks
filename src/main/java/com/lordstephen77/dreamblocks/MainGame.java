@@ -267,7 +267,10 @@ public class MainGame implements Resizable {
 			world.draw(g, spriteStore, 0, 0, screenWidth, screenHeight, cameraX, cameraY, tileSize, lightingEngineSun, lightingEngineSourceBlocks, tileStore);
 
             if (isInInventory()) {
-                boolean inventoryFocus = player.inventory.handleClick(screenMousePos, leftClick, rightClick);
+				//for some reason, y of mousepos is greater than actual y for this amount
+				int correctionY = 16;
+            	Int2 correctedMousePos = new Int2(screenMousePos.x, screenMousePos.y - correctionY);
+                boolean inventoryFocus = player.inventory.handleClick(correctedMousePos, leftClick, rightClick);
                 if (inventoryFocus) {
                     leftClick = false;
                     rightClick = false;
@@ -560,11 +563,11 @@ public class MainGame implements Resizable {
 		inMenu = true; // go back to the main startMenu
 	}
 	public void openWorkbenchInventory(){
-		player.inventory.setTableSizeAvailable(3);
+		player.inventory.useTableGrid();
 		inInventory = true;
 	}
 	public void openPlayerInventory(){
-		player.inventory.setTableSizeAvailable(2);
+		player.inventory.usePlayerGrid();
 	    inInventory = true;
     }
     public void closeInventory(){

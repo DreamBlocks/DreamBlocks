@@ -17,8 +17,8 @@ public class InventorySlot {
         this.stack = stack;
     }
 
-    public boolean isInside(int x, int y){
-        return this.bounds.contains(x, y);
+    public boolean isInside(Int2 pos){
+        return this.bounds.contains(pos.x, pos.y);
     }
 
     public InventoryItem getStack() {

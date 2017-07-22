@@ -51,7 +51,6 @@ import java.util.Optional;
  */
 public class Inventory implements java.io.Serializable, Resizable {
 	private static final long serialVersionUID = 1L;
-	
 	// Size inventory panel and block cells
     private int tileSize = 25; // Cells size
     private int seperation = 20; // Inventory size
@@ -61,30 +60,28 @@ public class Inventory implements java.io.Serializable, Resizable {
     private InventoryItem[] hotbarRow;
     private int x;
     private int y;
-    private int panelWidth;
-    private int panelHeight;
+    private int widthInSlots;
+    private int heightInSlots;
 
-	private int playerRow;
 	private InventoryItem holding = new InventoryItem();
-    private CraftingGrid craftingGrid;
-	public int craftingHeight;
-	private InventoryItem craftable = new InventoryItem();
+    private CraftingGrid playerGrid;
+    private CraftingGrid tableGrid;
+    private CraftingGrid currentGrid;
 	
-	public Inventory(int width, int height, int craftingHeight) {
-		inventoryItems = new InventoryItem[width][height + craftingHeight];
-        panelWidth = inventoryItems.length * (tileSize + seperation) + seperation;
-        panelHeight = inventoryItems[0].length * (tileSize + seperation) + seperation;
-        hotbarRow = new InventoryItem[width];
+	public Inventory(int widthInSlots, int heightInSlots) {
+	    this.widthInSlots = widthInSlots;
+	    this.heightInSlots = heightInSlots;
+		inventoryItems = new InventoryItem[widthInSlots][heightInSlots];
+        hotbarRow = new InventoryItem[widthInSlots];
         slotList = new ArrayList<>();
-        playerRow = height + craftingHeight - 1;
-		for (int i = 0; i < width; i++) {
-			for (int j = 0; j < height + craftingHeight; j++) {
+		for (int i = 0; i < widthInSlots; i++) {
+			for (int j = 0; j < heightInSlots; j++) {
 				inventoryItems[i][j] = new InventoryItem();
 			}
-			hotbarRow[i] = inventoryItems[i][playerRow];
+			hotbarRow[i] = inventoryItems[i][heightInSlots - 1];
 		}
-		for (int i = 0; i < width; i++){
-		    for (int j = craftingHeight; j < height + craftingHeight; j++){
+        for (int j = heightInSlots - 1; j > 0; j--){
+		    for (int i = 0; i < widthInSlots; i++){
                 slotList.add(new InventorySlot(
                     this.x + i * (tileSize + seperation) + seperation,
                     this.y + j * (tileSize + seperation) + seperation,
@@ -94,42 +91,38 @@ public class Inventory implements java.io.Serializable, Resizable {
                 ));
             }
         }
-        int craftingX = this.x + panelWidth - 2 * (tileSize + seperation) - seperation;
-		craftingGrid = new CraftingGrid(craftingX, y, tileSize, seperation);
-        craftingGrid.setInventoryItems(inventoryItems);
+        int craftingX = this.x + getPanelWidthInPx() - 2 * (tileSize + seperation) - seperation;
+		playerGrid = new CraftingGrid(craftingX, y, tileSize, seperation, 2);
 
-		this.craftingHeight = craftingHeight;
+        craftingX = this.x + getPanelWidthInPx() - 3 * (tileSize + seperation) - seperation;
+        tableGrid = new CraftingGrid(craftingX, y, tileSize, seperation, 3);
+
+        currentGrid = playerGrid;
+        moveSlots(0, currentGrid.getHeight());
 	}
 	
-	public void addItem(Item item, int count) {
-		// try active slots
-		int itemsToGo = inventoryItems[0][playerRow].add(item, count);
-		for (int i = 0; i < inventoryItems.length && itemsToGo > 0; i++) {
-			itemsToGo = inventoryItems[i][playerRow].add(item, count);
-		}
-		
-		// try the rest
-		for (int i = 0; i < inventoryItems.length && itemsToGo > 0; i++) {
-			for (int j = 0; j < inventoryItems[0].length - 1 && itemsToGo > 0; j++) {
-				if ((j < craftingHeight && i < inventoryItems.length - craftingGrid.getTableSizeAvailable())
-						|| (craftingHeight != craftingGrid.getTableSizeAvailable() && j == craftingGrid.getTableSizeAvailable())) {
-					continue;
-				}
-				itemsToGo = inventoryItems[i][playerRow].add(item, count);
-			}
-		}
+	public int addItem(Item item, int count) {
+	    int leftover = count;
+	    int i = 0;
+	    while(leftover > 0 && i < slotList.size()){
+	        InventoryItem stack = slotList.get(i).getStack();
+	        leftover = stack.add(item, leftover);
+	        i++;
+        }
+        return leftover;
 	}
 
     @Override
     public void resize(int screenWidth, int screenHeight){
 	    int oldX = this.x;
 	    int oldY = this.y;
-        this.x = screenWidth / 2 - panelWidth / 2;
-        this.y = screenHeight / 2 - panelHeight / 2;
-        this.craftingGrid.move(this.x - oldX, this.y - oldY);
-        for (InventorySlot slot : slotList) {
-            slot.move(this.x - oldX, this.y - oldY);
-        }
+        this.x = screenWidth / 2 - getPanelWidthInPx() / 2;
+        this.y = screenHeight / 2 - getPanelHeightInPx() / 2;
+        int dx = this.x - oldX;
+        int dy = this.y - oldY;
+        this.playerGrid.move(dx, dy);
+        this.tableGrid.move(dx, dy);
+        moveSlots(dx, dy);
     }
 
 	// returns true if the mouse hit in the inventory
@@ -143,7 +136,7 @@ public class Inventory implements java.io.Serializable, Resizable {
 		    if(itemUnderCursor != null){
 		        itemUnderCursor.handleLeftClick(holding);
             }
-            if (isMouseOverCraftingResult(mousePos)){
+            if (currentGrid.getResultSlot().isInside(mousePos)){
                 craftItem();
             }
         }
@@ -157,16 +150,13 @@ public class Inventory implements java.io.Serializable, Resizable {
 	}
 
 	private InventoryItem getItemUnderCursor(Int2 mousePos){
-        int correctionY = 16;//for some reason, y of mousepos is greater than actual y for this amount
-        int x = mousePos.x;
-        int y = mousePos.y - correctionY;
         for (InventorySlot slot : slotList) {
-            if(slot.isInside(x, y)){
+            if(slot.isInside(mousePos)){
                 return slot.getStack();
             }
         }
-        for(InventorySlot slot : craftingGrid.getCurrentTable()){
-            if(slot.isInside(x, y)){
+        for(InventorySlot slot : currentGrid.getCurrentTable()){
+            if(slot.isInside(mousePos)){
                 return slot.getStack();
             }
         }
@@ -174,39 +164,20 @@ public class Inventory implements java.io.Serializable, Resizable {
     }
 
     private boolean isMouseInsideInventory(Int2 mousePos){
-        return x <= mousePos.x && mousePos.x <= x + panelWidth
-                && y <= mousePos.y && mousePos.y <= y + panelHeight;
+        return x <= mousePos.x && mousePos.x <= x + getPanelWidthInPx()
+                && y <= mousePos.y && mousePos.y <= y + getPanelHeightInPx();
     }
-
-	private boolean isMouseOverCraftingResult(Int2 mousePos){
-        int widgetX = x + (inventoryItems.length - craftingGrid.getTableSizeAvailable() - 1) * (tileSize + seperation) - 5;
-        int widgetY = y + seperation * 2 + tileSize - 5;
-	    return widgetX <= mousePos.x && mousePos.x <= widgetX + tileSize + 10
-            && widgetY <= mousePos.y && mousePos.y <= widgetY + tileSize * 2 + 10;
-    }
-
 
     private void craftItem(){
-        Optional<Item> recipeResult = craftingGrid.getResult();
-        if (recipeResult.isPresent()) {
-            if (!recipeResult.get().isTool() || holding.isEmpty()) {
-                craftingGrid.takeRecipeMaterials();
-                int count = recipeResult.get().template.outCount;
-                holding.add(recipeResult.get().clone(), count);
+        if (currentGrid.hasResult()){
+            Item recipeResult = currentGrid.getResult();
+            if (!recipeResult.isTool() || holding.isEmpty()) {
+                currentGrid.takeRecipeMaterials();
+                int count = recipeResult.template.outCount;
+                holding.add(recipeResult.clone(), count);
             }
         }
     }
-
-	private void updateCraftingResult(){
-		Optional<Item> nextResult = craftingGrid.getResult();
-        if (nextResult.isPresent()){
-            craftable.item = nextResult.get();
-            craftable.count = nextResult.get().template.outCount;
-        } else {
-            craftable.item = null;
-            craftable.count = 0;
-        }
-	}
 
     public InventoryItem[] getHotbarRow(){
 	    return hotbarRow;
@@ -214,15 +185,7 @@ public class Inventory implements java.io.Serializable, Resizable {
 
     private void drawPanel(GraphicsHandler g){
         g.setColor(Color.gray);
-        g.fillRect(x, y, panelWidth, panelHeight);
-    }
-
-    private void drawCraftingResult(GraphicsHandler g, SpriteStore spriteStore){
-        g.setColor(Color.orange);
-        int x = this.x + (inventoryItems.length - craftingGrid.getTableSizeAvailable() - 1) * (tileSize + seperation);
-        int y = this.y + seperation * 2 + tileSize;
-        g.fillRect(x - 5, y - 5, tileSize + 10, tileSize + 10);
-        craftable.draw(g, spriteStore, x - seperation, y - seperation, tileSize, seperation);
+        g.fillRect(x, y, getPanelWidthInPx(), getPanelHeightInPx());
     }
 
     private void drawBackpack(GraphicsHandler g, SpriteStore spriteStore){
@@ -232,21 +195,44 @@ public class Inventory implements java.io.Serializable, Resizable {
     }
 
     public void draw(GraphicsHandler g, SpriteStore spriteStore, Int2 mousePos) {
-        updateCraftingResult();
         drawPanel(g);
-        craftingGrid.draw(g);
+        currentGrid.draw(g, spriteStore);
         drawBackpack(g, spriteStore);
-        drawCraftingResult(g, spriteStore);
 
         int holdingX = mousePos.x - tileSize / 2;
-        int holdingY = mousePos.y - tileSize - tileSize / 2;
+        int holdingY = mousePos.y - tileSize / 2;
         if(!holding.isEmpty()) {
             Sprite sprite = spriteStore.getSprite(holding.getItem().getSpriteId());
             g.drawImage(sprite, holdingX, holdingY, tileSize, tileSize);
         }
     }
 
-    public void setTableSizeAvailable(int tableSizeAvailable) {
-        this.craftingGrid.setTableSizeAvailable(tableSizeAvailable);
+    public void usePlayerGrid(){
+        int oldY = currentGrid.getHeight();
+        currentGrid = playerGrid;
+        int dy = currentGrid.getHeight() - oldY;
+        moveSlots(0, dy);
+    }
+
+    public void useTableGrid(){
+        int oldY = currentGrid.getHeight();
+        currentGrid = tableGrid;
+        int dy = currentGrid.getHeight() - oldY;
+        moveSlots(0, dy);
+    }
+
+    private void moveSlots(int dx, int dy){
+        for (InventorySlot slot : slotList) {
+            slot.move(dx, dy);
+        }
+    }
+
+    public int getPanelHeightInPx() {
+        int inventoryHeightInPx = heightInSlots * (tileSize + seperation) + seperation;
+        return currentGrid.getHeight() + inventoryHeightInPx;
+    }
+
+    public int getPanelWidthInPx(){
+        return widthInSlots * (tileSize + seperation) + seperation;
     }
 }
