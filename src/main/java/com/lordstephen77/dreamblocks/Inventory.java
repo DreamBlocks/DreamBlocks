@@ -42,7 +42,6 @@ import com.lordstephen77.dreamblocks.ui.Resizable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * <p>Property of the inventory</p>
@@ -132,51 +131,23 @@ public class Inventory implements java.io.Serializable, Resizable {
 		}
 
         if (leftClick){
-		    InventoryItem itemUnderCursor = getItemUnderCursor(mousePos);
-		    if(itemUnderCursor != null){
-		        itemUnderCursor.handleLeftClick(holding);
+            for (InventorySlot slot : slotList) {
+                slot.handleLeftClick(mousePos, holding);
             }
-            if (currentGrid.getResultSlot().isInside(mousePos)){
-                craftItem();
-            }
+            currentGrid.handleLeftClick(mousePos, holding);
         }
 		if (rightClick) {
-            InventoryItem itemUnderCursor = getItemUnderCursor(mousePos);
-            if(itemUnderCursor != null){
-                itemUnderCursor.handleRightClick(holding);
+            for (InventorySlot slot : slotList) {
+                slot.handleRightClick(mousePos, holding);
             }
+            currentGrid.handleRightClick(mousePos, holding);
         }
         return true;
 	}
 
-	private InventoryItem getItemUnderCursor(Int2 mousePos){
-        for (InventorySlot slot : slotList) {
-            if(slot.isInside(mousePos)){
-                return slot.getStack();
-            }
-        }
-        for(InventorySlot slot : currentGrid.getCurrentTable()){
-            if(slot.isInside(mousePos)){
-                return slot.getStack();
-            }
-        }
-        return null;
-    }
-
     private boolean isMouseInsideInventory(Int2 mousePos){
         return x <= mousePos.x && mousePos.x <= x + getPanelWidthInPx()
                 && y <= mousePos.y && mousePos.y <= y + getPanelHeightInPx();
-    }
-
-    private void craftItem(){
-        if (currentGrid.hasResult()){
-            Item recipeResult = currentGrid.getResult();
-            if (!recipeResult.isTool() || holding.isEmpty()) {
-                currentGrid.takeRecipeMaterials();
-                int count = recipeResult.template.outCount;
-                holding.add(recipeResult.clone(), count);
-            }
-        }
     }
 
     public InventoryItem[] getHotbarRow(){

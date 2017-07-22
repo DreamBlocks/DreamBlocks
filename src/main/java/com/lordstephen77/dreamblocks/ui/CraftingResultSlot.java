@@ -46,4 +46,18 @@ public class CraftingResultSlot {
             g.drawString(String.valueOf(craftable.count), bounds.x, bounds.y + bounds.height / 2);
         }
     }
+
+    public void handleLeftClick(Int2 mousePos, InventoryItem holding){
+        if(!isInside(mousePos)){
+            return;
+        }
+        if (craftingGrid.hasResult()){
+            Item recipeResult = craftingGrid.getResult();
+            if (!recipeResult.isTool() || holding.isEmpty()) {
+                craftingGrid.takeRecipeMaterials();
+                int count = recipeResult.template.outCount;
+                holding.add(recipeResult.clone(), count);
+            }
+        }
+    }
 }

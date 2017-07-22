@@ -14,7 +14,6 @@ import java.util.Optional;
 public class CraftingGrid implements Serializable{
     private static final long serialVersionUID = 1L;
 
-    private SpriteStore spriteStore;
     private CraftingResultSlot resultSlot;
     private InventoryItem[][] inventoryItems;
     private int tableSizeAvailable = 2;
@@ -28,7 +27,6 @@ public class CraftingGrid implements Serializable{
     public CraftingGrid(int x, int y, int tileSize, int seperation, int tableSizeAvailable){
         this.x = x;
         this.y = y;
-        this.spriteStore = SpriteStore.get();
         this.tileSize = tileSize;
         this.seperation = seperation;
         this.tableSizeAvailable = tableSizeAvailable;
@@ -48,10 +46,6 @@ public class CraftingGrid implements Serializable{
         }
         tableChar = new char[tableSizeAvailable][tableSizeAvailable];
         resultSlot = new CraftingResultSlot(x - tileSize - seperation, y + tileSize + seperation, tileSize, tileSize, this);
-    }
-
-    public List<InventorySlot> getCurrentTable(){
-        return table;
     }
 
     public void move(int dx, int dy){
@@ -136,7 +130,16 @@ public class CraftingGrid implements Serializable{
         return getHeight();
     }
 
-    public CraftingResultSlot getResultSlot() {
-        return resultSlot;
+    public void handleLeftClick(Int2 mousePos, InventoryItem holding) {
+        for(InventorySlot slot : table){
+            slot.handleLeftClick(mousePos, holding);
+        }
+        resultSlot.handleLeftClick(mousePos, holding);
+    }
+
+    public void handleRightClick(Int2 mousePos, InventoryItem holding){
+        for(InventorySlot slot : table){
+            slot.handleRightClick(mousePos, holding);
+        }
     }
 }
