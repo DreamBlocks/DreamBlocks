@@ -320,9 +320,8 @@ public class World implements java.io.Serializable {
 		}
 	}
 	
-	public void draw(GraphicsHandler g, int x, int y, int screenWidth, int screenHeight,
+	public void draw(GraphicsHandler g, SpriteStore spriteStore, int x, int y, int screenWidth, int screenHeight,
 			float cameraX, float cameraY, int tileSize, LightingEngine sun, LightingEngine sourceBlocks, TileStore tileStore) {
-		SpriteStore spriteStore = SpriteStore.get();
 		Int2 pos;
 
 		pos = StockMethods.calculatePosition(0, height / 2, cameraX, cameraY, tileSize);

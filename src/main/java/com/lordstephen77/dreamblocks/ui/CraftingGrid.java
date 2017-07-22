@@ -11,6 +11,7 @@ import java.util.Optional;
 public class CraftingGrid implements Serializable{
     private static final long serialVersionUID = 1L;
 
+    private SpriteStore spriteStore;
     private InventoryItem[][] inventoryItems;
     private int tableSizeAvailable = 2;
     private int x;
@@ -23,6 +24,7 @@ public class CraftingGrid implements Serializable{
     private char[][] tableThree = new char[3][3];
 
     public CraftingGrid(int tileSize, int seperation, int panelWidth, int panelHeight){
+        this.spriteStore = SpriteStore.get();
         this.tileSize = tileSize;
         this.seperation = seperation;
         this.panelWidth = panelWidth;
@@ -54,7 +56,7 @@ public class CraftingGrid implements Serializable{
         for (int rowIdx = 0; rowIdx < tableSizeAvailable; rowIdx++){
             x = this.x + (tileSize + seperation) * dxInItems;
             for (int colIdx = dxInItems; colIdx < inventoryItems.length; colIdx++){
-                inventoryItems[colIdx][rowIdx].draw(g, x, y, tileSize, seperation);
+                inventoryItems[colIdx][rowIdx].draw(g, spriteStore, x, y, tileSize, seperation);
                 x += tileSize + seperation;
             }
             y += tileSize + seperation;

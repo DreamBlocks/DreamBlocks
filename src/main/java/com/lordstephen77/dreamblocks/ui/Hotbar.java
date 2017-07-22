@@ -1,14 +1,12 @@
 package com.lordstephen77.dreamblocks.ui;
 
-import com.lordstephen77.dreamblocks.Color;
-import com.lordstephen77.dreamblocks.GraphicsHandler;
-import com.lordstephen77.dreamblocks.Inventory;
-import com.lordstephen77.dreamblocks.InventoryItem;
+import com.lordstephen77.dreamblocks.*;
 
 /**
  * Created by Александр on 21.06.2017.
  */
 public class Hotbar {
+    private SpriteStore spriteStore;
     private int hotbarIdx;
     private InventoryItem[] hotbarRow;
     private int tileSize;
@@ -16,7 +14,8 @@ public class Hotbar {
     private int width;
     private int height;
 
-    public Hotbar(int tileSize, int margin){
+    public Hotbar(SpriteStore spriteStore, int tileSize, int margin){
+        this.spriteStore = spriteStore;
         this.tileSize = tileSize;
         this.margin = margin;
     }
@@ -65,7 +64,10 @@ public class Hotbar {
             g.setColor(Color.LIGHT_GRAY);
             g.fillRect(x + margin, y + margin, tileSize, tileSize);
 
-            current.draw(g, x + margin, y + margin, tileSize);
+            if(!current.isEmpty()) {
+                Sprite sprite = spriteStore.getSprite(current.getItem().getSpriteId());
+                g.drawImage(sprite, x + margin, y + margin, tileSize, tileSize);
+            }
             x += tileSize + margin;
         }
     }

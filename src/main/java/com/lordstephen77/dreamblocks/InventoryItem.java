@@ -104,22 +104,12 @@ public class InventoryItem implements java.io.Serializable {
 		}
 	}
 
-	public void draw(GraphicsHandler g, int x, int y, int tileSize){
-		if (this.getCount() <= 0) {
-			return;
-		}
-		SpriteStore spriteStore = SpriteStore.get();
-		Sprite sprite = spriteStore.getSprite(item.getSpriteId());
-		g.drawImage(sprite, x, y, tileSize, tileSize);
-	}
-
-	public void draw(GraphicsHandler g, int x, int y, int tileSize, int seperation) {
+	public void draw(GraphicsHandler g, SpriteStore spriteStore, int x, int y, int tileSize, int seperation) {
 		g.setColor(Color.LIGHT_GRAY);
 		g.fillRect(x + seperation - 2, y + seperation - 2, tileSize + 4, tileSize + 4);
 		if (this.getCount() <= 0) {
 			return;
 		}
-		SpriteStore spriteStore = SpriteStore.get();
 		Sprite sprite = spriteStore.getSprite(item.getSpriteId());
 		g.drawImage(sprite, x + seperation, y + seperation, tileSize, tileSize);
 		if (this.getCount() > 1) {
@@ -187,20 +177,20 @@ public class InventoryItem implements java.io.Serializable {
 		}
 	}
 
-	public void pickHalfOfStack(InventoryItem hand){
+	private void pickHalfOfStack(InventoryItem hand){
 		hand.item = this.item;
 		hand.count = (int) Math.ceil((double) this.count / 2);
 		this.count = (int) Math.floor((double) this.count / 2);
 	}
 
-	public void pickWholeStack(InventoryItem hand){
+	private void pickWholeStack(InventoryItem hand){
 		hand.item = this.item;
 		hand.count = this.count;
 		this.item = null;
 		this.count = 0;
 	}
 
-	public void dropSingleItemToEmptyTile(InventoryItem hand){
+	private void dropSingleItemToEmptyTile(InventoryItem hand){
 		this.item = hand.item;
 		this.count = 1;
 		hand.count--;
@@ -209,14 +199,14 @@ public class InventoryItem implements java.io.Serializable {
 		}
 	}
 
-	public void dropWholeStackToEmptyTile(InventoryItem hand){
+	private void dropWholeStackToEmptyTile(InventoryItem hand){
 		this.item = hand.item;
 		this.count = hand.count;
 		hand.item = null;
 		hand.count = 0;
 	}
 
-	public void dropSingleItemToStack(InventoryItem hand){
+	private void dropSingleItemToStack(InventoryItem hand){
 		this.count++;
 		hand.count--;
 		if (hand.count <= 0) {
@@ -224,7 +214,7 @@ public class InventoryItem implements java.io.Serializable {
 		}
 	}
 
-	public void dropStackToStack(InventoryItem hand){
+	private void dropStackToStack(InventoryItem hand){
 		this.count += hand.count;
 		if (this.count > maxCount) {
 			hand.count = maxCount - this.count;
@@ -235,7 +225,7 @@ public class InventoryItem implements java.io.Serializable {
 		}
 	}
 
-	public void swapItems(InventoryItem hand){
+	private void swapItems(InventoryItem hand){
 		Item item = this.item;
 		int count = this.count;
 		this.item = hand.item;

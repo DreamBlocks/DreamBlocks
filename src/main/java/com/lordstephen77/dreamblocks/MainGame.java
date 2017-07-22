@@ -103,7 +103,7 @@ public class MainGame implements Resizable {
 		newGameMenu = new NewGameMenu(this, spriteStore);
 		int tileSize = 16;
         int margin = 10;
-        hotbar = new Hotbar(tileSize, margin);
+        hotbar = new Hotbar(spriteStore, tileSize, margin);
 		GraphicsHandler.get().init(this);
 		System.gc();
 	}
@@ -220,7 +220,9 @@ public class MainGame implements Resizable {
 
 	@Override
 	public void resize(int screenWidth, int screenHeight){
-		player.inventory.resize(screenWidth, screenHeight);
+		if(player != null) {
+			player.inventory.resize(screenWidth, screenHeight);
+		}
 		newGameMenu.resize(screenWidth, screenHeight);
 		startMenu.resize(screenWidth, screenHeight);
 	}
@@ -261,7 +263,7 @@ public class MainGame implements Resizable {
 			float worldMouseY = (cameraY * tileSize + screenMousePos.y) / tileSize - .5f;
 			
 			world.chunkUpdate(lightingEngineSun, lightingEngineSourceBlocks, tileStore);
-			world.draw(g, 0, 0, screenWidth, screenHeight, cameraX, cameraY, tileSize, lightingEngineSun, lightingEngineSourceBlocks, tileStore);
+			world.draw(g, spriteStore, 0, 0, screenWidth, screenHeight, cameraX, cameraY, tileSize, lightingEngineSun, lightingEngineSourceBlocks, tileStore);
 
             if (isInInventory()) {
                 boolean inventoryFocus = player.inventory.handleClick(screenMousePos, leftClick, rightClick);
@@ -306,7 +308,7 @@ public class MainGame implements Resizable {
 			}
 
             if (isInInventory()){
-                player.inventory.draw(g, screenMousePos);
+                player.inventory.draw(g, spriteStore, screenMousePos);
             }
 			hotbar.draw(g, screenWidth, screenHeight);
 
