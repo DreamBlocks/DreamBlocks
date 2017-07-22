@@ -17,8 +17,8 @@ public class InventorySlot {
         this.stack = stack;
     }
 
-    public boolean isInside(int x, int y){
-        return this.bounds.contains(x, y);
+    public boolean isInside(Int2 pos){
+        return this.bounds.contains(pos.x, pos.y);
     }
 
     public InventoryItem getStack() {
@@ -28,6 +28,44 @@ public class InventorySlot {
     public void move(int dx, int dy){
         this.bounds.x += dx;
         this.bounds.y += dy;
+    }
+
+    public void handleLeftClick(Int2 mousePos, InventoryItem holding){
+        if(!isInside(mousePos)){
+            return;
+        }
+        if (holding.isEmpty()) {
+            stack.pickWholeStack(holding);
+        } else if (stack.item == null) {
+            stack.dropWholeStackToEmptyTile(holding);
+        } else if (holding.item.item_id == stack.item.item_id && stack.count < stack.maxCount) {
+            if (!holding.item.isTool() && !stack.item.isTool()) {
+                stack.dropStackToStack(holding);
+            }
+        } else {
+            stack.swapItems(holding);
+        }
+    }
+
+    public void handleRightClick(Int2 mousePos, InventoryItem holding){
+        if(!isInside(mousePos)){
+            return;
+        }
+        if (holding.isEmpty()) {
+            if (stack.count > 1) {
+                stack.pickHalfOfStack(holding);
+            } else {
+                stack.pickWholeStack(holding);
+            }
+        } else if (stack.item == null) {
+            stack.dropSingleItemToEmptyTile(holding);
+        } else if (holding.item.item_id == stack.item.item_id && stack.count < stack.maxCount) {
+            if (holding.item.isTool() && stack.item.isTool()) {
+                stack.dropSingleItemToStack(holding);
+            }
+        } else {
+            stack.swapItems(holding);
+        }
     }
 
     public void draw(GraphicsHandler g, SpriteStore spriteStore) {

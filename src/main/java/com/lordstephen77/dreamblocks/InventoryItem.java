@@ -104,31 +104,6 @@ public class InventoryItem implements java.io.Serializable {
 		}
 	}
 
-	public void draw(GraphicsHandler g, SpriteStore spriteStore, int x, int y, int tileSize, int seperation) {
-		g.setColor(Color.LIGHT_GRAY);
-		g.fillRect(x + seperation - 2, y + seperation - 2, tileSize + 4, tileSize + 4);
-		if (this.getCount() <= 0) {
-			return;
-		}
-		Sprite sprite = spriteStore.getSprite(item.getSpriteId());
-		g.drawImage(sprite, x + seperation, y + seperation, tileSize, tileSize);
-		if (this.getCount() > 1) {
-			g.setColor(Color.white);
-			g.drawString("" + this.getCount(), x + seperation, y + seperation + tileSize / 2);
-		}
-		if (item.isTool()) {
-			Tool tool = (Tool) item;
-			if (tool.getUses() != 0) {
-				int left = x + seperation + 2;
-				int width = (int) (tool.getFractionOfUses() * tileSize);
-				int top = y + seperation + tileSize - 4;
-				int height = 2;
-				g.setColor(Color.green);
-				g.fillRect(left, top, width, height);
-			}
-		}
-	}
-
 	public void setItem(Item item) {
 		this.item = item;
 	}
@@ -145,52 +120,20 @@ public class InventoryItem implements java.io.Serializable {
 		return count;
 	}
 
-	public void handleLeftClick(InventoryItem holding){
-		if (holding.isEmpty()) {
-			pickWholeStack(holding);
-		} else if (this.item == null) {
-			dropWholeStackToEmptyTile(holding);
-		} else if (holding.item.item_id == this.item.item_id && this.count < maxCount) {
-			if (!holding.item.isTool() && !this.item.isTool()) {
-				dropStackToStack(holding);
-			}
-		} else {
-			swapItems(holding);
-		}
-	}
-
-	public void handleRightClick(InventoryItem holding){
-		if (holding.isEmpty()) {
-			if (this.count > 1) {
-				pickHalfOfStack(holding);
-			} else {
-				pickWholeStack(holding);
-			}
-		} else if (this.item == null) {
-			dropSingleItemToEmptyTile(holding);
-		} else if (holding.item.item_id == this.item.item_id && this.count < maxCount) {
-			if (holding.item.isTool() && this.item.isTool()) {
-				dropSingleItemToStack(holding);
-			}
-		} else {
-			swapItems(holding);
-		}
-	}
-
-	private void pickHalfOfStack(InventoryItem hand){
+	public void pickHalfOfStack(InventoryItem hand){
 		hand.item = this.item;
 		hand.count = (int) Math.ceil((double) this.count / 2);
 		this.count = (int) Math.floor((double) this.count / 2);
 	}
 
-	private void pickWholeStack(InventoryItem hand){
+	public void pickWholeStack(InventoryItem hand){
 		hand.item = this.item;
 		hand.count = this.count;
 		this.item = null;
 		this.count = 0;
 	}
 
-	private void dropSingleItemToEmptyTile(InventoryItem hand){
+	public void dropSingleItemToEmptyTile(InventoryItem hand){
 		this.item = hand.item;
 		this.count = 1;
 		hand.count--;
@@ -199,14 +142,14 @@ public class InventoryItem implements java.io.Serializable {
 		}
 	}
 
-	private void dropWholeStackToEmptyTile(InventoryItem hand){
+	public void dropWholeStackToEmptyTile(InventoryItem hand){
 		this.item = hand.item;
 		this.count = hand.count;
 		hand.item = null;
 		hand.count = 0;
 	}
 
-	private void dropSingleItemToStack(InventoryItem hand){
+	public void dropSingleItemToStack(InventoryItem hand){
 		this.count++;
 		hand.count--;
 		if (hand.count <= 0) {
@@ -214,7 +157,7 @@ public class InventoryItem implements java.io.Serializable {
 		}
 	}
 
-	private void dropStackToStack(InventoryItem hand){
+	public void dropStackToStack(InventoryItem hand){
 		this.count += hand.count;
 		if (this.count > maxCount) {
 			hand.count = maxCount - this.count;
@@ -225,7 +168,7 @@ public class InventoryItem implements java.io.Serializable {
 		}
 	}
 
-	private void swapItems(InventoryItem hand){
+	public void swapItems(InventoryItem hand){
 		Item item = this.item;
 		int count = this.count;
 		this.item = hand.item;

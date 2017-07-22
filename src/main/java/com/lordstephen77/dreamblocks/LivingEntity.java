@@ -56,11 +56,11 @@ public abstract class LivingEntity extends Entity {
 	public LivingEntity(boolean gravityApplies, float x, float y, int width, int height) {
 		super(null, gravityApplies, x, y, width, height);
 		this.hitPoints = maxHP;
-		inventory = new Inventory(10, 4, 3);
+		inventory = new Inventory(10, 4);
 	}
 
-	public void giveItem(Item item, int count) {
-		inventory.addItem(item, count);
+	public boolean giveItem(Item item, int count) {
+		return inventory.addItem(item, count) == 0;
 	}
 	
 	public int airRemaining() {
