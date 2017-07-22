@@ -71,6 +71,14 @@ public class CraftingGrid implements Serializable{
         }
     }
 
+    public List<InventorySlot> getCurrentTable(){
+        if(tableSizeAvailable == 2){
+            return twoTable;
+        } else {
+            return threeTable;
+        }
+    }
+
     public void move(int dx, int dy){
         this.x += dx;
         this.y += dy;

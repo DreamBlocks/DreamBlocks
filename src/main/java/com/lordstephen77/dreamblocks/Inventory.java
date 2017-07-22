@@ -165,6 +165,11 @@ public class Inventory implements java.io.Serializable, Resizable {
                 return slot.getStack();
             }
         }
+        for(InventorySlot slot : craftingGrid.getCurrentTable()){
+            if(slot.isInside(x, y)){
+                return slot.getStack();
+            }
+        }
         return null;
     }
 
