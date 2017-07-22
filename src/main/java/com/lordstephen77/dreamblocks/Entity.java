@@ -222,7 +222,11 @@ public abstract class Entity implements java.io.Serializable {
 	public float getRight(int tileSize) {
 		return x + (float) (widthPX) / tileSize;
 	}
-	
+
+	public boolean isItem(){
+		return false;
+	}
+
 	public boolean isInWater(World world, int tileSize) {
 		int left = (int) this.getLeft(tileSize);
 		int right = (int) this.getRight(tileSize);

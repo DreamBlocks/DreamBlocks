@@ -98,7 +98,7 @@ public class AwtGraphicsHandler extends com.lordstephen77.dreamblocks.GraphicsHa
 		});
 		
 		// setup our canvas size and put it into the content of the frame
-		canvas.setBounds(0, 0, screenWidth + 10, screenHeight + 10);
+		canvas.setBounds(0, 0, screenWidth, screenHeight);
 		panel.add(canvas);
 		
 		// Tell AWT not to bother repainting our canvas since we're
@@ -186,10 +186,6 @@ public class AwtGraphicsHandler extends com.lordstephen77.dreamblocks.GraphicsHa
 	public void drawImage(Sprite sprite, int x, int y) {
 		// TODO: This is inefficient, and serialization should be done more neatly
 		AwtSprite awtSprite = (AwtSprite) sprite;
-		if (awtSprite.image == null) {
-			AwtSprite other = (AwtSprite) SpriteStore.get().loadSprite(awtSprite.ref);
-			awtSprite.image = other.image;
-		}
 		g.drawImage(awtSprite.image, x, y, null);
 	}
 	
@@ -203,10 +199,6 @@ public class AwtGraphicsHandler extends com.lordstephen77.dreamblocks.GraphicsHa
 	@Override
 	public void drawImage(Sprite sprite, int x, int y, int width, int height) {
 		AwtSprite awtSprite = (AwtSprite) sprite;
-		if (awtSprite.image == null) {
-			AwtSprite other = (AwtSprite) SpriteStore.get().loadSprite(awtSprite.ref);
-			awtSprite.image = other.image;
-		}
 		g.drawImage(awtSprite.image, x, y, width, height, null);
 	}
 	

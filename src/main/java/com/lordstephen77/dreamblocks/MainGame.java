@@ -103,7 +103,7 @@ public class MainGame implements Resizable {
 		newGameMenu = new NewGameMenu(this, spriteStore);
 		int tileSize = 16;
         int margin = 10;
-        hotbar = new Hotbar(tileSize, margin);
+        hotbar = new Hotbar(spriteStore, tileSize, margin);
 		GraphicsHandler.get().init(this);
 		System.gc();
 	}
@@ -176,6 +176,7 @@ public class MainGame implements Resizable {
 			player.giveItem(Constants.itemTypes.get((char) 175).clone(), 1);
 			player.giveItem(Constants.itemTypes.get((char) 88).clone(), 1);
 			player.giveItem(Constants.itemTypes.get((char) 106).clone(), 64);
+			player.giveItem(Constants.itemTypes.get((char) 102).clone(), 1);
 		}
 		loadSprite();
 	}
@@ -220,7 +221,9 @@ public class MainGame implements Resizable {
 
 	@Override
 	public void resize(int screenWidth, int screenHeight){
-		player.inventory.resize(screenWidth, screenHeight);
+		if(player != null) {
+			player.inventory.resize(screenWidth, screenHeight);
+		}
 		newGameMenu.resize(screenWidth, screenHeight);
 		startMenu.resize(screenWidth, screenHeight);
 	}
@@ -259,9 +262,9 @@ public class MainGame implements Resizable {
 			float cameraY = player.y - screenHeight / tileSize / 2;
 			float worldMouseX = (cameraX * tileSize + screenMousePos.x) / tileSize;
 			float worldMouseY = (cameraY * tileSize + screenMousePos.y) / tileSize - .5f;
-			
+
 			world.chunkUpdate(lightingEngineSun, lightingEngineSourceBlocks, tileStore);
-			world.draw(g, 0, 0, screenWidth, screenHeight, cameraX, cameraY, tileSize, lightingEngineSun, lightingEngineSourceBlocks, tileStore);
+			world.draw(g, spriteStore, 0, 0, screenWidth, screenHeight, cameraX, cameraY, tileSize, lightingEngineSun, lightingEngineSourceBlocks, tileStore);
 
             if (isInInventory()) {
                 boolean inventoryFocus = player.inventory.handleClick(screenMousePos, leftClick, rightClick);
@@ -287,7 +290,7 @@ public class MainGame implements Resizable {
 			while (it.hasNext()) {
 				Entity entity = it.next();
 				if (entity != player && player.collidesWith(entity, tileSize)) {
-					if (entity instanceof Item || entity instanceof Tool) {
+					if (entity.isItem()) {
 						player.giveItem((Item) entity, 1);
 					}
 					it.remove();
@@ -306,7 +309,7 @@ public class MainGame implements Resizable {
 			}
 
             if (isInInventory()){
-                player.inventory.draw(g, screenMousePos);
+                player.inventory.draw(g, spriteStore, screenMousePos);
             }
 			hotbar.draw(g, screenWidth, screenHeight);
 
@@ -343,10 +346,10 @@ public class MainGame implements Resizable {
 		g.drawImage(breakingSprites[sprite_index], pos.x, pos.y, tileSize, tileSize);
 
 		if (breakingTicks >= ticksNeeded) {
-			if (item != null && item.getClass() == Tool.class) {
+			if (item != null && item.isTool()) {
 				Tool tool = (Tool) item;
-				tool.uses++;
-				if (tool.uses >= tool.totalUses) {
+				tool.useFor(1);
+				if (tool.getUses() >= tool.totalUses) {
 					inventoryItem.setEmpty();
 				}
 			}
@@ -473,6 +476,7 @@ public class MainGame implements Resizable {
 		g.fillOval(pos.x - 4, pos.y - 4, 8, 8);
 		g.setColor(Color.black);
 		g.fillOval(pos.x - 3, pos.y - 3, 6, 6);
+		g.drawString(pos.toString(), pos.x, pos.y);
 	}
 
 	/**
@@ -534,8 +538,8 @@ public class MainGame implements Resizable {
 		InventoryItem inventoryItem = hotbar.getSelected();
 		if (!inventoryItem.isEmpty()) {
 			Item newItem = inventoryItem.getItem();
-			if (!(newItem instanceof Tool)) {
-				newItem = (Item) newItem.clone();
+			if (!newItem.isTool()) {
+				newItem = newItem.clone();
 			}
 			inventoryItem.remove(1);
 			if (player.facingRight) {

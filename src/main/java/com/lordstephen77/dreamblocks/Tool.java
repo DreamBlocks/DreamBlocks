@@ -47,8 +47,8 @@ public class Tool extends Item {
 		Wood, Stone, Metal, Diamond
 	};
 	
-	int totalUses;
-	int uses;
+	public final int totalUses;
+	private int uses;
 	public ToolType toolType;
 	public ToolPower toolPower;
 	
@@ -67,7 +67,24 @@ public class Tool extends Item {
 		this.toolPower = toolPower;
 		this.toolType = toolType;
 	}
-	
+
+	@Override
+    public boolean isTool(){
+	    return true;
+    }
+
+	public int getUses() {
+		return uses;
+	}
+
+	public void useFor(int value){
+		uses += value;
+	}
+
+	public double getFractionOfUses(){
+		return (totalUses - uses) / totalUses;
+	}
+
 	@Override
 	public Tool clone() {
 		Tool t = (Tool) super.clone();
