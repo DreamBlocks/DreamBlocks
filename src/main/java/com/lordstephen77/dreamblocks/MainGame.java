@@ -176,6 +176,7 @@ public class MainGame implements Resizable {
 			player.giveItem(Constants.itemTypes.get((char) 175).clone(), 1);
 			player.giveItem(Constants.itemTypes.get((char) 88).clone(), 1);
 			player.giveItem(Constants.itemTypes.get((char) 106).clone(), 64);
+			player.giveItem(Constants.itemTypes.get((char) 102).clone(), 1);
 		}
 		loadSprite();
 	}
@@ -261,7 +262,7 @@ public class MainGame implements Resizable {
 			float cameraY = player.y - screenHeight / tileSize / 2;
 			float worldMouseX = (cameraX * tileSize + screenMousePos.x) / tileSize;
 			float worldMouseY = (cameraY * tileSize + screenMousePos.y) / tileSize - .5f;
-			
+
 			world.chunkUpdate(lightingEngineSun, lightingEngineSourceBlocks, tileStore);
 			world.draw(g, spriteStore, 0, 0, screenWidth, screenHeight, cameraX, cameraY, tileSize, lightingEngineSun, lightingEngineSourceBlocks, tileStore);
 
@@ -347,8 +348,8 @@ public class MainGame implements Resizable {
 		if (breakingTicks >= ticksNeeded) {
 			if (item != null && item.getClass() == Tool.class) {
 				Tool tool = (Tool) item;
-				tool.uses++;
-				if (tool.uses >= tool.totalUses) {
+				tool.useFor(1);
+				if (tool.getUses() >= tool.totalUses) {
 					inventoryItem.setEmpty();
 				}
 			}
@@ -475,6 +476,7 @@ public class MainGame implements Resizable {
 		g.fillOval(pos.x - 4, pos.y - 4, 8, 8);
 		g.setColor(Color.black);
 		g.fillOval(pos.x - 3, pos.y - 3, 6, 6);
+		g.drawString(pos.toString(), pos.x, pos.y);
 	}
 
 	/**

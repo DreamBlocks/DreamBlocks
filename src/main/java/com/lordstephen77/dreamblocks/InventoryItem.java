@@ -118,9 +118,9 @@ public class InventoryItem implements java.io.Serializable {
 		}
 		if (item.getClass() == Tool.class) {
 			Tool tool = (Tool) item;
-			if (tool.uses != 0) {
+			if (tool.getUses() != 0) {
 				int left = x + seperation + 2;
-				int width = (int) (((float) (tool.totalUses - tool.uses) / tool.totalUses) * (tileSize));
+				int width = (int) (tool.getFractionOfUses() * tileSize);
 				int top = y + seperation + tileSize - 4;
 				int height = 2;
 				g.setColor(Color.green);
@@ -128,7 +128,7 @@ public class InventoryItem implements java.io.Serializable {
 			}
 		}
 	}
-	
+
 	public void setItem(Item item) {
 		this.item = item;
 	}

@@ -98,7 +98,7 @@ public class AwtGraphicsHandler extends com.lordstephen77.dreamblocks.GraphicsHa
 		});
 		
 		// setup our canvas size and put it into the content of the frame
-		canvas.setBounds(0, 0, screenWidth + 10, screenHeight + 10);
+		canvas.setBounds(0, 0, screenWidth, screenHeight);
 		panel.add(canvas);
 		
 		// Tell AWT not to bother repainting our canvas since we're

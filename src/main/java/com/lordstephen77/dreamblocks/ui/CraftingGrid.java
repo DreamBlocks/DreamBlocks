@@ -3,6 +3,8 @@ package com.lordstephen77.dreamblocks.ui;
 import com.lordstephen77.dreamblocks.*;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -16,19 +18,21 @@ public class CraftingGrid implements Serializable{
     private int tableSizeAvailable = 2;
     private int x;
     private int y;
-    private int panelWidth;
-    private int panelHeight;
     private int tileSize;
     private int seperation;
+    private List<InventorySlot> twoTable;
+    private List<InventorySlot> threeTable;
     private char[][] tableTwo = new char[2][2];
     private char[][] tableThree = new char[3][3];
 
-    public CraftingGrid(int tileSize, int seperation, int panelWidth, int panelHeight){
+    public CraftingGrid(int x, int y, int tileSize, int seperation){
+        this.x = x;
+        this.y = y;
         this.spriteStore = SpriteStore.get();
         this.tileSize = tileSize;
         this.seperation = seperation;
-        this.panelWidth = panelWidth;
-        this.panelHeight = panelHeight;
+        twoTable = new ArrayList<>(4);
+        threeTable = new ArrayList<>(9);
     }
 
     public int getTableSizeAvailable() {
@@ -41,25 +45,53 @@ public class CraftingGrid implements Serializable{
 
     public void setInventoryItems(InventoryItem[][] inventoryItems) {
         this.inventoryItems = inventoryItems;
+        twoTable = new ArrayList<>(4);
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 2; j++) {
+                twoTable.add(new InventorySlot(
+                        this.x + i * (tileSize + seperation) + seperation,
+                        this.y + j * (tileSize + seperation) + seperation,
+                        tileSize,
+                        tileSize,
+                        inventoryItems[i + inventoryItems.length - 2][j]
+                ));
+            }
+        }
+        threeTable = new ArrayList<>(9);
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                threeTable.add(new InventorySlot(
+                        this.x + i * (tileSize + seperation) + seperation,
+                        this.y + j * (tileSize + seperation) + seperation,
+                        tileSize,
+                        tileSize,
+                        inventoryItems[i + inventoryItems.length - 3][j]
+                ));
+            }
+        }
     }
 
-    public void resize(int screenWidth, int screenHeight){
-        x = screenWidth / 2 - panelWidth / 2;
-        y = screenHeight / 2 - panelHeight / 2;
+    public void move(int dx, int dy){
+        this.x += dx;
+        this.y += dy;
+        for (InventorySlot slot : twoTable) {
+            slot.move(dx, dy);
+        }
+        for (InventorySlot slot : threeTable) {
+            slot.move(dx, dy);
+        }
     }
 
     public void draw(GraphicsHandler g){
         drawBackground(g);
-        int x;
-        int dxInItems = inventoryItems.length - tableSizeAvailable;
-        int y = this.y;
-        for (int rowIdx = 0; rowIdx < tableSizeAvailable; rowIdx++){
-            x = this.x + (tileSize + seperation) * dxInItems;
-            for (int colIdx = dxInItems; colIdx < inventoryItems.length; colIdx++){
-                inventoryItems[colIdx][rowIdx].draw(g, spriteStore, x, y, tileSize, seperation);
-                x += tileSize + seperation;
+        if(tableSizeAvailable == 2) {
+            for (InventorySlot slot : twoTable) {
+                slot.draw(g, spriteStore);
             }
-            y += tileSize + seperation;
+        } else {
+            for (InventorySlot slot : threeTable) {
+                slot.draw(g, spriteStore);
+            }
         }
     }
 
@@ -71,6 +103,19 @@ public class CraftingGrid implements Serializable{
             }
         }
         return Optional.empty();
+    }
+
+    public void takeRecipeMaterials(){
+        for (int i = 0; i < getTableSizeAvailable(); i++) {
+            for (int j = 0; j < getTableSizeAvailable(); j++) {
+                int actualI = i + inventoryItems.length - getTableSizeAvailable();
+                inventoryItems[actualI][j].count -= 1;
+                if (inventoryItems[actualI][j].count <= 0) {
+                    inventoryItems[actualI][j].item = null;
+                    inventoryItems[actualI][j].count = 0;
+                }
+            }
+        }
     }
 
     private char[][] compute() {
@@ -96,9 +141,8 @@ public class CraftingGrid implements Serializable{
 
     private void drawBackground(GraphicsHandler g){
         g.setColor(Color.DARK_GRAY);
-        int widgetX = this.x + panelWidth - tableSizeAvailable * (tileSize + seperation) - seperation;
         int width = tableSizeAvailable * (tileSize + seperation) + seperation;
         int height = tableSizeAvailable * (tileSize + seperation) + seperation;
-        g.fillRect(widgetX, y, width, height);
+        g.fillRect(x, y, width, height);
     }
 }
