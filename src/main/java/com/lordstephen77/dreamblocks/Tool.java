@@ -68,6 +68,11 @@ public class Tool extends Item {
 		this.toolType = toolType;
 	}
 
+	@Override
+    public boolean isTool(){
+	    return true;
+    }
+
 	public int getUses() {
 		return uses;
 	}

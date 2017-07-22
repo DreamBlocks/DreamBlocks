@@ -49,7 +49,16 @@ public class Item extends Entity implements Cloneable {
 		this.item_id = id;
 		this.name = name;
 	}
-	
+
+	@Override
+	public boolean isItem(){
+		return true;
+	}
+
+	public boolean isTool(){
+		return false;
+	}
+
 	@Override
 	public Item clone() {
 		try {

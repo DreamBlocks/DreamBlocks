@@ -279,7 +279,7 @@ public class World implements java.io.Serializable {
 				breakType = breakDiamond;
 			}
 		}
-		if (item == null || item.getClass() != Tool.class) {
+		if (item == null || !item.isTool()) {
 			return handResult(breakType);
 		}
 		Tool tool = (Tool) item;

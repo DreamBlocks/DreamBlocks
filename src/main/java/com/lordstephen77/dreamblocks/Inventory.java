@@ -184,7 +184,7 @@ public class Inventory implements java.io.Serializable, Resizable {
     private void craftItem(){
         Optional<Item> recipeResult = craftingGrid.getResult();
         if (recipeResult.isPresent()) {
-            if (recipeResult.get().getClass() != Tool.class || holding.isEmpty()) {
+            if (!recipeResult.get().isTool() || holding.isEmpty()) {
                 craftingGrid.takeRecipeMaterials();
                 int count = recipeResult.get().template.outCount;
                 holding.add(recipeResult.get().clone(), count);

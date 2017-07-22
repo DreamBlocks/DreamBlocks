@@ -42,7 +42,7 @@ public class InventorySlot {
             g.setColor(com.lordstephen77.dreamblocks.Color.white);
             g.drawString(String.valueOf(stack.getCount()), bounds.x, bounds.y + bounds.height / 2);
         }
-        if (stack.item.getClass() == Tool.class) {
+        if (stack.item.isTool()) {
             Tool tool = (Tool) stack.item;
             if (tool.getUses() != 0) {
                 int left = bounds.x + BORDER_WIDTH;

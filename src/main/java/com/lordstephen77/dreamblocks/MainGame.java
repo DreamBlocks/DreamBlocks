@@ -290,7 +290,7 @@ public class MainGame implements Resizable {
 			while (it.hasNext()) {
 				Entity entity = it.next();
 				if (entity != player && player.collidesWith(entity, tileSize)) {
-					if (entity instanceof Item || entity instanceof Tool) {
+					if (entity.isItem()) {
 						player.giveItem((Item) entity, 1);
 					}
 					it.remove();
@@ -346,7 +346,7 @@ public class MainGame implements Resizable {
 		g.drawImage(breakingSprites[sprite_index], pos.x, pos.y, tileSize, tileSize);
 
 		if (breakingTicks >= ticksNeeded) {
-			if (item != null && item.getClass() == Tool.class) {
+			if (item != null && item.isTool()) {
 				Tool tool = (Tool) item;
 				tool.useFor(1);
 				if (tool.getUses() >= tool.totalUses) {
@@ -538,8 +538,8 @@ public class MainGame implements Resizable {
 		InventoryItem inventoryItem = hotbar.getSelected();
 		if (!inventoryItem.isEmpty()) {
 			Item newItem = inventoryItem.getItem();
-			if (!(newItem instanceof Tool)) {
-				newItem = (Item) newItem.clone();
+			if (!newItem.isTool()) {
+				newItem = newItem.clone();
 			}
 			inventoryItem.remove(1);
 			if (player.facingRight) {

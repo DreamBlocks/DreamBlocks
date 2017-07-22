@@ -56,7 +56,7 @@ public class InventoryItem implements java.io.Serializable {
 			return count;
 		}
 		int maxCount = this.maxCount;
-		if (this.getItem().getClass() == Tool.class) {
+		if (this.getItem().isTool()) {
 			maxCount = 1;
 		}
 		if (this.getCount() + count <= maxCount) {
@@ -98,7 +98,7 @@ public class InventoryItem implements java.io.Serializable {
 	}
 	
 	public void stack(InventoryItem other) {
-		if (other.getItem().getClass() != Tool.class) {
+		if (!other.getItem().isTool()) {
 			int result = this.add(other.getItem(), other.getCount());
 			other.remove(other.getCount() - result);
 		}
@@ -116,7 +116,7 @@ public class InventoryItem implements java.io.Serializable {
 			g.setColor(Color.white);
 			g.drawString("" + this.getCount(), x + seperation, y + seperation + tileSize / 2);
 		}
-		if (item.getClass() == Tool.class) {
+		if (item.isTool()) {
 			Tool tool = (Tool) item;
 			if (tool.getUses() != 0) {
 				int left = x + seperation + 2;
@@ -151,7 +151,7 @@ public class InventoryItem implements java.io.Serializable {
 		} else if (this.item == null) {
 			dropWholeStackToEmptyTile(holding);
 		} else if (holding.item.item_id == this.item.item_id && this.count < maxCount) {
-			if ((holding.item.getClass() != Tool.class) && (this.item.getClass() != Tool.class)) {
+			if (!holding.item.isTool() && !this.item.isTool()) {
 				dropStackToStack(holding);
 			}
 		} else {
@@ -169,7 +169,7 @@ public class InventoryItem implements java.io.Serializable {
 		} else if (this.item == null) {
 			dropSingleItemToEmptyTile(holding);
 		} else if (holding.item.item_id == this.item.item_id && this.count < maxCount) {
-			if ((holding.item.getClass() != Tool.class) && (this.item.getClass() != Tool.class)) {
+			if (holding.item.isTool() && this.item.isTool()) {
 				dropSingleItemToStack(holding);
 			}
 		} else {
